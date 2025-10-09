@@ -1,9 +1,9 @@
 <template>
-  <button @click="loadMessages">daj</button>
-  <div class="row justify-evenly overflow-auto" style="max-height: 50vh;">
-    <div class="col-10">
+  <div class="row full-height justify-evenly overflow-auto" >
+    <!-- <button @click="loadMessages" class="">daj</button> -->
+    <div class="col-11 column justify-end">
       <template v-for="(mess,index) in messages" :key="index">
-        <q-chat-message :text="[mess.content]" :sent="mess.senderId===1" />
+        <q-chat-message :text="[mess.content]" :sent="mess.senderId===1" class=""/>
       </template>
     </div>
   </div>
@@ -19,23 +19,7 @@ export default {
     }
   },
   methods: {
-    loadMessages() {
-      const newMessages = [
-        {
-          id: 0,
-          timestamp: 'a',
-          senderId: 1,
-          senderName: 'ja',
-          content: 'ab'
-        },
-        {
-          id: 0,
-          timestamp: 'a',
-          senderId: 2,
-          senderName: 'ja',
-          content: 'cd'
-        },
-      ]
+    loadMessages(newMessages: Message[]) {
       this.messages.push(...newMessages)
     }
   }
