@@ -25,7 +25,9 @@
       <div class="row q-pa-sm" :class="leftDrawerOpen ? 'justify-end' : 'justify-center'">
         <q-btn dense flat round :icon= "leftDrawerOpen ? 'arrow_left' : 'arrow_right'" @click="toggleLeftDrawer"/>
       </div>
-      <div class="row"></div>
+      <div class="row" :class="leftDrawerOpen ? '' : 'hidden'">
+        <ChannelBadge v-for="(value, index) in channels" :key="index" :channel="value" class="full-width"/>
+      </div>
     </q-drawer>
 
     <q-page-container>
@@ -36,30 +38,54 @@
 </template>
 
 <script lang="ts">
-//import { ref } from 'vue'
+import ChannelBadge from 'src/components/ChannelBadge.vue';
+import type { ChannelAtr } from 'src/components/models';
 
 export default {
-  
-  // setup () {
-  //   const leftDrawerOpen = ref(false)
-
-  //   return {
-  //     leftDrawerOpen,
-  //     toggleLeftDrawer () {
-  //       leftDrawerOpen.value = !leftDrawerOpen.value
-  //     }
-  //   }
-  // }
-
   data() {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      channels: [
+        {
+          id: 0,
+          type: 'public',
+          name: 'generic name',
+          description: 'generic description'
+        },
+        {
+          id: 1,
+          type: 'public',
+          name: 'generic name',
+          description: 'generic description'
+        },
+        {
+          id: 2,
+          type: 'public',
+          name: 'generic name',
+          description: 'generic description'
+        },
+        {
+          id: 3,
+          type: 'public',
+          name: 'generic name',
+          description: 'generic description'
+        },
+        {
+          id: 4,
+          type: 'public',
+          name: 'generic name',
+          description: 'generic description'
+        },
+      ] as ChannelAtr[]
     }
   },
   methods: {
     toggleLeftDrawer () {
       this.leftDrawerOpen = !this.leftDrawerOpen;
     }
+  },
+  components: {
+    ChannelBadge,
   }
 }
 </script>
