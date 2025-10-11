@@ -6,7 +6,7 @@
     :caption="channel.type"
   >
     <template #header>
-      <q-item class="full-width column" clickable :to="`/channels/${channel.id}`">
+      <q-item class="full-width column" @click="activeStore.setActivePage(channel.name)" clickable :to="`/channels/${channel.id}`">
         <div class="text-weight-medium">{{ channel.name }}</div>
         <div class="text-caption text-grey">{{ channel.description }}</div>
     </q-item>
@@ -28,11 +28,14 @@
 
 <script lang="ts">
 import type { ChannelAtr } from './models';
+import { useActivePage } from '../stores/activePage';
 
 export default {
   data() {
     return {
-      isOpen: false
+      isOpen: false,
+      activeStore: useActivePage()
+
     }
   },
   props: {

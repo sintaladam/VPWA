@@ -3,7 +3,7 @@
     <!-- content -->
     <div class="column full-height no-wrap">
       <div class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
-        channel name
+        {{ activeStore.activePage }}
       </div>
       <div class="col q-pa-md">
         <MessageBoard ref="msgBoard" />
@@ -19,6 +19,7 @@
 <script lang="ts">
 import MessageBoard from 'src/components/MessageBoard.vue';
 import CLI from 'src/components/CLI.vue';
+import { useActivePage } from '../stores/activePage';
 
 export default {
   components: {
@@ -41,7 +42,8 @@ export default {
   },
   data() {
     return {
-      message: ''
+      message: '',
+      activeStore: useActivePage()
     }
   }
 }

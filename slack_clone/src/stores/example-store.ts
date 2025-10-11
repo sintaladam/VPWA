@@ -16,6 +16,17 @@ export const useCounterStore = defineStore('counter', {
   },
 });
 
+export const useActivePage = defineStore('channelPage', {
+  state: () => ({
+    channelPage: '', // current active page or channel name
+  }),
+  actions: {
+    setActiveChannelPage(pageName: string) {
+      this.channelPage = pageName
+    }
+  }
+})
+
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useCounterStore, import.meta.hot));
 }

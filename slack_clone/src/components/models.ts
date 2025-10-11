@@ -26,3 +26,9 @@ export interface ChannelAtr {
   name: string;
   description: string;
 }
+
+export interface ChatAtr {
+  id: number;
+  senderId: number;
+  senderNickname: string;
+}
