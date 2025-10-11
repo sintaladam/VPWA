@@ -1,19 +1,18 @@
 <template>
   <q-page padding class="" style="height: calc(100vh - 50px)"> <!-- this just sucks but it will have to do -->
     <!-- content -->
-     <div class="column full-height no-wrap">
-       <div class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
-          channel name
-        </div>
-        <div class="col q-pa-md">
-          <MessageBoard ref="msgBoard"/>
-        </div>
-        
-        <div class="bg-grey-3 q-pa-md" style="height: 75px; flex: 0 0 auto;">
-          <CLI @submitMessageEvent="addMessage"/>
-        </div>      
-     </div>
-    
+    <div class="column full-height no-wrap">
+      <div class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
+        channel name
+      </div>
+      <div class="col q-pa-md">
+        <MessageBoard ref="msgBoard" />
+      </div>
+
+      <div class="bg-grey-3 q-pa-md" style="height: 75px; flex: 0 0 auto;">
+        <CLI @submitMessageEvent="addMessage" />
+      </div>
+    </div>
   </q-page>
 </template>
 

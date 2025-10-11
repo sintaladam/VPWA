@@ -17,6 +17,10 @@
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos corrupti
         commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
         eveniet doloribus ullam aliquid.
+      <div class="column q-pt-md q-gutter-md">
+        <q-btn color="white" text-color="black" label="edit channel" />
+        <q-btn color="white" text-color="red-10" label="leave channel" />
+      </div>
       </q-card-section>
     </q-card>
   </q-expansion-item>
