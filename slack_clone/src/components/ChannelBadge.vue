@@ -18,8 +18,10 @@
         commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
         eveniet doloribus ullam aliquid.
       <div class="column q-pt-md q-gutter-md">
-        <q-btn color="white" text-color="black" label="edit channel" />
-        <q-btn color="white" text-color="red-10" label="leave channel" />
+        <q-btn color="white" text-color="black" label="edit channel" @click="editorOpen = true"/>
+        <q-btn color="white" text-color="red-10" label="leave channel" @click="deleteOpen = true"/>
+        <channel-editor v-model=editorOpen />
+        <leave-confirmation v-model="deleteOpen" title="Leave Channel" @deleteEvent="forwardDelete()"/>
       </div>
       </q-card-section>
     </q-card>
@@ -29,13 +31,16 @@
 <script lang="ts">
 import type { ChannelAtr } from './models';
 import { useActivePage } from '../stores/activePage';
+import ChannelEditor from './ChannelEditor.vue';
+import LeaveConfirmation from './LeaveConfirmation.vue';
 
 export default {
   data() {
     return {
       isOpen: false,
-      activeStore: useActivePage()
-
+      activeStore: useActivePage(),
+      editorOpen: false,
+      deleteOpen: false,
     }
   },
   props: {
@@ -43,6 +48,17 @@ export default {
       type: Object as () => ChannelAtr,
       required: true,
     }
-  }
+  },
+  components: {
+    ChannelEditor,
+    LeaveConfirmation,
+  },
+  methods: {
+    forwardDelete() {
+      this.$emit('deleteChannelEvent');
+    }
+  },
+  emits: ['deleteChannelEvent']
+  
 }
 </script>

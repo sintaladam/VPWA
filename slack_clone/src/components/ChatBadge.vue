@@ -16,7 +16,8 @@
         Chat ID: {{ chat.id }} <br>
         Sender ID: {{ chat.senderId }}
         <div class="column q-pt-md q-gutter-md">
-          <q-btn color="white" text-color="red-10" label="delete chat" />
+          <q-btn color="white" text-color="red-10" label="delete chat" @click="deleteOpen = true"/>
+          <leave-confirmation v-model="deleteOpen" title="Delete Chat" @deleteEvent="forwardDelete()"/>
         </div>
       </q-card-section>
     </q-card>
@@ -26,12 +27,14 @@
 <script lang="ts">
 import type { ChatAtr } from './models';
 import { useActivePage } from '../stores/activePage'
+import LeaveConfirmation from './LeaveConfirmation.vue';
 
 export default {
   data() {
     return {
       isOpen: false,
-      activeStore: useActivePage()
+      activeStore: useActivePage(),
+      deleteOpen: false,
     }
   },
   props: {
@@ -39,6 +42,15 @@ export default {
       type: Object as () => ChatAtr,
       required: true,
     }
-  }
+  },
+  components: {
+    LeaveConfirmation,
+  },
+  methods: {
+    forwardDelete() {
+      this.$emit('deleteChatEvent');
+    }
+  },
+  emits: ['deleteChatEvent']
 }
 </script>

@@ -32,11 +32,11 @@
 
       <div class="row" :class="leftDrawerOpen ? '' : 'hidden'">
         <template v-if="activeTab === 'chats'">
-          <ChatBadge v-for="(value, index) in chats" :key="index" :chat="value" class="full-width" />
+          <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width" @deleteChatEvent="deleteChat(value.id)"/>
         </template>
 
         <template v-else-if="activeTab === 'channels'">
-          <ChannelBadge v-for="(value, index) in channels" :key="index" :channel="value" class="full-width" />
+          <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class="full-width" @deleteChannelEvent="deleteChannel(value.id)"/>
         </template>
       </div>
     </q-drawer>
@@ -124,7 +124,14 @@ export default {
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
-    }
+    },
+    deleteChannel(id:number) {
+      this.channels = this.channels.filter(ch => ch.id !== id);
+    },
+    deleteChat(id:number) {
+      this.chats = this.chats.filter(ch => ch.id !== id);
+    },
+
   },
   components: {
     ChannelBadge, ChatBadge
