@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center column">
     <div class="q-pa-xl q-ma-md custom-border">
-      <q-input outlined v-model="username" label="Nickname" class="q-mt-md" />
+      <q-input outlined v-model="email" label="Email" class="q-mt-md" />
       <q-input outlined v-model="password" label="Password" :type="isPwd ? 'password' : 'text'" class="q-mt-md">
         <template v-slot:append>
           <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
@@ -24,7 +24,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CryptoJS from 'crypto-js';
 
-const username = ref('')
+const email = ref('');
 const password = ref('')
 const router = useRouter()
 
@@ -36,7 +36,7 @@ async function login() {
   //CHECK IF USERS CREDENTIALS MATCH THE ONES IN OUR DB
   const HashedPassword = CryptoJS.SHA256(password.value).toString();
 
-  if (username.value && HashedPassword) {
+  if (email.value && HashedPassword) {
     //log user in
     await router.push('/')
   }

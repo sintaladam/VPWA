@@ -32,11 +32,16 @@
 
       <div class="row" :class="leftDrawerOpen ? '' : 'hidden'">
         <template v-if="activeTab === 'chats'">
-          <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width" @deleteChatEvent="deleteChat(value.id)"/>
+          <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width"
+            @deleteChatEvent="deleteChat(value.id)" />
         </template>
 
         <template v-else-if="activeTab === 'channels'">
-          <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class="full-width" @deleteChannelEvent="deleteChannel(value.id)"/>
+          <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class="full-width"
+            @deleteChannelEvent="deleteChannel(value.id)" />
+        </template>
+        <template v-else-if="activeTab === 'profile'">
+          <UserProfile class="full-width" :profile="profile" />
         </template>
       </div>
     </q-drawer>
@@ -51,7 +56,8 @@
 <script lang="ts">
 import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChatBadge from 'src/components/ChatBadge.vue';
-import type { ChannelAtr, ChatAtr } from 'src/components/models';
+import UserProfile from 'src/components/UserProfile.vue';
+import type { ChannelAtr, ChatAtr, ProfileAtr } from 'src/components/models';
 
 type TabName = 'channels' | 'chats' | 'profile';
 
@@ -119,22 +125,29 @@ export default {
           senderNickname: 'Eve'
         },
       ] as ChatAtr[],
-    }
+      profile: {
+        id: 0,
+        email: 'johndough@gmail.com',
+        nickname: 'johndough33',
+        name: 'John',
+        surname: 'Dough',
+        description: 'Just a generic user profile description.'
+      } as ProfileAtr,
+    };
   },
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
     },
-    deleteChannel(id:number) {
+    deleteChannel(id: number) {
       this.channels = this.channels.filter(ch => ch.id !== id);
     },
-    deleteChat(id:number) {
+    deleteChat(id: number) {
       this.chats = this.chats.filter(ch => ch.id !== id);
     },
-
   },
   components: {
-    ChannelBadge, ChatBadge
+    ChannelBadge, ChatBadge, UserProfile
   },
   watch: {
     activeTab(newTab: TabName) {

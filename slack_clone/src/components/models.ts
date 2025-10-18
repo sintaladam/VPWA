@@ -32,3 +32,12 @@ export interface ChatAtr {
   senderId: number;
   senderNickname: string;
 }
+
+export interface ProfileAtr {
+  id: number;
+  email: string;
+  nickname: string;
+  name: string;
+  surname: string;
+  description?: string;
+}
