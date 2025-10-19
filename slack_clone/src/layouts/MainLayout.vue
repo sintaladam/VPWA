@@ -10,18 +10,14 @@
           slack clone
         </q-toolbar-title>
       </q-toolbar>
-
-      <!-- <q-tabs align="left">
-        <q-route-tab to="/page1" label="Page One" />
-        <q-route-tab to="/page2" label="Page Two" />
-        <q-route-tab to="/page3" label="Page Three" />
-      </q-tabs> -->
     </q-header>
 
-    <q-drawer show-if-above persistent behavior="default" :mini="!leftDrawerOpen" :mini-width="60" :side="drawerSide" bordered>
+    <q-drawer show-if-above persistent :behavior="activeDevice" :mini="!leftDrawerOpen" :mini-width="60" :side="activeDevice === 'desktop' ? 'left' : 'right'"
+      bordered>
       <!-- drawer content -->
-      <div class="row q-pa-sm" :class="leftDrawerOpen ? 'justify-end' : 'justify-center'">
-        <q-btn dense flat round :icon="leftDrawerOpen ? 'arrow_left' : 'arrow_right'" @click="toggleLeftDrawer" />
+      <div class="row q-pa-sm" :class="leftDrawerOpen ? 'justify-end' : ''">
+        <q-btn dense flat round :icon="leftDrawerOpen ? 'arrow_left' : 'arrow_right'"
+          :class="activeDevice === 'mobile' ? 'hidden' : 'visible'" @click="toggleLeftDrawer" />
       </div>
       <q-tabs :class="leftDrawerOpen ? '' : 'hidden'" v-model="activeTab" dense class="text-dark" active-color="primary"
         indicator-color="primary">
@@ -40,7 +36,7 @@
 
           <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width"
             @deleteChatEvent="deleteChat(value.id)" />
-          <div class="full-width flex justify-end q-pr-md">
+          <div class="full-width flex justify-end q-pr-md q-py-md">
             <q-btn fab icon="add" color="primary" @click="addNewChat" />
           </div>
 
@@ -75,18 +71,18 @@
 import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChatBadge from 'src/components/ChatBadge.vue';
 import UserProfile from 'src/components/UserProfile.vue';
-import { ChannelType, type ChannelAtr, type  ChatAtr, type  ProfileAtr, type TabName } from 'src/components/models';
+import { ChannelType, type ChannelAtr, type ChatAtr, type ProfileAtr, type TabName, type DeviceType } from 'src/components/models';
 import { ref } from 'vue';
-import { useQuasar } from 'quasar'
+import { Platform } from 'quasar'
 
 export default {
   data() {
     return {
       searchChats: ref(''),
       searchChannels: ref(''),
-      leftDrawerOpen: false,
-      drawerSide: 'left' as 'left' | 'right', // <- reactive property
+      leftDrawerOpen: true,
       activeTab: 'channels' as TabName,
+      activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       channels: [
         {
           id: 0,
@@ -187,17 +183,5 @@ export default {
   components: {
     ChannelBadge, ChatBadge, UserProfile
   },
-  mounted() {
-    const $q = useQuasar()
-    this.drawerSide = $q.screen.gt.md ? 'left' : 'right'
-    this.leftDrawerOpen = $q.screen.lt.md ? true : false
-
-  },
-  watch: {
-    '$q.screen.width'(w: number) {
-      this.drawerSide = w >= 1024 ? 'left' : 'right'
-      this.leftDrawerOpen = w <= 1024 ? true : false
-    }
-  }
 }
 </script>

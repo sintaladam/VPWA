@@ -43,3 +43,5 @@ export interface ProfileAtr {
 }
 
 export type TabName = 'channels' | 'chats' | 'profile';
+
+export type DeviceType = 'mobile' | 'desktop';
