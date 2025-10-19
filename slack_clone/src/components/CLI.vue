@@ -6,18 +6,31 @@
 </template>
 
 <script lang="ts">
+import { CommandHandler } from 'src/utils/CommandHandler';
+
 export default {
   data() {
     return {
       messageInput: '',
+      command: new CommandHandler()
+
     };
   },
   methods: {
+    isCommand(message: string): boolean {
+      return message.startsWith('/');
+    },
     submitMessage() {
       const mess = this.messageInput.trim();
       if (!mess) return;
-      this.$emit('submitMessageEvent', mess);
-      this.messageInput=''
+      if (this.isCommand(mess)) {
+        console.log('Command detected:', mess);
+        const command = mess.slice(1); 
+        this.command.handle(command);
+      }else {
+        this.$emit('submitMessageEvent', mess);
+        this.messageInput=''
+      }
     }
   },
   emits: {
