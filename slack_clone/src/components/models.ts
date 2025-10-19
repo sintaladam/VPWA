@@ -41,3 +41,5 @@ export interface ProfileAtr {
   surname: string;
   description?: string;
 }
+
+export type TabName = 'channels' | 'chats' | 'profile';

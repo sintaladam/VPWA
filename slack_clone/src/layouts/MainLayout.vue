@@ -18,7 +18,7 @@
       </q-tabs> -->
     </q-header>
 
-    <q-drawer show-if-above :mini="!leftDrawerOpen" :mini-width="60" side="left" bordered>
+    <q-drawer show-if-above persistent behavior="default" :mini="!leftDrawerOpen" :mini-width="60" :side="drawerSide" bordered>
       <!-- drawer content -->
       <div class="row q-pa-sm" :class="leftDrawerOpen ? 'justify-end' : 'justify-center'">
         <q-btn dense flat round :icon="leftDrawerOpen ? 'arrow_left' : 'arrow_right'" @click="toggleLeftDrawer" />
@@ -32,13 +32,31 @@
 
       <div class="row" :class="leftDrawerOpen ? '' : 'hidden'">
         <template v-if="activeTab === 'chats'">
+          <q-input class="full-width" filled dense v-model="searchChats" placeholder="Search..." clearable>
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+
           <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width"
             @deleteChatEvent="deleteChat(value.id)" />
+          <div class="full-width flex justify-end q-pr-md">
+            <q-btn fab icon="add" color="primary" @click="addNewChat" />
+          </div>
+
         </template>
 
         <template v-else-if="activeTab === 'channels'">
+          <q-input class="full-width" filled dense v-model="searchChannels" placeholder="Search..." clearable>
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
           <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class="full-width"
             @deleteChannelEvent="deleteChannel(value.id)" />
+          <div class="full-width flex justify-end q-pr-md q-py-md">
+            <q-btn fab icon="add" color="primary" @click="addNewChannel" />
+          </div>
         </template>
         <template v-else-if="activeTab === 'profile'">
           <UserProfile class="full-width" :profile="profile" />
@@ -57,14 +75,17 @@
 import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChatBadge from 'src/components/ChatBadge.vue';
 import UserProfile from 'src/components/UserProfile.vue';
-import type { ChannelAtr, ChatAtr, ProfileAtr } from 'src/components/models';
-
-type TabName = 'channels' | 'chats' | 'profile';
+import { ChannelType, type ChannelAtr, type  ChatAtr, type  ProfileAtr, type TabName } from 'src/components/models';
+import { ref } from 'vue';
+import { useQuasar } from 'quasar'
 
 export default {
   data() {
     return {
+      searchChats: ref(''),
+      searchChannels: ref(''),
       leftDrawerOpen: false,
+      drawerSide: 'left' as 'left' | 'right', // <- reactive property
       activeTab: 'channels' as TabName,
       channels: [
         {
@@ -145,13 +166,37 @@ export default {
     deleteChat(id: number) {
       this.chats = this.chats.filter(ch => ch.id !== id);
     },
+    addNewChannel() {
+      const newChannel: ChannelAtr = {
+        id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
+        type: ChannelType.Public,
+        name: 'New Channel',
+        description: 'New channel description'
+      };
+      this.channels.push(newChannel);
+    },
+    addNewChat() {
+      const newChat: ChatAtr = {
+        id: this.chats.length ? (this.chats[this.chats.length - 1]?.id ?? 0) + 1 : 0,
+        senderId: Math.floor(Math.random() * 100),
+        senderNickname: 'New Chat User'
+      };
+      this.chats.push(newChat);
+    }
   },
   components: {
     ChannelBadge, ChatBadge, UserProfile
   },
+  mounted() {
+    const $q = useQuasar()
+    this.drawerSide = $q.screen.gt.md ? 'left' : 'right'
+    this.leftDrawerOpen = $q.screen.lt.md ? true : false
+
+  },
   watch: {
-    activeTab(newTab: TabName) {
-      console.log('Active tab changed to:', newTab);
+    '$q.screen.width'(w: number) {
+      this.drawerSide = w >= 1024 ? 'left' : 'right'
+      this.leftDrawerOpen = w <= 1024 ? true : false
     }
   }
 }
