@@ -20,6 +20,7 @@
 import MessageBoard from 'src/components/MessageBoard.vue';
 import CLI from 'src/components/CLI.vue';
 import { useActivePage } from '../stores/activePage';
+import type { messageType } from 'src/components/models';
 
 export default {
   components: {
@@ -27,14 +28,15 @@ export default {
     CLI,
   },
   methods: {
-    addMessage (value:string) {
+    addMessage (value:string, type: messageType) {
       (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).loadMessages([
         {
           id: 0,
           timestamp: 'a',
           senderId: 1,
           senderName: 'ja',
-          content: value
+          content: value,
+          type: type
         },
       ]);
       this.message=value

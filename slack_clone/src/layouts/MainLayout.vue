@@ -163,11 +163,13 @@ export default {
       this.chats = this.chats.filter(ch => ch.id !== id);
     },
     addNewChannel() {
+      const time = new Date();
       const newChannel: ChannelAtr = {
         id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
         type: ChannelType.Public,
         name: 'New Channel',
-        description: 'New channel description'
+        description: 'New channel description',
+        createdAt: time
       };
       this.channels.push(newChannel);
     },

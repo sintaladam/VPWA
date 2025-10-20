@@ -1,9 +1,10 @@
 <template>
-  <div class="row full-height justify-evenly overflow-auto" >
+  <div class="row full-height justify-evenly overflow-auto">
     <!-- <button @click="loadMessages" class="">daj</button> -->
     <div class="col-11 column justify-end">
-      <template v-for="(mess,index) in messages" :key="index">
-        <q-chat-message :text="[mess.content]" :sent="mess.senderId===1" class=""/>
+      <template v-for="(mess, index) in messages" :key="index">
+        <q-chat-message :text="[mess.content]" :sent="mess.senderId === 1"
+          :bg-color="mess.type === 'command' ? 'green' : userStore.id == mess.senderId ? 'blue' : 'grey'" class="" /> 
       </template>
     </div>
   </div>
@@ -11,10 +12,12 @@
 
 <script lang="ts">
 import type { Message } from './models';
+import { useUserStore } from 'src/stores/userUserStore';
 
 export default {
   data() {
     return {
+      userStore: useUserStore(),
       messages: [] as Message[]
     }
   },

@@ -3,21 +3,13 @@ export enum ChannelType {
   Private = 'private'
 }
 
-export interface Todo {
-  id: number;
-  content: string;
-}
-
-export interface Meta {
-  totalCount: number;
-}
-
 export interface Message {
   id: number;
   timestamp: string;
   senderId: number;
   senderName: string;
   content: string;
+  type: messageType;
 }
 
 export interface ChannelAtr {
@@ -25,6 +17,7 @@ export interface ChannelAtr {
   type: ChannelType;
   name: string;
   description: string;
+  createdAt: Date;
 }
 
 export interface ChatAtr {
@@ -34,14 +27,21 @@ export interface ChatAtr {
 }
 
 export interface ProfileAtr {
-  id: number;
+  id: number | null;
   email: string;
   nickname: string;
   name: string;
   surname: string;
-  description?: string;
+  description: string | null;
+  status: StatusType;
+  token: string;
+  isAuthenticated: boolean;
 }
+
+export type StatusType = 'online' | 'offline' | 'DND';
 
 export type TabName = 'channels' | 'chats' | 'profile';
 
 export type DeviceType = 'mobile' | 'desktop';
+
+export type messageType = 'command' | 'message';
