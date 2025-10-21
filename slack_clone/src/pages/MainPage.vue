@@ -2,7 +2,7 @@
   <q-page padding class="" style="height: calc(100vh - 50px)"> <!-- this just sucks but it will have to do -->
     <!-- content -->
     <div class="column full-height no-wrap">
-      <div class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
+      <div v-show="activeStore.activePage != ''" class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
         {{ activeStore.activePage }}
       </div>
       <div class="col q-pa-md">

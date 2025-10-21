@@ -3,7 +3,7 @@ import type { ProfileAtr } from '../components/models'
 
 export const useUserStore = defineStore('user', {
   state: (): ProfileAtr => ({
-    id: 0 ,
+    id: 1 ,
     name: '', 
     surname: '',
     nickname: '',
@@ -13,7 +13,6 @@ export const useUserStore = defineStore('user', {
     token: '',
     isAuthenticated: true
   }),
-
   actions: {
     login(userData: ProfileAtr) {
         this.id = userData.id
