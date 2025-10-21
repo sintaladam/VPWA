@@ -1,6 +1,5 @@
 <template>
   <div class="row full-height justify-evenly overflow-auto">
-    <!-- <button @click="loadMessages" class="">daj</button> -->
     <div class="col-11 column justify-end">
       <template v-for="(mess, index) in messages" :key="index">
         <q-chat-message :text="[mess.content]" :sent="mess.senderId === 1"

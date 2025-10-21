@@ -9,7 +9,7 @@
         <MessageBoard ref="msgBoard" />
       </div>
 
-      <div class="bg-grey-3 q-pa-md" style="height: 75px; flex: 0 0 auto;">
+      <div class="bg-white-1" style="height: 75px; flex: 0 0 auto;">
         <CLI @submitMessageEvent="addMessage" />
       </div>
     </div>

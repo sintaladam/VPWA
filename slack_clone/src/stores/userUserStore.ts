@@ -32,7 +32,7 @@ export const useUserStore = defineStore('user', {
       this.token = ''
       this.isAuthenticated = false
     }
-  },
+  },  
 
   //persist: true // Enable this line to persist the store across sessions
 })

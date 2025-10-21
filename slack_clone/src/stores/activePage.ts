@@ -8,5 +8,9 @@ export const useActivePage = defineStore('channelPage', {
     setActivePage(pageName: string) {
       this.activePage = pageName
     }
+  },
+  persist: {
+    key: 'activePageStore',
+    storage: sessionStorage,
   }
 })

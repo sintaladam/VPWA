@@ -3,60 +3,64 @@
 
     <q-header elevated class="bg-grey text-white" height-hint="98">
       <q-toolbar>
-        <q-toolbar-title class="text-center">
+        <q-toolbar-title class="text-center flex justify-between items-center">
           <!-- <q-avatar>
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
           </q-avatar> -->
           slack clone
+          <q-btn v-if="activeDevice === 'mobile'" flat @click="toggleLeftDrawer" round dense icon="menu"
+            class="flex justify-end" />
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above persistent :behavior="activeDevice" :mini="!leftDrawerOpen" :mini-width="60" :side="activeDevice === 'desktop' ? 'left' : 'right'"
-      bordered>
-      <!-- drawer content -->
-      <div class="row q-pa-sm" :class="leftDrawerOpen ? 'justify-end' : ''">
-        <q-btn dense flat round :icon="leftDrawerOpen ? 'arrow_left' : 'arrow_right'"
-          :class="activeDevice === 'mobile' ? 'hidden' : 'visible'" @click="toggleLeftDrawer" />
+    <q-drawer show-if-above v-model="leftDrawerOpen" :mini="miniState" :mini-width="60"
+      :side="activeDevice === 'desktop' ? 'left' : 'right'" :behavior="activeDevice" bordered>
+      <div class="row q-pa-sm" :class="miniState ? '' : 'justify-end'">
+        <q-btn dense flat round :icon="miniState ? 'arrow_right' : 'arrow_left'" v-if="activeDevice === 'desktop'"
+          @click="toggleMini" />
       </div>
-      <q-tabs :class="leftDrawerOpen ? '' : 'hidden'" v-model="activeTab" dense class="text-dark" active-color="primary"
-        indicator-color="primary">
-        <q-tab name="channels" label="Channels" />
-        <q-tab name="chats" label="Chats" />
-        <q-tab name="profile" label="Profile" />
-      </q-tabs>
+      <div v-show="!miniState" class="q-pa-sm">
 
-      <div class="row" :class="leftDrawerOpen ? '' : 'hidden'">
-        <template v-if="activeTab === 'chats'">
-          <q-input class="full-width" filled dense v-model="searchChats" placeholder="Search..." clearable>
-            <template #prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+        <q-tabs :class="leftDrawerOpen ? '' : 'hidden'" v-model="activeTab" dense class="text-dark"
+          active-color="primary" indicator-color="primary">
+          <q-tab name="channels" label="Channels" />
+          <q-tab name="chats" label="Chats" />
+          <q-tab name="profile" label="Profile" />
+        </q-tabs>
 
-          <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width"
-            @deleteChatEvent="deleteChat(value.id)" />
-          <div class="full-width flex justify-end q-pr-md q-py-md">
-            <q-btn fab icon="add" color="primary" @click="addNewChat" />
-          </div>
+        <div class="row" :class="leftDrawerOpen ? '' : 'hidden'">
+          <template v-if="activeTab === 'chats'">
+            <q-input class="full-width" filled dense v-model="searchChats" placeholder="Search..." clearable>
+              <template #prepend>
+                <q-icon name="search" />
+              </template>
+            </q-input>
 
-        </template>
+            <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width"
+              @deleteChatEvent="deleteChat(value.id)" />
+            <div class="full-width flex justify-end q-pr-md q-py-md">
+              <q-btn fab icon="add" color="primary" @click="addNewChat" />
+            </div>
 
-        <template v-else-if="activeTab === 'channels'">
-          <q-input class="full-width" filled dense v-model="searchChannels" placeholder="Search..." clearable>
-            <template #prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-          <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class="full-width"
-            @deleteChannelEvent="deleteChannel(value.id)" />
-          <div class="full-width flex justify-end q-pr-md q-py-md">
-            <q-btn fab icon="add" color="primary" @click="addNewChannel" />
-          </div>
-        </template>
-        <template v-else-if="activeTab === 'profile'">
-          <UserProfile class="full-width" :profile="profile" />
-        </template>
+          </template>
+
+          <template v-else-if="activeTab === 'channels'">
+            <q-input class="full-width" filled dense v-model="searchChannels" placeholder="Search..." clearable>
+              <template #prepend>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+            <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class="full-width"
+              @deleteChannelEvent="deleteChannel(value.id)" />
+            <div class="full-width flex justify-end q-pr-md q-py-md">
+              <q-btn fab icon="add" color="primary" @click="addNewChannel" />
+            </div>
+          </template>
+          <template v-else-if="activeTab === 'profile'">
+            <UserProfile class="full-width" :profile="profile" />
+          </template>
+        </div>
       </div>
     </q-drawer>
 
@@ -80,9 +84,11 @@ export default {
     return {
       searchChats: ref(''),
       searchChannels: ref(''),
-      leftDrawerOpen: true,
       activeTab: 'channels' as TabName,
+      miniState: false,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
+      leftDrawerOpen: Platform.is.desktop ? true : false,
+
       channels: [
         {
           id: 0,
@@ -155,6 +161,9 @@ export default {
   methods: {
     toggleLeftDrawer() {
       this.leftDrawerOpen = !this.leftDrawerOpen;
+    },
+    toggleMini() {
+      this.miniState = !this.miniState;
     },
     deleteChannel(id: number) {
       this.channels = this.channels.filter(ch => ch.id !== id);
