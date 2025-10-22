@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="localDialogOpen" >
+  <q-dialog v-model="localDialogOpen">
     <q-card>
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">Are you sure?</div>
@@ -7,9 +7,9 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <q-card-section>
+      <q-card-section class="q-gutter-sm">
         <q-btn color="white" text-color="black" label = "Close" v-close-popup/>
-        <q-btn color="white" text-color="red-10" :label = "title" @click="deleteSelf()"/>
+        <q-btn color="white" text-color="negative" :label = "title" @click="deleteSelf()"/>
       </q-card-section>
     </q-card>
   </q-dialog>

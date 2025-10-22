@@ -45,3 +45,5 @@ export type TabName = 'channels' | 'chats' | 'profile';
 export type DeviceType = 'mobile' | 'desktop';
 
 export type messageType = 'command' | 'message';
+
+export type userMode = 'on' | 'off' | 'dnd';

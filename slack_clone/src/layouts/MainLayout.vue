@@ -8,36 +8,66 @@
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
           </q-avatar> -->
           slack clone
-          <q-btn v-if="activeDevice === 'mobile'" flat @click="toggleLeftDrawer" round dense icon="menu"
-            class="flex justify-end" />
+          <div class="row q-gutter-xs">
+            
+            <q-avatar>
+            <img src="https://cdn.quasar.dev/img/avatar.png">
+            </q-avatar>
+            <q-btn-dropdown unelevated rounded :color="modeIcon.color">
+              <template #label>
+                <q-icon  :name="modeIcon.icon" />
+              </template>
+              <q-list>
+                <q-item clickable v-close-popup @click="changeMode('on')">
+                  <q-item-section>
+                    <q-item-label class="flex justify-center">Online</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable v-close-popup @click="changeMode('dnd')">
+                  <q-item-section>
+                    <q-item-label class="flex justify-center">DND</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable v-close-popup @click="changeMode('off')">
+                  <q-item-section>
+                    <q-item-label class="flex justify-center">Offline</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+            <q-btn v-if="activeDevice === 'mobile'" flat @click="toggleLeftDrawer" round dense icon="menu"
+              class="flex justify-end" />
+          </div>
+          
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
     <q-drawer show-if-above v-model="leftDrawerOpen" :mini="miniState" :mini-width="60"
-      :side="activeDevice === 'desktop' ? 'left' : 'right'" :behavior="activeDevice" bordered>
-      <div class="row q-pa-sm" :class="miniState ? '' : 'justify-end'">
-        <q-btn dense flat round :icon="miniState ? 'arrow_right' : 'arrow_left'" v-if="activeDevice === 'desktop'"
-          @click="toggleMini" />
-      </div>
-      <div v-show="!miniState" class="q-pa-sm">
-
-        <q-tabs :class="leftDrawerOpen ? '' : 'hidden'" v-model="activeTab" dense class="text-dark"
-          active-color="primary" indicator-color="primary">
+      :side="activeDevice === 'desktop' ? 'left' : 'right'" :behavior="activeDevice" bordered class="q-pa-sm no-scrollbar">
+      
+      <div class="row justify-center q-gutter-xs">
+        <q-tabs v-model="activeTab" dense class="text-dark col rounded-borders"
+          active-color="primary" indicator-color="primary" v-show="!miniState">
           <q-tab name="channels" label="Channels" />
           <q-tab name="chats" label="Chats" />
-          <q-tab name="profile" label="Profile" />
+          <!-- <q-tab name="profile" label="Profile" /> -->
         </q-tabs>
+        <q-btn dense flat round :icon="miniState ? 'arrow_right' : 'arrow_left'" v-if="activeDevice === 'desktop'"
+              @click="toggleMini" class=""/>
+      </div>
 
-        <div class="row" :class="leftDrawerOpen ? '' : 'hidden'">
+      <div v-show="!miniState" class="q-gutter-sm q-py-sm">
           <template v-if="activeTab === 'chats'">
-            <q-input class="full-width" filled dense v-model="searchChats" placeholder="Search..." clearable>
+            <q-input class="" outlined dense v-model="searchChats" placeholder="Search..." clearable>
               <template #prepend>
                 <q-icon name="search" />
               </template>
             </q-input>
 
-            <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class="full-width"
+            <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class=""
               @deleteChatEvent="deleteChat(value.id)" />
             <div class="full-width flex justify-end q-pr-md q-py-md">
               <q-btn fab icon="add" color="primary" @click="addNewChat" />
@@ -46,21 +76,20 @@
           </template>
 
           <template v-else-if="activeTab === 'channels'">
-            <q-input class="full-width" filled dense v-model="searchChannels" placeholder="Search..." clearable>
+            <q-input class="rounded-borders" outlined dense v-model="searchChannels" placeholder="Search..." clearable>
               <template #prepend>
                 <q-icon name="search" />
               </template>
             </q-input>
-            <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class="full-width"
+            <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class=""
               @deleteChannelEvent="deleteChannel(value.id)" />
-            <div class="full-width flex justify-end q-pr-md q-py-md">
-              <q-btn fab icon="add" color="primary" @click="addNewChannel" />
+            <div class="full-width flex justify-center q-py-md">
+              <q-btn fab-mini icon="add" color="primary" @click="addNewChannel" />
             </div>
           </template>
           <template v-else-if="activeTab === 'profile'">
             <UserProfile class="full-width" :profile="profile" />
           </template>
-        </div>
       </div>
     </q-drawer>
 
@@ -75,7 +104,7 @@
 import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChatBadge from 'src/components/ChatBadge.vue';
 import UserProfile from 'src/components/UserProfile.vue';
-import { ChannelType, type ChannelAtr, type ChatAtr, type ProfileAtr, type TabName, type DeviceType } from 'src/components/models';
+import { ChannelType, type ChannelAtr, type ChatAtr, type ProfileAtr, type TabName, type DeviceType, type userMode } from 'src/components/models';
 import { ref } from 'vue';
 import { Platform } from 'quasar'
 
@@ -88,6 +117,8 @@ export default {
       miniState: false,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       leftDrawerOpen: Platform.is.desktop ? true : false,
+      currMode: 'on' as userMode,
+    
 
       channels: [
         {
@@ -189,10 +220,36 @@ export default {
         senderNickname: 'New Chat User'
       };
       this.chats.push(newChat);
+    },
+    changeMode(mode:userMode) {
+      this.currMode = mode;
     }
   },
   components: {
     ChannelBadge, ChatBadge, UserProfile
   },
+  computed: {
+    modeIcon() {
+      switch (this.currMode) {
+        case 'on':
+          return { icon:'check_circle', color:'positive' }
+        case 'off':
+          return { icon: 'cancel', color: 'negative' }
+        case 'dnd':
+          return { icon: 'do_not_disturb', color: 'orange' }
+        default:
+          return { icon: '', color: '' }
+      }
+    }
+  }
 }
 </script>
+<style>
+.no-scrollbar  {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar  {
+  display: none;
+}
+</style>

@@ -1,11 +1,10 @@
 <template>
   <q-expansion-item
     expand-icon-toggle
-    expand-separator
-    :label="chat.senderNickname"
+    class="q-pa-none custom-class"
   >
     <template #header>
-      <q-item class="full-width column" @click="activeStore.setActivePage(chat.senderNickname)" clickable :to="`/chats/${chat.id}`">
+      <q-item class="full-width column q-pa-xs rounded-borders" @click="activeStore.setActivePage(chat.senderNickname)" clickable :to="`/chats/${chat.id}`">
         <div class="text-weight-medium">{{ chat.senderNickname }}</div>
         <div class="text-caption text-grey">Sender ID: {{ chat.senderId }}</div>
       </q-item>
@@ -16,7 +15,7 @@
         Chat ID: {{ chat.id }} <br>
         Sender ID: {{ chat.senderId }}
         <div class="column q-pt-md q-gutter-md">
-          <q-btn color="white" text-color="red-10" label="delete chat" @click="deleteOpen = true"/>
+          <q-btn color="white" text-color="negative" label="delete chat" @click="deleteOpen = true"/>
           <leave-confirmation v-model="deleteOpen" title="Delete Chat" @deleteEvent="forwardDelete()"/>
         </div>
       </q-card-section>
@@ -54,3 +53,11 @@ export default {
   emits: ['deleteChatEvent']
 }
 </script>
+
+<style scoped>
+.custom-class:hover {
+  box-shadow: 0 0 10px var(--q-secondary);
+}
+/* .custom-class :deep(.q-expansion-item__container > .q-item:hover) {
+} */
+</style>

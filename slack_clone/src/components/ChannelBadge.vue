@@ -1,15 +1,13 @@
 <template>
   <q-expansion-item
     expand-icon-toggle
-    expand-separator
-    :label="channel.name"
-    :caption="channel.type"
+    class="q-pa-none custom-class"
   >
     <template #header>
-      <q-item class="full-width column" @click="activeStore.setActivePage(channel.name)" clickable :to="`/channels/${channel.id}`">
+      <q-item class="full-width column q-pa-xs rounded-borders" @click="activeStore.setActivePage(channel.name)" :to="`/channels/${channel.id}`">
         <div class="text-weight-medium">{{ channel.name }}</div>
-        <div class="text-caption text-grey">{{ channel.description }}</div>
-    </q-item>
+        <div class="text-caption text-grey">{{ channel.type }}</div>
+      </q-item>
     </template>
     <q-card>
       <q-card-section>
@@ -19,7 +17,7 @@
         eveniet doloribus ullam aliquid.
       <div class="column q-pt-md q-gutter-md">
         <q-btn color="white" text-color="black" label="edit channel" @click="editorOpen = true"/>
-        <q-btn color="white" text-color="red-10" label="leave channel" @click="deleteOpen = true"/>
+        <q-btn color="white" text-color="negative" label="leave channel" @click="deleteOpen = true"/>
         <channel-editor v-model=editorOpen />
         <leave-confirmation v-model="deleteOpen" title="Leave Channel" @deleteEvent="forwardDelete()"/>
       </div>
@@ -62,3 +60,11 @@ export default {
   
 }
 </script>
+
+<style scoped>
+.custom-class:hover {
+  box-shadow: 0 0 10px var(--q-secondary);
+}
+/* .custom-class :deep(.q-expansion-item__container > .q-item:hover) {
+} */
+</style>
