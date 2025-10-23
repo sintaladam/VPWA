@@ -1,8 +1,11 @@
+import { useActivePage } from "src/stores/activePage";
+
 export class CommandHandler {
+    activePage = useActivePage();
     people = ['Alice', 'Bob', 'Charlie', 'David'];
     output = [''];
 
-    handle(command: string) {
+    handle(command: string, argument?: string[] ) {
         this.output = []
         switch (command) {
             case 'list':
@@ -23,11 +26,12 @@ export class CommandHandler {
                 // }
                 break
             case 'join':
-                //if (channel exists) {
-                // join channel
-                //} else {
-                // create and join channel
-                //}
+                if (argument && this.activePage.channels.some(c => c.name === argument[0])) {
+                    console.log('channel exists')
+                    console.log('joining channel...')
+                } else {
+                    console.log('creating channel...')
+                }
                 break
             default:
                 this.output.push('Unknown command. type /help for available commands');

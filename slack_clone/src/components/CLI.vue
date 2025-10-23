@@ -24,9 +24,11 @@ export default {
       const mess = this.messageInput.trim();
       if (!mess) return;
       if (this.isCommand(mess)) {
-        console.log('Command detected:', mess);
-        const command = mess.slice(1);
-        const messageOutput = this.command.handle(command);
+        const parts = mess.slice(1).split(' ');
+        const command = parts[0] as string;
+        const argument = parts.slice(1);
+
+        const messageOutput = this.command.handle(command, argument);
         this.$emit('submitMessageEvent', messageOutput, this.messageType = 'command');
         this.messageInput = ''
       } else {
