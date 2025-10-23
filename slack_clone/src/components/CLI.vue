@@ -1,6 +1,8 @@
 <template>
-  <q-input outlined autogrow v-model="messageInput" class="input-field full-height full-width"
+  <div class="custom-border full-height">
+  <q-input autogrow v-model="messageInput" class="input-field full-height full-width overflow-auto q-pa-sm no-scrollbar" style="max-height: 65px;"
     @keyup.enter.exact.prevent="submitMessage" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -49,5 +51,8 @@ export default {
 <style scoped>
 input.input-field {
   border-radius: 20px;
+}
+.custom-border {
+  border: 1px solid var(--q-primary);
 }
 </style>
