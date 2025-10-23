@@ -33,6 +33,28 @@ export const useUserStore = defineStore('user', {
     },
     changeStatus(status: StatusType) {
       this.status = status;
+    },
+    updateProfile({ id, nickname, name, surname, description }: ProfileAtr) {
+      console.log(id);
+      this.nickname = nickname;
+      this.name = name;
+      this.surname = surname;
+      this.description = description;
+    }
+  },
+  getters: {
+    getProfileDetails: (state) => () => {
+      return {
+        id: state.id,
+        email: state.email,
+        nickname: state.nickname,
+        name: state.name,
+        surname: state.surname,
+        description: state.description,
+        status: state.status,
+        token: '',
+        isAuthenticated: state.isAuthenticated
+      };
     }
   }
 

@@ -10,9 +10,14 @@
           slack clone
           <div class="row q-gutter-xs">
             
-            <q-avatar>
-            <img src="https://cdn.quasar.dev/img/avatar.png">
-            </q-avatar>
+            <q-btn round flat @click="profileEditorOpen = true" class="p-0">
+              <q-avatar>
+                <img src="https://cdn.quasar.dev/img/avatar.png">
+              </q-avatar>
+            </q-btn>
+
+            <updated-user-profile v-model="profileEditorOpen" :profile="profile"/>
+
             <q-btn-dropdown unelevated rounded :color="statusIcon.color">
               <template #label>
                 <q-icon  :name="statusIcon.icon" />
@@ -89,9 +94,9 @@
             <channel-creator v-model="channelCreatorOpen"/>
           </div>
         </template>
-        <template v-else-if="activeTab === 'profile'">
+        <!-- <template v-else-if="activeTab === 'profile'">
           <UserProfile class="full-width" :profile="profile" />
-        </template>
+        </template> -->
       </div>
     </q-drawer>
 
@@ -105,10 +110,10 @@
 <script lang="ts">
 import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChatBadge from 'src/components/ChatBadge.vue';
-import UserProfile from 'src/components/UserProfile.vue';
 import ChannelCreator from 'src/components/ChannelCreator.vue';
 import ChatCreator from 'src/components/ChatCreator.vue';
-import { type ProfileAtr, type TabName, type DeviceType, type pageType, type ChannelAtr, type ChatAtr } from 'src/components/models';
+import UpdatedUserProfile from 'src/components/UpdatedUserProfile.vue';
+import { type TabName, type DeviceType, type pageType, type ChannelAtr, type ChatAtr } from 'src/components/models';
 import { Platform } from 'quasar'
 import { useUserStore } from 'src/stores/userUserStore';
 import { useActivePage } from 'src/stores/activePage';
@@ -126,15 +131,16 @@ export default {
       activePage: useActivePage(),
       channelCreatorOpen: false,
       chatCreatorOpen: false,
+      profileEditorOpen: false,
 
-      profile: {
-        id: 0,
-        email: 'johndough@gmail.com',
-        nickname: 'johndough33',
-        name: 'John',
-        surname: 'Dough',
-        description: 'Just a generic user profile description.'
-      } as ProfileAtr,
+      // profile: {
+      //   id: 0,
+      //   email: 'johndough@gmail.com',
+      //   nickname: 'johndough33',
+      //   name: 'John',
+      //   surname: 'Dough',
+      //   description: 'Just a generic user profile description.'
+      // } as ProfileAtr,
     };
   },
   methods: {
@@ -152,7 +158,7 @@ export default {
     }
   },
   components: {
-    ChannelBadge, ChatBadge, UserProfile, ChannelCreator, ChatCreator
+    ChannelBadge, ChatBadge, UpdatedUserProfile, ChannelCreator, ChatCreator
   },
   computed: {
     statusIcon() {
@@ -172,10 +178,14 @@ export default {
     },
     chats() {
       return this.activePage.searchThreads('chat', this.searchChats) as ChatAtr[];
+    },
+    profile() {
+      return { ...this.userStore.getProfileDetails() };
     }
   }
 }
 </script>
+
 <style>
 .no-scrollbar  {
   scrollbar-width: none;
