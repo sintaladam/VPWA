@@ -7,7 +7,7 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <q-card-section class="column q-gutter-sm" style="max-width: 500px; width: 50vw;">
+      <q-card-section class="column q-gutter-sm" :style="activeDevice==='desktop' && 'max-width: 500px; width: 50vw;'">
         <div>Enter recipient's nickname or email</div>
         <q-input v-model="recipient" filled></q-input>
         <q-btn label="Confirm" @click="createChat"></q-btn>

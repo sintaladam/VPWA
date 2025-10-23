@@ -7,7 +7,7 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <q-card-section class="column q-gutter-sm" style="max-width: 500px; width: 50vw;">
+      <q-card-section class="column q-gutter-sm" :style="activeDevice==='desktop' && 'max-width: 500px; width: 50vw;'">
         <q-input v-model="newChannel.name" filled hint="Name"></q-input>
         <q-input v-model="newChannel.description" filled type="textarea" hint="Description"></q-input>
         <q-btn-toggle
