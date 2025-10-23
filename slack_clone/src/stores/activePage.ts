@@ -135,9 +135,17 @@ export const useActivePage = defineStore('channelPage', {
           return state.chats.find(ch => ch.id == id);
       };
     },
-    getChannelName: (state) => (id: number) => {
-      return state.channels.find(ch => ch.id == id)?.name;
+    getThreadName: (state) => (id: number, type: pageType) => {
+      switch (type) {
+        case 'channel':
+          return state.channels.find(ch => ch.id == id)?.name;
+        case 'chat':
+          return state.chats.find(ch => ch.id == id)?.senderNickname;
+      };
     },
+    // searchThreads: (state) => (type: pageType,) => {
+    //   return state.channels.find(ch => ch.id == id)?.name;
+    // },
   },
   persist: {
     key: 'activePageStore',

@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     channelName() {
-      return this.activeStore.getChannelName(this.activeStore.activePageId);
+      return this.activeStore.getThreadName(this.activeStore.activePageId, this.activeStore.activePageType);
     }
   }
 }
