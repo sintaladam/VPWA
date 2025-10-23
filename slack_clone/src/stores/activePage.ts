@@ -91,6 +91,22 @@ export const useActivePage = defineStore('channelPage', {
           break;
       };
     },
+    createChannel({ name, type, description }: ChannelAtr) {
+      this.channels.push({
+        id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
+        type,
+        name,
+        description,
+        createdAt: new Date()
+      } as ChannelAtr);
+    },
+    createChat(recipient: string) {
+      this.chats.push({
+        id: this.chats.length ? (this.chats[this.chats.length - 1]?.id ?? 0) + 1 : 0,
+        senderId: Math.floor(Math.random() * 100),
+        senderNickname: recipient
+      });
+    },
     deleteThread(id: number, type: pageType) {
       switch (type) {
         case 'channel':

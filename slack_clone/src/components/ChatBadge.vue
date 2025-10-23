@@ -37,10 +37,7 @@ export default {
     }
   },
   props: {
-    chat: {
-      type: Object as () => ChatAtr,
-      required: true,
-    }
+    chatId: Number,
   },
   components: {
     LeaveConfirmation,
@@ -48,6 +45,11 @@ export default {
   methods: {
     forwardDelete() {
       this.$emit('deleteChatEvent');
+    }
+  },
+  computed: {
+    chat() {
+      return this.activeStore.getThreadDetails(this.chatId as number, 'chat') as ChatAtr;
     }
   },
   emits: ['deleteChatEvent']

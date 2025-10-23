@@ -8,8 +8,8 @@
       </q-card-section>
 
       <q-card-section class="column q-gutter-sm" style="max-width: 500px; width: 50vw;">
-        <q-input v-model="localChannel.name" filled :readonly="!editing"></q-input>
-        <q-input v-model="localChannel.description" filled type="textarea" :readonly="!editing"></q-input>
+        <q-input v-model="localChannel.name" filled :readonly="!editing" hint="Name"></q-input>
+        <q-input v-model="localChannel.description" filled type="textarea" :readonly="!editing" hint="Description"></q-input>
         <q-btn-toggle
           v-model="localChannel.type"
           no-caps
@@ -23,6 +23,7 @@
             {label: 'public', value: 'public'},
           ]"
           :readonly="!editing"
+          hint="Type"
         />
         <q-btn label="Edit" v-show="!editing" @click="editing=true"></q-btn>
         <div v-show="editing" class="row q-gutter-sm full-width q-pt-lg">

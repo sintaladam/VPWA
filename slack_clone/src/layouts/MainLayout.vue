@@ -67,10 +67,11 @@
             </template>
           </q-input>
 
-          <ChatBadge v-for="value in activePage.chats" :key="value.id" :chat="value" class=""
+          <ChatBadge v-for="value in activePage.chats" :key="value.id" :chatId="value.id" class=""
             @deleteChatEvent="deleteThread(value.id, 'chat')" />
           <div class="full-width flex justify-center q-py-md">
-            <q-btn fab-mini icon="add" color="primary" @click="activePage.createThread('chat')" />
+            <q-btn fab-mini icon="add" color="primary" @click="chatCreatorOpen=true" />
+            <ChatCreator v-model="chatCreatorOpen"/>
           </div>
 
         </template>
@@ -84,7 +85,8 @@
           <ChannelBadge v-for="value in activePage.channels" :key="value.id" :channelId="value.id" class=""
             @deleteChannelEvent="deleteThread(value.id, 'channel')" />
           <div class="full-width flex justify-center q-py-md">
-            <q-btn fab-mini icon="add" color="primary" @click="activePage.createThread('channel')" />
+            <q-btn fab-mini icon="add" color="primary" @click="channelCreatorOpen=true" />
+            <channel-creator v-model="channelCreatorOpen"/>
           </div>
         </template>
         <template v-else-if="activeTab === 'profile'">
@@ -104,6 +106,8 @@
 import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChatBadge from 'src/components/ChatBadge.vue';
 import UserProfile from 'src/components/UserProfile.vue';
+import ChannelCreator from 'src/components/ChannelCreator.vue';
+import ChatCreator from 'src/components/ChatCreator.vue';
 import { type ProfileAtr, type TabName, type DeviceType, type pageType } from 'src/components/models';
 import { ref } from 'vue';
 import { Platform } from 'quasar'
@@ -121,6 +125,8 @@ export default {
       leftDrawerOpen: Platform.is.desktop ? true : false,
       userStore: useUserStore(),
       activePage: useActivePage(),
+      channelCreatorOpen: false,
+      chatCreatorOpen: false,
 
       profile: {
         id: 0,
@@ -147,7 +153,7 @@ export default {
     }
   },
   components: {
-    ChannelBadge, ChatBadge, UserProfile
+    ChannelBadge, ChatBadge, UserProfile, ChannelCreator, ChatCreator
   },
   computed: {
     statusIcon() {

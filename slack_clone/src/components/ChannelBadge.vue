@@ -36,6 +36,7 @@ export default {
       activeStore: useActivePage(),
       editorOpen: false,
       deleteOpen: false,
+      createOpen: false,
     }
   },
   props: {
