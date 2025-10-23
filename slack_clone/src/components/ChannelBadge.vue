@@ -4,21 +4,18 @@
     class="q-pa-none custom-class"
   >
     <template #header>
-      <q-item class="full-width column q-pa-xs rounded-borders" @click="activeStore.setActivePage(channel.name)" :to="`/channels/${channel.id}`">
+      <q-item class="full-width column q-pa-xs rounded-borders" :to="`/channel/${channelId}`">
         <div class="text-weight-medium">{{ channel.name }}</div>
         <div class="text-caption text-grey">{{ channel.type }}</div>
       </q-item>
     </template>
     <q-card>
       <q-card-section>
-        {{ channel.description }} <br>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos corrupti
-        commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
-        eveniet doloribus ullam aliquid.
+        {{ channel.description}}
       <div class="column q-pt-md q-gutter-md">
-        <q-btn color="white" text-color="black" label="edit channel" @click="editorOpen = true"/>
+        <q-btn color="white" text-color="black" label="Details" @click="editorOpen = true"/>
         <q-btn color="white" text-color="negative" label="leave channel" @click="deleteOpen = true"/>
-        <channel-editor v-model=editorOpen />
+        <channel-editor v-if="channelId !== undefined" v-model=editorOpen :channel="channel" />
         <leave-confirmation v-model="deleteOpen" title="Leave Channel" @deleteEvent="forwardDelete()"/>
       </div>
       </q-card-section>
@@ -27,10 +24,10 @@
 </template>
 
 <script lang="ts">
-import type { ChannelAtr } from './models';
 import { useActivePage } from '../stores/activePage';
 import ChannelEditor from './ChannelEditor.vue';
 import LeaveConfirmation from './LeaveConfirmation.vue';
+import { type ChannelAtr } from './models';
 
 export default {
   data() {
@@ -42,10 +39,11 @@ export default {
     }
   },
   props: {
-    channel: {
-      type: Object as () => ChannelAtr,
-      required: true,
-    }
+    // channel: {
+    //   type: Object as () => ChannelAtr,
+    //   required: true,
+    // }
+    channelId: Number
   },
   components: {
     ChannelEditor,
@@ -54,6 +52,11 @@ export default {
   methods: {
     forwardDelete() {
       this.$emit('deleteChannelEvent');
+    }
+  },
+  computed: {
+    channel() {
+      return this.activeStore.getThreadDetails(this.channelId as number, 'channel') as ChannelAtr;
     }
   },
   emits: ['deleteChannelEvent']

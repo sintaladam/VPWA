@@ -13,24 +13,24 @@
             <q-avatar>
             <img src="https://cdn.quasar.dev/img/avatar.png">
             </q-avatar>
-            <q-btn-dropdown unelevated rounded :color="modeIcon.color">
+            <q-btn-dropdown unelevated rounded :color="statusIcon.color">
               <template #label>
-                <q-icon  :name="modeIcon.icon" />
+                <q-icon  :name="statusIcon.icon" />
               </template>
               <q-list>
-                <q-item clickable v-close-popup @click="changeMode('on')">
+                <q-item clickable v-close-popup @click="userStore.changeStatus('online')">
                   <q-item-section>
                     <q-item-label class="flex justify-center">Online</q-item-label>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup @click="changeMode('dnd')">
+                <q-item clickable v-close-popup @click="userStore.changeStatus('dnd')">
                   <q-item-section>
                     <q-item-label class="flex justify-center">DND</q-item-label>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup @click="changeMode('off')">
+                <q-item clickable v-close-popup @click="userStore.changeStatus('offline')">
                   <q-item-section>
                     <q-item-label class="flex justify-center">Offline</q-item-label>
                   </q-item-section>
@@ -60,41 +60,41 @@
       </div>
 
       <div v-show="!miniState" class="q-gutter-sm q-py-sm">
-          <template v-if="activeTab === 'chats'">
-            <q-input class="" outlined dense v-model="searchChats" placeholder="Search..." clearable>
-              <template #prepend>
-                <q-icon name="search" />
-              </template>
-            </q-input>
+        <template v-if="activeTab === 'chats'">
+          <q-input class="" outlined dense v-model="searchChats" placeholder="Search..." clearable>
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
 
-            <ChatBadge v-for="value in chats" :key="value.id" :chat="value" class=""
-              @deleteChatEvent="deleteChat(value.id)" />
-            <div class="full-width flex justify-end q-pr-md q-py-md">
-              <q-btn fab icon="add" color="primary" @click="addNewChat" />
-            </div>
+          <ChatBadge v-for="value in activePage.chats" :key="value.id" :chat="value" class=""
+            @deleteChatEvent="deleteThread(value.id, 'chat')" />
+          <div class="full-width flex justify-center q-py-md">
+            <q-btn fab-mini icon="add" color="primary" @click="activePage.createThread('chat')" />
+          </div>
 
-          </template>
+        </template>
 
-          <template v-else-if="activeTab === 'channels'">
-            <q-input class="rounded-borders" outlined dense v-model="searchChannels" placeholder="Search..." clearable>
-              <template #prepend>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-            <ChannelBadge v-for="value in channels" :key="value.id" :channel="value" class=""
-              @deleteChannelEvent="deleteChannel(value.id)" />
-            <div class="full-width flex justify-center q-py-md">
-              <q-btn fab-mini icon="add" color="primary" @click="addNewChannel" />
-            </div>
-          </template>
-          <template v-else-if="activeTab === 'profile'">
-            <UserProfile class="full-width" :profile="profile" />
-          </template>
+        <template v-else-if="activeTab === 'channels'">
+          <q-input class="rounded-borders" outlined dense v-model="searchChannels" placeholder="Search..." clearable>
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+          <ChannelBadge v-for="value in activePage.channels" :key="value.id" :channelId="value.id" class=""
+            @deleteChannelEvent="deleteThread(value.id, 'channel')" />
+          <div class="full-width flex justify-center q-py-md">
+            <q-btn fab-mini icon="add" color="primary" @click="activePage.createThread('channel')" />
+          </div>
+        </template>
+        <template v-else-if="activeTab === 'profile'">
+          <UserProfile class="full-width" :profile="profile" />
+        </template>
       </div>
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view :key="$route.fullPath" />
     </q-page-container>
 
   </q-layout>
@@ -104,9 +104,11 @@
 import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChatBadge from 'src/components/ChatBadge.vue';
 import UserProfile from 'src/components/UserProfile.vue';
-import { ChannelType, type ChannelAtr, type ChatAtr, type ProfileAtr, type TabName, type DeviceType, type userMode } from 'src/components/models';
+import { type ProfileAtr, type TabName, type DeviceType, type pageType } from 'src/components/models';
 import { ref } from 'vue';
 import { Platform } from 'quasar'
+import { useUserStore } from 'src/stores/userUserStore';
+import { useActivePage } from 'src/stores/activePage';
 
 export default {
   data() {
@@ -117,68 +119,9 @@ export default {
       miniState: false,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       leftDrawerOpen: Platform.is.desktop ? true : false,
-      currMode: 'on' as userMode,
-    
+      userStore: useUserStore(),
+      activePage: useActivePage(),
 
-      channels: [
-        {
-          id: 0,
-          type: 'public',
-          name: 'Generic name1',
-          description: 'generic description'
-        },
-        {
-          id: 1,
-          type: 'public',
-          name: 'Generic name2',
-          description: 'generic description'
-        },
-        {
-          id: 2,
-          type: 'public',
-          name: 'Generic name3',
-          description: 'generic description'
-        },
-        {
-          id: 3,
-          type: 'public',
-          name: 'Generic name4',
-          description: 'generic description'
-        },
-        {
-          id: 4,
-          type: 'public',
-          name: 'Generic name5',
-          description: 'generic description'
-        },
-      ] as ChannelAtr[],
-      chats: [
-        {
-          id: 0,
-          senderId: 123,
-          senderNickname: 'Alice'
-        },
-        {
-          id: 1,
-          senderId: 124,
-          senderNickname: 'Bob'
-        },
-        {
-          id: 2,
-          senderId: 125,
-          senderNickname: 'Charlie'
-        },
-        {
-          id: 3,
-          senderId: 126,
-          senderNickname: 'David'
-        },
-        {
-          id: 4,
-          senderId: 127,
-          senderNickname: 'Eve'
-        },
-      ] as ChatAtr[],
       profile: {
         id: 0,
         email: 'johndough@gmail.com',
@@ -196,44 +139,22 @@ export default {
     toggleMini() {
       this.miniState = !this.miniState;
     },
-    deleteChannel(id: number) {
-      this.channels = this.channels.filter(ch => ch.id !== id);
-    },
-    deleteChat(id: number) {
-      this.chats = this.chats.filter(ch => ch.id !== id);
-    },
-    addNewChannel() {
-      const time = new Date();
-      const newChannel: ChannelAtr = {
-        id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
-        type: ChannelType.Public,
-        name: 'New Channel',
-        description: 'New channel description',
-        createdAt: time
-      };
-      this.channels.push(newChannel);
-    },
-    addNewChat() {
-      const newChat: ChatAtr = {
-        id: this.chats.length ? (this.chats[this.chats.length - 1]?.id ?? 0) + 1 : 0,
-        senderId: Math.floor(Math.random() * 100),
-        senderNickname: 'New Chat User'
-      };
-      this.chats.push(newChat);
-    },
-    changeMode(mode:userMode) {
-      this.currMode = mode;
+    deleteThread(id: number, type: pageType) {
+      this.activePage.deleteThread(id, type);
+      if (this.activePage.activePageId == id && this.activePage.activePageType == type) {
+        this.$router.push('/' + type);
+      }
     }
   },
   components: {
     ChannelBadge, ChatBadge, UserProfile
   },
   computed: {
-    modeIcon() {
-      switch (this.currMode) {
-        case 'on':
+    statusIcon() {
+      switch (this.userStore.status) {
+        case 'online':
           return { icon:'check_circle', color:'positive' }
-        case 'off':
+        case 'offline':
           return { icon: 'cancel', color: 'negative' }
         case 'dnd':
           return { icon: 'do_not_disturb', color: 'orange' }

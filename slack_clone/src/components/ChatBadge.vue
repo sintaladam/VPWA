@@ -4,7 +4,7 @@
     class="q-pa-none custom-class"
   >
     <template #header>
-      <q-item class="full-width column q-pa-xs rounded-borders" @click="activeStore.setActivePage(chat.senderNickname)" clickable :to="`/chats/${chat.id}`">
+      <q-item class="full-width column q-pa-xs rounded-borders" clickable :to="`/chat/${chat.id}`">
         <div class="text-weight-medium">{{ chat.senderNickname }}</div>
         <div class="text-caption text-grey">Sender ID: {{ chat.senderId }}</div>
       </q-item>

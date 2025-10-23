@@ -38,7 +38,7 @@ export interface ProfileAtr {
   isAuthenticated: boolean;
 }
 
-export type StatusType = 'online' | 'offline' | 'DND';
+export type StatusType = 'online' | 'offline' | 'dnd';
 
 export type TabName = 'channels' | 'chats' | 'profile';
 
@@ -46,4 +46,4 @@ export type DeviceType = 'mobile' | 'desktop';
 
 export type messageType = 'command' | 'message';
 
-export type userMode = 'on' | 'off' | 'dnd';
+export type pageType = 'channel' | 'chat';

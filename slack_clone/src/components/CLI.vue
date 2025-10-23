@@ -1,5 +1,5 @@
 <template>
-  <q-input outlined v-model="messageInput" class="input-field full-height full-width"
+  <q-input outlined autogrow v-model="messageInput" class="input-field full-height full-width"
     @keyup.enter.exact.prevent="submitMessage" />
 </template>
 

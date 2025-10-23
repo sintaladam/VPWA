@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="localDialogOpen">
     <q-card>
-      <q-card-section class="row items-center q-pb-none">
+      <q-card-section class="row items-center q-pb-none q-gutter-sm">
         <div class="text-h6">Are you sure?</div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />

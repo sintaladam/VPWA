@@ -2,8 +2,8 @@
   <q-page padding class="" style="height: calc(100vh - 50px)"> <!-- this just sucks but it will have to do -->
     <!-- content -->
     <div class="column full-height no-wrap">
-      <div v-show="activeStore.activePage != ''" class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
-        {{ activeStore.activePage }}
+      <div class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
+        {{ channelName }}
       </div>
       <div class="col q-pa-md">
         <MessageBoard ref="msgBoard" />
@@ -20,7 +20,7 @@
 import MessageBoard from 'src/components/MessageBoard.vue';
 import CLI from 'src/components/CLI.vue';
 import { useActivePage } from '../stores/activePage';
-import type { messageType } from 'src/components/models';
+import type { messageType, pageType } from 'src/components/models';
 
 export default {
   components: {
@@ -46,6 +46,15 @@ export default {
     return {
       message: '',
       activeStore: useActivePage()
+    }
+  },
+  created() {
+    this.activeStore.setActivePage(Number(this.$route.params.id), this.$route.name as pageType)
+    console.log(this.$route.name);
+  },
+  computed: {
+    channelName() {
+      return this.activeStore.getChannelName(this.activeStore.activePageId);
     }
   }
 }
