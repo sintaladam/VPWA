@@ -270,8 +270,10 @@ export const useActivePage = defineStore('channelPage', {
     searchThreads: (state) => (type: pageType, term: string) => {
       switch (type) {
         case 'channel':
-          return state.channels.filter(ch => ch.name.toLowerCase().includes(term.toLowerCase()));
+          console.log(state.channels)
+          return state.channels.filter(ch => ch.name?.toLowerCase().includes(term.toLowerCase()));
         case 'chat':
+          console.log(state.channels)
           return state.chats.filter(ch => ch.senderNickname.toLowerCase().includes(term.toLowerCase()));
       };
     },

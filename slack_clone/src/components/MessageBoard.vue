@@ -3,7 +3,7 @@
     <div class="col-11 column justify-end">
       <template v-for="(mess, index) in messages" :key="index">
         <q-chat-message :text="[mess.content]" :sent="mess.senderId === 1" :name="mess.senderName"
-          :bg-color="mess.type === 'command' ? 'green' : userStore.id == mess.senderId ? 'grey' : 'primary'" class="" /> 
+          :bg-color="mess.type === 'command' ? 'green' : userStore.id == mess.senderId ? 'primary' : 'grey'" class="" /> 
       </template>
     </div>
   </div>

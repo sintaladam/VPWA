@@ -22,7 +22,7 @@ export default {
     isCommand(message: string): boolean {
       return message.startsWith('/');
     },
-    submitMessage() {
+    async submitMessage() {
       const mess = this.messageInput.trim();
       if (!mess) return;
       if (this.isCommand(mess)) {
@@ -30,7 +30,7 @@ export default {
         const command = parts[0] as string;
         const argument = parts.slice(1);
 
-        const messageOutput = this.command.handle(command, argument);
+        const messageOutput = await this.command.handle(command, argument);
         this.$emit('submitMessageEvent', messageOutput, this.messageType = 'command');
         this.messageInput = ''
       } else {
