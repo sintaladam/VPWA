@@ -67,7 +67,7 @@
             </template>
           </q-input>
 
-          <ChatBadge v-for="value in activePage.chats" :key="value.id" :chatId="value.id" class=""
+          <ChatBadge v-for="value in chats" :key="value.id" :chatId="value.id" class=""
             @deleteChatEvent="deleteThread(value.id, 'chat')" />
           <div class="full-width flex justify-center q-py-md">
             <q-btn fab-mini icon="add" color="primary" @click="chatCreatorOpen=true" />
@@ -82,7 +82,7 @@
               <q-icon name="search" />
             </template>
           </q-input>
-          <ChannelBadge v-for="value in activePage.channels" :key="value.id" :channelId="value.id" class=""
+          <ChannelBadge v-for="value in channels" :key="value.id" :channelId="value.id" class=""
             @deleteChannelEvent="deleteThread(value.id, 'channel')" />
           <div class="full-width flex justify-center q-py-md">
             <q-btn fab-mini icon="add" color="primary" @click="channelCreatorOpen=true" />
@@ -108,8 +108,7 @@ import ChatBadge from 'src/components/ChatBadge.vue';
 import UserProfile from 'src/components/UserProfile.vue';
 import ChannelCreator from 'src/components/ChannelCreator.vue';
 import ChatCreator from 'src/components/ChatCreator.vue';
-import { type ProfileAtr, type TabName, type DeviceType, type pageType } from 'src/components/models';
-import { ref } from 'vue';
+import { type ProfileAtr, type TabName, type DeviceType, type pageType, type ChannelAtr, type ChatAtr } from 'src/components/models';
 import { Platform } from 'quasar'
 import { useUserStore } from 'src/stores/userUserStore';
 import { useActivePage } from 'src/stores/activePage';
@@ -117,8 +116,8 @@ import { useActivePage } from 'src/stores/activePage';
 export default {
   data() {
     return {
-      searchChats: ref(''),
-      searchChannels: ref(''),
+      searchChats: '',
+      searchChannels: '',
       activeTab: 'channels' as TabName,
       miniState: false,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
@@ -167,6 +166,12 @@ export default {
         default:
           return { icon: '', color: '' }
       }
+    },
+    channels() {
+      return this.activePage.searchThreads('channel', this.searchChannels) as ChannelAtr[];
+    },
+    chats() {
+      return this.activePage.searchThreads('chat', this.searchChats) as ChatAtr[];
     }
   }
 }
