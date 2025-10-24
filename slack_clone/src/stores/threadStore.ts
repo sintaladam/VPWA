@@ -270,10 +270,8 @@ export const useActivePage = defineStore('channelPage', {
     searchThreads: (state) => (type: pageType, term: string) => {
       switch (type) {
         case 'channel':
-          console.log(state.channels)
           return state.channels.filter(ch => ch.name?.toLowerCase().includes(term.toLowerCase()));
         case 'chat':
-          console.log(state.channels)
           return state.chats.filter(ch => ch.senderNickname.toLowerCase().includes(term.toLowerCase()));
       };
     },
@@ -282,6 +280,13 @@ export const useActivePage = defineStore('channelPage', {
       return (group?.messages ?? []) as Message[];
       // console.log(state, id, type);
       // return [] as Message[];
+    },
+    getThreadId: (state) => (argument: string) => {
+      const channel = state.channels.find(c => c.name === argument);
+      if (channel) {
+        return channel;
+      }
+      return 0;
     }
   },
   persist: {

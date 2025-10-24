@@ -116,7 +116,7 @@ import UpdatedUserProfile from 'src/components/UpdatedUserProfile.vue';
 import { type TabName, type DeviceType, type pageType, type ChannelAtr, type ChatAtr } from 'src/components/models';
 import { Platform } from 'quasar'
 import { useUserStore } from 'src/stores/userUserStore';
-import { useActivePage } from 'src/stores/activePage';
+import { useActivePage } from 'src/stores/threadStore';
 
 export default {
   data() {

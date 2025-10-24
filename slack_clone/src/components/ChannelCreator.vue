@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { useActivePage } from 'src/stores/activePage';
+import { useActivePage } from 'src/stores/threadStore';
 import { Platform } from 'quasar';
 import { type ChannelAtr, type DeviceType } from './models';
 

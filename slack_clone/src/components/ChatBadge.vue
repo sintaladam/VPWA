@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import type { ChatAtr } from './models';
-import { useActivePage } from '../stores/activePage'
+import { useActivePage } from '../stores/threadStore'
 import LeaveConfirmation from './LeaveConfirmation.vue';
 
 export default {

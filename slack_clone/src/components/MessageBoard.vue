@@ -12,7 +12,7 @@
 <script lang="ts">
 import type { Message, messageType } from './models';
 import { useUserStore } from 'src/stores/userUserStore';
-import { useActivePage } from 'src/stores/activePage';
+import { useActivePage } from 'src/stores/threadStore';
 import { nextTick } from 'vue';
 
 export default {

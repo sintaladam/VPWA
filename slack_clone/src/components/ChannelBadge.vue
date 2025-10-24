@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { useActivePage } from '../stores/activePage';
+import { useActivePage } from '../stores/threadStore';
 import ChannelEditor from './ChannelEditor.vue';
 import LeaveConfirmation from './LeaveConfirmation.vue';
 import { type ChannelAtr } from './models';

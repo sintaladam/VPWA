@@ -19,7 +19,7 @@
 <script lang="ts">
 import MessageBoard from 'src/components/MessageBoard.vue';
 import CLI from 'src/components/CLI.vue';
-import { useActivePage } from '../stores/activePage';
+import { useActivePage } from '../stores/threadStore';
 import type { messageType, pageType } from 'src/components/models';
 import { useUserStore } from 'src/stores/userUserStore';
 
