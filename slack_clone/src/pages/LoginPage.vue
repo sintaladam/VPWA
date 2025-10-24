@@ -54,7 +54,6 @@ export default {
       //const { cookies } = useCookies();
 
       const form = this.$refs.formRef as QForm
-      console.log(this.$q.platform)
 
       const isValid = await form.validate()
       if (!isValid) {

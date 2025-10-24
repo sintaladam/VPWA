@@ -35,7 +35,6 @@ export const useUserStore = defineStore('user', {
       this.status = status;
     },
     updateProfile({ id, nickname, name, surname, description }: ProfileAtr) {
-      console.log(id);
       this.nickname = nickname;
       this.name = name;
       this.surname = surname;
@@ -59,5 +58,5 @@ export const useUserStore = defineStore('user', {
   },
   persist: true 
 
-  //using cookies for this
+  //will be using cookies for this but currently this is fine
 });

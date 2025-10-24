@@ -225,7 +225,6 @@ export const useActivePage = defineStore('channelPage', {
         .find(u => u?.nickname === targetUserNick)?.id;
 
       if (!targetUserId) {
-          console.log('User not found in this channel.');
           return;
       }
 
@@ -342,12 +341,12 @@ export const useActivePage = defineStore('channelPage', {
       });
     },
     removeUsersFromThread(channelId: number, userIds: number | number[]) {
-      const idsToRemove = new Set(Array.isArray(userIds) ? userIds : [userIds]); // <-- convert to Set
+      const idsToRemove = new Set(Array.isArray(userIds) ? userIds : [userIds]); 
       const channel = this.channels.find(c => c.id === channelId);
 
       if (!channel) return;
 
-      channel.users = channel.users.filter(userId => !idsToRemove.has(userId)); // <-- use Set.has()
+      channel.users = channel.users.filter(userId => !idsToRemove.has(userId));
     }
   },
   getters: {
@@ -394,7 +393,7 @@ export const useActivePage = defineStore('channelPage', {
 
       return channel.users
         .map(userId => state.users[userId])
-        .filter(Boolean); // remove undefined users just in case
+        .filter(Boolean);
     },
   },
   persist: {

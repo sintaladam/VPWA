@@ -46,7 +46,6 @@ export default {
   },
   created() {
     this.activeStore.setActivePage(Number(this.$route.params.id), this.$route.name as pageType)
-    console.log(this.$route.name);
   },
   computed: {
     channelName() {

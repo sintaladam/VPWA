@@ -24,7 +24,7 @@ export default defineRouter(function () {
   Router.beforeEach((to, from, next) => {
     const userStore = useUserStore();
     const isAuthenticated = userStore.isAuthenticated;
-    console.log(isAuthenticated, to.path, to.path.startsWith('/login'))
+    
     if (to.path.startsWith('/channel') || to.path.startsWith('/chat')) {
       if (!isAuthenticated) {
         return next('/login');

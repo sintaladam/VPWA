@@ -10,7 +10,7 @@
       </q-item>
     </template>
 
-    <q-card @click="console.log('random')">
+    <q-card>
       <q-card-section>
         Chat ID: {{ chat.id }} <br>
         Sender ID: {{ chat.senderId }}
