@@ -1,41 +1,93 @@
 import { defineStore } from 'pinia';
 import { type Message, type pageType, type messageType } from 'src/components/models';
-import { type ChannelAtr, type ChatAtr } from 'src/components/models';
+import type { ChannelAtr, ChatAtr, KickVote, StatusType, UserAtr } from 'src/components/models';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
     activePageId: 0 as number, // current active page or channel name
     activePageType: '' as pageType,
+    users: {
+      1: {
+        id: 1,
+        email: 'karolina1@gmail.com',
+        nickname: 'karolina_one',
+        name: 'Karolina',
+        surname: 'Loplotova',
+        status: 'online' as StatusType,
+      },
+      2: {
+        id: 2,
+        email: 'michael2@example.com',
+        nickname: 'mike_2',
+        name: 'Michael',
+        surname: 'Davis',
+        status: 'online' as StatusType,
+      },
+      3: {
+        id: 3,
+        email: 'lucy3@example.com',
+        nickname: 'lucy_rocks',
+        name: 'Lucy',
+        surname: 'Stone',
+        status: 'online' as StatusType,
+      },
+      4: {
+        id: 4,
+        email: 'john4@example.com',
+        nickname: 'johnny_four',
+        name: 'John',
+        surname: 'Doe',
+        status: 'online' as StatusType,
+      },
+      5: {
+        id: 5,
+        email: 'emily5@example.com',
+        nickname: 'emily_star',
+        name: 'Emily',
+        surname: 'Blake',
+        status: 'online' as StatusType,
+      }
+    } as Record<number, UserAtr>,
+
     channels: [
       {
         id: 0,
         type: 'public',
-        name: 'Generic name1',
-        description: 'generic description'
+        name: 'AdminChannel',
+        description: 'channel where you are admin user',
+        creatorId: 1,
+        users: [1, 2, 3]
       },
       {
         id: 1,
         type: 'public',
-        name: 'Generic name2',
-        description: 'generic description'
+        name: 'Basic Public Channel',
+        description: 'channel where you are basic user',
+        creatorId: 2,
+        users: [1, 2, 3, 4],
+        kickVotes: [] as KickVote[],
       },
       {
         id: 2,
         type: 'public',
-        name: 'Generic name3',
-        description: 'generic description'
+        name: 'Generic name2',
+        description: 'generic description',
+        users: [1, 2, 3]
       },
+
       {
         id: 3,
         type: 'public',
         name: 'Generic name4',
-        description: 'generic description'
+        description: 'generic description',
+        users: [1, 2, 3]
       },
       {
         id: 4,
         type: 'public',
         name: 'Generic name5',
-        description: 'generic description'
+        description: 'generic description',
+        users: [1, 2, 3]
       },
     ] as ChannelAtr[],
     chats: [
@@ -157,6 +209,46 @@ export const useActivePage = defineStore('channelPage', {
     ]
   }),
   actions: {
+    isAdmin (channelId: number, userId: number) {//current implementation is dependant on the fact that data are hardcoded in right order
+      if (this.channels[channelId]?.creatorId == userId) {
+        return true;
+      }
+      return false;
+    },
+    voteKickUser(targetUserNick: string, voterId: number, channelId: number) {
+      const channel = this.channels.find(c => c.id === channelId);
+      
+      if (!channel) return;
+
+      const targetUserId = channel.users
+        .map(id => this.users[id])         
+        .find(u => u?.nickname === targetUserNick)?.id;
+
+      if (!targetUserId) {
+          console.log('User not found in this channel.');
+          return;
+      }
+
+      if (channel.kickVotes) {
+        const existingVote = channel.kickVotes.find(vote => vote.targetUserId === targetUserId);
+        if (existingVote) {
+          existingVote.voters.add(voterId)
+          if (existingVote.voters.size >= 3) {
+            this.removeUsersFromThread(channelId, targetUserId);
+            channel.kickVotes = channel.kickVotes.filter(v => v.targetUserId !== targetUserId);
+            return `${targetUserNick} was kicked`;
+          }
+          return `${existingVote.voters.size} kick ${existingVote.voters.size > 1 ? 'votes' : 'vote'} to kick ${targetUserNick}` 
+        } else {
+          channel.kickVotes.push({
+            targetUserId,
+            voters: new Set([voterId])
+          })
+          return '1 kick vote'
+        }
+      }
+      
+    },
     setActivePage(id: number, type: pageType) {
       this.activePageId = id;
       this.activePageType = type;
@@ -248,6 +340,14 @@ export const useActivePage = defineStore('channelPage', {
         content,
         timestamp
       });
+    },
+    removeUsersFromThread(channelId: number, userIds: number | number[]) {
+      const idsToRemove = new Set(Array.isArray(userIds) ? userIds : [userIds]); // <-- convert to Set
+      const channel = this.channels.find(c => c.id === channelId);
+
+      if (!channel) return;
+
+      channel.users = channel.users.filter(userId => !idsToRemove.has(userId)); // <-- use Set.has()
     }
   },
   getters: {
@@ -287,10 +387,18 @@ export const useActivePage = defineStore('channelPage', {
         return channel;
       }
       return 0;
-    }
+    },
+    getThreadUsers: (state) => (id: number) => {
+      const channel = state.channels.find(c => c.id === id);
+      if (!channel) return [];
+
+      return channel.users
+        .map(userId => state.users[userId])
+        .filter(Boolean); // remove undefined users just in case
+    },
   },
   persist: {
-    key: 'activePageStore',
+    key: 'threadStore',
     storage: sessionStorage,
   }
 });

@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import type { QForm } from 'quasar'
-import { useCookies } from 'vue3-cookies';
+//import { useCookies } from 'vue3-cookies';
 
 // import CryptoJS from 'crypto-js'
 
@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     async login() {
-      const { cookies } = useCookies();
+      //const { cookies } = useCookies();
 
       const form = this.$refs.formRef as QForm
       console.log(this.$q.platform)
@@ -66,12 +66,12 @@ export default {
 
       // Replace with real backend check
       // Create JWT token here 
-      const loginSuccess = true;
-      const userToken = ''
+      const loginSuccess = false;
+      //const userToken = ''
 
       if (loginSuccess) {
         this.$q.notify({ type: 'positive', message: 'Login successful!' })
-        cookies.set('token', userToken, '1h', '/', '', true, 'Strict');
+        //cookies.set('token', userToken, '1h', '/', '', true, 'Strict');
         void this.$router.push('/')
       } else {
         this.$q.notify({ type: 'negative', message: 'Invalid email or password' })

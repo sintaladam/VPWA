@@ -11,7 +11,7 @@ export const useUserStore = defineStore('user', {
     description: '',
     status: 'offline',
     token: '',
-    isAuthenticated: true
+    isAuthenticated: false
   }),
   actions: {
     login(userData: ProfileAtr) {
@@ -26,7 +26,7 @@ export const useUserStore = defineStore('user', {
       this.isAuthenticated = true;
     },
     logout() {
-      this.id = null;
+      this.id = Infinity;
       this.name = '';
       this.token = '';
       this.isAuthenticated = false;
@@ -56,7 +56,8 @@ export const useUserStore = defineStore('user', {
         isAuthenticated: state.isAuthenticated
       };
     }
-  }
+  },
+  persist: true 
 
   //using cookies for this
 });

@@ -12,12 +12,20 @@ export interface Message {
   type: messageType;
 }
 
+export interface KickVote {
+  targetUserId: number,
+  voters: Set<number>
+}
+
 export interface ChannelAtr {
   id: number;
   type: ChannelType;
   name: string;
   description: string;
   createdAt: number;
+  creatorId: number;
+  users: number[];
+  kickVotes?: KickVote[]
 }
 
 export interface ChatAtr {
@@ -27,7 +35,7 @@ export interface ChatAtr {
 }
 
 export interface ProfileAtr {
-  id: number | null;
+  id: number;
   email: string;
   nickname: string;
   name: string;
@@ -36,6 +44,14 @@ export interface ProfileAtr {
   status: StatusType;
   token: string;
   isAuthenticated: boolean;
+}
+export interface UserAtr {
+  id: number;
+  email: string;
+  nickname: string;
+  name: string;
+  surname: string;
+  status: StatusType;
 }
 
 export type StatusType = 'online' | 'offline' | 'dnd';

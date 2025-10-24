@@ -105,7 +105,8 @@ export default {
         email: this.form.email,
         description: '',
         status: 'online',
-        token: 'sometoken'
+        token: 'sometoken',
+        isAuthenticated: true
       } as ProfileAtr)
 
       this.$q.notify({ type: 'positive', message: 'Registration successful!' })

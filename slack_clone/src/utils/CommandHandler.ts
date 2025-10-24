@@ -12,31 +12,70 @@ export class CommandHandler {
     router = useRouter();
     activePage = useActivePage();
     userStore = useUserStore();
-    people = ['Alice', 'Bob', 'Charlie', 'David'];
     output = [''];
 
-
+    print(value: string): void {
+        this.output.push(value)
+    }
 
     handle = async (command: string, argument?: string[]) => {
         this.output = []
+        if (this.activePage.activePageType != 'channel') {
+            this.print('Commands can be used only inside channels')
+            return this.output.join('\n');
+        }
         switch (command) {
-            case 'list':
-                this.output.push('Listing all users:');
-                this.output.push(...this.people);
-                break
+            case 'list': {
+                this.print('Listing all users:');
+                const users = this.activePage.getThreadUsers(this.activePage.activePageId);
+
+                if (users && users.length > 0) {
+                    const userNames = users.map(u => u?.nickname ?? u?.name ?? 'Unknown');
+                    this.output.push(userNames.join(', '));
+                } else {
+                    this.output.push('No users found.');
+                }
+                break;
+            }
             case 'help':
                 this.output.push(`available commands: ${this.commandList.join(', ')}`)
                 break
             case 'kick':
-                //admin can kick user
-                //users can vote to kick user they need at least 3 votes
-                this.output.push('kicking user...')
-                break
+                if (!this.activePage.isAdmin(this.activePage.activePageId, this.userStore.id)) {
+                    if (argument && argument.length > 0 && argument.length < 2) {
+                        const output = this.activePage.voteKickUser(argument[0]!, this.userStore.id, this.activePage.activePageId)
+                        if (output) {
+                           this.print(output);
+                        }
+                    } else {
+                        this.print("Invalid number of arguments")
+                    }
+                } else {
+                    if (argument && argument.length > 0) {
+                        const userIds = argument
+                            .map(name => {
+                                const userEntry = Object.values(this.activePage.users).find(u => u.nickname === name);
+                                return userEntry?.id;
+                            })
+                            .filter(Boolean) as number[]; // remove undefined (nicknames not found)
+
+                        if (userIds.length > 0) {
+                            this.activePage.removeUsersFromThread(this.activePage.activePageId, userIds);
+                            const kickedNames = userIds
+                                .map(id => this.activePage.users[id]?.nickname ?? 'Unknown')
+                                .join(', ');
+                            this.output.push(`Kicked user(s): ${kickedNames}`);
+                        } else {
+                            this.output.push('No valid users found to kick by nickname.');
+                        }
+                    }
+                }
+                break;
             case 'revoke':
                 //kick users from private channel only admin
                 break
             case 'invite':
-                //invite users from private channel only admin
+                //invite users to private channel only admin
                 //everyone can invite to public channel
                 break
             case 'cancel':
