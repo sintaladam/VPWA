@@ -34,7 +34,7 @@ export const useUserStore = defineStore('user', {
     changeStatus(status: StatusType) {
       this.status = status;
     },
-    updateProfile({ id, nickname, name, surname, description }: ProfileAtr) {
+    updateProfile({nickname, name, surname, description }: ProfileAtr) {
       this.nickname = nickname;
       this.name = name;
       this.surname = surname;
