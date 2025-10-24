@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { type pageType } from 'src/components/models';
+import { type Message, type pageType, type messageType } from 'src/components/models';
 import { type ChannelAtr, type ChatAtr } from 'src/components/models';
 
 export const useActivePage = defineStore('channelPage', {
@@ -65,6 +65,96 @@ export const useActivePage = defineStore('channelPage', {
         senderNickname: 'Eve'
       },
     ] as ChatAtr[],
+    messageGroups: [
+      {
+        threadId: 0,
+        threadType: 'channel' as pageType,
+        messages: [
+          {
+            id: 0,
+            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 3, // 3 days ago
+            senderId: 1,
+            senderName: 'nvm',
+            content: 'first message in channel 0',
+            type: 'message'
+          },
+          {
+            id: 1,
+            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
+            senderId: 2,
+            senderName: 'alice',
+            content: 'second message in channel 0',
+            type: 'message'
+          }
+        ] as Message[]
+      },
+      {
+        threadId: 1,
+        threadType: 'channel' as pageType,
+        messages: [
+          {
+            id: 2,
+            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 1, // 1 day ago
+            senderId: 3,
+            senderName: 'bob',
+            content: 'first message in channel 1',
+            type: 'message'
+          },
+          {
+            id: 3,
+            timestamp: Date.now(),
+            senderId: 1,
+            senderName: 'nvm',
+            content: 'second message in channel 1',
+            type: 'message'
+          }
+        ] as Message[]
+      },
+      {
+        threadId: 0,
+        threadType: 'chat' as pageType,
+        messages: [
+          {
+            id: 4,
+            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 5, // 5 days ago
+            senderId: 4,
+            senderName: 'jane',
+            content: 'first message in chat 0',
+            type: 'message'
+          },
+          {
+            id: 5,
+            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 4, // 4 days ago
+            senderId: 1,
+            senderName: 'nvm',
+            content: 'second message in chat 0',
+            type: 'message'
+          }
+        ] as Message[]
+      },
+      {
+        threadId: 1,
+        threadType: 'chat' as pageType,
+        messages: [
+          {
+            id: 6,
+            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2,
+            senderId: 2,
+            senderName: 'alice',
+            content: 'first message in chat 1',
+            type: 'message'
+          },
+          {
+            id: 7,
+            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 1,
+            senderId: 3,
+            senderName: 'bob',
+            content: 'second message in chat 1',
+            type: 'message'
+          }
+        ] as Message[]
+      }
+    ]
   }),
   actions: {
     setActivePage(id: number, type: pageType) {
@@ -79,7 +169,7 @@ export const useActivePage = defineStore('channelPage', {
             type: 'public',
             name: 'New Channel',
             description: 'New channel description',
-            createdAt: new Date()
+            createdAt: Date.now()
           } as ChannelAtr);
           break;
         case 'chat':
@@ -97,7 +187,7 @@ export const useActivePage = defineStore('channelPage', {
         type,
         name,
         description,
-        createdAt: new Date()
+        createdAt: Date.now()
       } as ChannelAtr);
     },
     createChat(recipient: string) {
@@ -125,6 +215,40 @@ export const useActivePage = defineStore('channelPage', {
         channel.type = type;
       }
     },
+    addMessage({
+      threadId,
+      threadType,
+      timestamp,
+      senderId,
+      content,
+      type
+    }: {
+      threadId: number;
+      threadType: pageType;
+      timestamp: number;
+      senderId: number;
+      content: string;
+      type: messageType;
+    }) {
+      let group = this.messageGroups.find(group => group.threadId === threadId && group.threadType === threadType);
+      if (!group) {
+        group = {
+          threadId: threadId,
+          threadType: threadType,
+          messages: [] as Message[]
+        };
+        this.messageGroups.push(group);
+      }
+
+      group.messages.push({
+        id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
+        senderId,
+        senderName: 'nvm',
+        type,
+        content,
+        timestamp
+      });
+    }
   },
   getters: {
     getThreadDetails: (state) => (id: number, type: pageType) => {
@@ -146,11 +270,19 @@ export const useActivePage = defineStore('channelPage', {
     searchThreads: (state) => (type: pageType, term: string) => {
       switch (type) {
         case 'channel':
-          return state.channels.filter(ch => ch.name.toLowerCase().includes(term.toLowerCase()));
+          console.log(state.channels)
+          return state.channels.filter(ch => ch.name?.toLowerCase().includes(term.toLowerCase()));
         case 'chat':
+          console.log(state.channels)
           return state.chats.filter(ch => ch.senderNickname.toLowerCase().includes(term.toLowerCase()));
       };
     },
+    getThreadMessages: (state) => (id: number, type: pageType) => {
+      const group = state.messageGroups.find(group => group.threadId === id && group.threadType === type);
+      return (group?.messages ?? []) as Message[];
+      // console.log(state, id, type);
+      // return [] as Message[];
+    }
   },
   persist: {
     key: 'activePageStore',

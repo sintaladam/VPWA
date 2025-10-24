@@ -5,7 +5,7 @@ export enum ChannelType {
 
 export interface Message {
   id: number;
-  timestamp: string;
+  timestamp: number;
   senderId: number;
   senderName: string;
   content: string;
@@ -17,7 +17,7 @@ export interface ChannelAtr {
   type: ChannelType;
   name: string;
   description: string;
-  createdAt: Date;
+  createdAt: number;
 }
 
 export interface ChatAtr {
