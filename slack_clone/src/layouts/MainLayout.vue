@@ -9,13 +9,18 @@
           </q-avatar> -->
           slack clone
           <div class="row q-gutter-xs">
-            
-            <q-btn round flat @click="profileEditorOpen = true" class="p-0">
+            <div class="row flex-end">
+              <q-btn round flat @click="profileEditorOpen = true" class="p-0">
               <q-avatar>
                 <img src="https://cdn.quasar.dev/img/avatar.png">
               </q-avatar>
             </q-btn>
+            <q-btn unelevated rounded color="negative" @click="userStore.logout" class="p-0">
+              Log out
+            </q-btn>
 
+            </div>
+            
             <updated-user-profile v-model="profileEditorOpen" :profile="profile"/>
 
             <q-btn-dropdown unelevated rounded :color="statusIcon.color">

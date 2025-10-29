@@ -30,6 +30,11 @@ export const useUserStore = defineStore('user', {
       this.name = '';
       this.token = '';
       this.isAuthenticated = false;
+
+      window.location.reload();
+
+      localStorage.clear();
+      sessionStorage.clear();
     },
     changeStatus(status: StatusType) {
       this.status = status;

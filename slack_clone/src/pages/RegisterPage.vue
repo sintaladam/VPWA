@@ -1,18 +1,35 @@
 <template>
   <q-page class="flex flex-center column">
-    <div class="q-pa-xl q-ma-md custom-border">
-      <q-form ref="formRef">
-        <div class="row justify-between q-gutter-y-md">
-          <div class="col-xs-12 col-md-5">
-            <q-input outlined v-model="form.firstname" label="Firstname" :rules="nameRules" />
+    <div class="q-pa-xl q-ma-md custom-border" style="min-width: 320px; max-width: 500px; width: 100%;"    >
+      <div class="q-pb-md">
+        <p class="text-center text-h4 text-weight-bold q-ma-none">Create Account</p>
+        <p class="text-center text-grey-7 q-mt-sm q-mb-none">Join us today</p>
+      </div>
+
+      <q-form class="q-mt-lg" ref="formRef">
+        <div class="row q-col-gutter-sm q-mb-sm">
+          <div class="col-12 col-sm">
+            <q-input outlined v-model="form.firstname" label="Firstname" :rules="nameRules">
+              <template v-slot:prepend>
+                <q-icon name="person" />
+              </template>
+            </q-input>
           </div>
-          <div class="col-xs-12 col-md-5">
-            <q-input outlined v-model="form.lastname" label="Lastname" :rules="nameRules" />
+          <div class="col-12 col-sm">
+            <q-input outlined v-model="form.lastname" label="Lastname" :rules="nameRules"/>
           </div>
         </div>
-
-        <q-input outlined v-model="form.username" label="Nickname" class="q-mt-md" :rules="nameRules" />
-        <q-input outlined v-model="form.email" label="Email" type="email" autocomplete="email" class="q-mt-md" :rules="emailRules" />
+      
+        <q-input outlined v-model="form.username" label="Nickname" class="q-mb-sm" :rules="nameRules">
+          <template v-slot:prepend>
+                <q-icon name="alternate_email" />
+              </template>
+        </q-input>
+        <q-input outlined v-model="form.email" label="Email" class="q-mb-sm" type="email" autocomplete="email" :rules="emailRules">
+          <template v-slot:prepend>
+                <q-icon name="email" />
+              </template>
+        </q-input>
 
         <q-input
           outlined
@@ -20,10 +37,13 @@
           label="Password"
           :type="isPwd ? 'password' : 'text'"
           autocomplete="new-password"
-          class="q-mt-md"
           :rules="passwordRules"
         >
+        <template v-slot:prepend>
+                <q-icon name="lock" />
+              </template>
           <template v-slot:append>
+            
             <q-icon
               :name="isPwd ? 'visibility_off' : 'visibility'"
               class="cursor-pointer"
@@ -32,17 +52,15 @@
           </template>
         </q-input>
 
-        <div class="row items-center q-mt-md justify-start q-col-gutter-md">
-          <div class="col-12 col-sm-auto">
-            <q-btn label="Register" @click="register" color="primary" />
-          </div>
+        <q-btn label="Register" @click="register" color="primary" class="full-width q-mt-lg" />
 
-          <div class="col-12 col-sm-auto row items-center q-gutter-x-sm">
-            <p class="q-mb-none">Already have an account?</p>
-            <router-link to="/login" class="text-primary text-bold text-decoration-none">
-              Log in
-            </router-link>
-          </div>
+        <q-separator class="q-my-lg" />
+
+        <div class="row items-center q-mt-md justify-center q-col-gutter-x-md">
+          <p class="q-mb-none">Already have an account?</p>
+          <router-link to="/login" class="text-primary text-bold text-decoration-none">
+            Log in
+          </router-link>
         </div>
       </q-form>
     </div>

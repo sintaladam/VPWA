@@ -243,7 +243,7 @@ export const useActivePage = defineStore('channelPage', {
             targetUserId,
             voters: new Set([voterId])
           })
-          return '1 kick vote'
+          return '1 kick vote to kick ' + targetUserNick;
         }
       }
       
