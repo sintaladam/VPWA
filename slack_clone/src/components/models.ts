@@ -1,6 +1,6 @@
 export enum ChannelType {
   Public = 'public',
-  Private = 'private'
+  Private = 'private',
 }
 
 export interface Message {
@@ -13,8 +13,8 @@ export interface Message {
 }
 
 export interface KickVote {
-  targetUserId: number,
-  voters: Set<number>
+  targetUserId: number;
+  voters: Set<number>;
 }
 
 export interface ChannelAtr {
@@ -25,7 +25,7 @@ export interface ChannelAtr {
   createdAt: number;
   creatorId: number;
   users: number[];
-  kickVotes?: KickVote[]
+  kickVotes?: KickVote[];
 }
 
 export interface ChatAtr {
@@ -60,6 +60,6 @@ export type TabName = 'channels' | 'chats' | 'profile';
 
 export type DeviceType = 'mobile' | 'desktop';
 
-export type messageType = 'command' | 'message';
+export type messageType = 'command' | 'message' | 'component';
 
 export type pageType = 'channel' | 'chat';

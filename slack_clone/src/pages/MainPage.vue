@@ -8,11 +8,14 @@
       <div class="col q-pa-md">
         <MessageBoard ref="msgBoard" />
       </div>
-
       <div class="bg-white-1" style="height: 75px; flex: 0 0 auto;">
-        <CLI @submitMessageEvent="addMessage" />
+        <CLI @submitMessageEvent="addMessage" @showList="showList" />
       </div>
     </div>
+
+    <UserList :users="activeUsers" v-model="editorOpen" />
+
+
   </q-page>
 </template>
 
@@ -20,28 +23,39 @@
 import MessageBoard from 'src/components/MessageBoard.vue';
 import CLI from 'src/components/CLI.vue';
 import { useActivePage } from '../stores/threadStore';
-import type { messageType, pageType } from 'src/components/models';
+import type { messageType, pageType, UserAtr } from 'src/components/models';
 import { useUserStore } from 'src/stores/userUserStore';
+import UserList from 'src/components/UserList.vue'
+import { ref } from 'vue';
 
 export default {
   components: {
     MessageBoard,
     CLI,
+    UserList
   },
   methods: {
-    addMessage (value:string, type: messageType) {
+    addMessage(value: string, type: messageType) {
       (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addMessage({
         timestamp: Date.now(),
         senderId: this.userStore.id as number,
         content: value,
         type: type
       });
+    },
+    showList(data: UserAtr[], messageType: messageType) {
+      if (messageType === 'component') {
+        this.editorOpen = !this.editorOpen;
+        this.activeUsers = data;
+      }
     }
   },
   data() {
     return {
       activeStore: useActivePage(),
       userStore: useUserStore(),
+      editorOpen: ref(false),
+      activeUsers: [] as UserAtr[]
     }
   },
   created() {
@@ -51,6 +65,6 @@ export default {
     channelName() {
       return this.activeStore.getThreadName(this.activeStore.activePageId, this.activeStore.activePageType);
     }
-  }
+  },
 }
 </script>

@@ -3,7 +3,7 @@
     <div class="col-11 column justify-end">
       <template v-for="(mess, index) in messages" :key="index">
         <q-chat-message :text="[mess.content]" :sent="mess.senderId === 1" :name="mess.senderName"
-          :bg-color="mess.type === 'command' ? 'green' : userStore.id == mess.senderId ? 'primary' : 'grey'" class="" /> 
+          :bg-color="mess.type === 'command' ? 'green' : userStore.id == mess.senderId ? 'primary' : 'grey'" class="" />
       </template>
     </div>
   </div>
@@ -33,8 +33,8 @@ export default {
       if (newMessage.type === 'command') {
         this.localMessages.push({ ...newMessage, id: -1, senderName: 'System' });
       }
-      else {
-        this.activePage.addMessage({ threadId:this.activePage.activePageId, threadType: this.activePage.activePageType, ...newMessage});
+      else if (newMessage.type === 'message') {
+        this.activePage.addMessage({ threadId: this.activePage.activePageId, threadType: this.activePage.activePageType, ...newMessage });
       }
     },
     async scrollToBottom() {
