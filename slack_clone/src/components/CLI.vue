@@ -31,12 +31,10 @@ export default {
         const argument = parts.slice(1);
         const { type, output } = await this.command.handle(command, argument);
         if (type === 'command') {
-          // ensure output is a string when emitting submitMessageEvent
           const out = Array.isArray(output) ? output.join(' ') : output;
           this.$emit('submitMessageEvent', out, 'command' as messageType);
           this.messageInput = ''
         } else {
-          // show component (payload can be string or string[])
           this.$emit('showList', output as UserAtr[], 'component' as messageType);
           this.messageInput = ''
         }

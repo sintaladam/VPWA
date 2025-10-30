@@ -397,7 +397,9 @@ export const useActivePage = defineStore('channelPage', {
       const channel = state.channels.find((c) => c.id === id);
       if (!channel) return [];
 
-      return channel.users.map((userId) => state.users[userId]).filter(Boolean);
+      return channel.users
+        .map((userId) => state.users[userId])
+        .filter((u): u is UserAtr => u !== undefined);
     },
   },
   persist: {

@@ -1,11 +1,11 @@
 <template>
-    <q-dialog v-model="open" persistent>
+    <q-dialog>
         <q-card style="min-width: 300px; max-width: 400px;">
             <!-- Header -->
             <q-card-section class="row items-center q-pb-none q-gutter-sm">
                 <div class="text-h6">Users in this channel</div>
                 <q-space />
-                <q-btn icon="close" flat round dense v-close-popup @click="open = false" />
+                <q-btn icon="close" flat round dense v-close-popup />
             </q-card-section>
 
             <q-separator />
@@ -38,20 +38,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, type PropType } from 'vue';
+import type { PropType } from 'vue';
 import type { UserAtr } from './models';
 
-export default defineComponent({
-    name: 'UserList',
+export default {
     props: {
         users: {
             type: Array as PropType<UserAtr[]>,
             required: true
-        }
+        },
     },
-    setup() {
-        const open = ref(true);
-        return { open };
+    data() {
+        return {}
     }
-});
+
+}
 </script>

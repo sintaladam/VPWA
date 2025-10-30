@@ -11,8 +11,10 @@
         {{ channel.description }}
         <div class="column q-pt-md q-gutter-md">
           <q-btn color="white" text-color="black" label="Details" @click="editorOpen = true" />
+          <q-btn color="white" text-color="black" label="User list" @click="openUserList" />
           <q-btn color="white" text-color="negative" label="leave channel" @click="deleteOpen = true" />
           <channel-editor v-if="channelId !== undefined" v-model=editorOpen :channel="channel" />
+          <user-list v-model="listOpen" :users="activeUsers" />
           <leave-confirmation v-model="deleteOpen" title="Leave Channel" @deleteEvent="forwardDelete()" />
         </div>
       </q-card-section>
@@ -24,7 +26,8 @@
 import { useActivePage } from '../stores/threadStore';
 import ChannelEditor from './ChannelEditor.vue';
 import LeaveConfirmation from './LeaveConfirmation.vue';
-import { type ChannelAtr } from './models';
+import UserList from './UserList.vue'
+import type { ChannelAtr, UserAtr } from './models';
 
 export default {
   data() {
@@ -34,20 +37,26 @@ export default {
       editorOpen: false,
       deleteOpen: false,
       createOpen: false,
+      listOpen: false,
+      activeUsers: [] as UserAtr[]
     }
   },
   props: {
-    // channel: {
-    //   type: Object as () => ChannelAtr,
-    //   required: true,
-    // }
     channelId: Number
   },
   components: {
     ChannelEditor,
     LeaveConfirmation,
+    UserList
   },
   methods: {
+    getUsers() {
+      this.activeUsers = this.activeStore.getThreadUsers(this.activeStore.activePageId);
+    },
+    openUserList() {
+      this.listOpen = true;
+      this.getUsers();
+    },
     forwardDelete() {
       this.$emit('deleteChannelEvent');
     }
