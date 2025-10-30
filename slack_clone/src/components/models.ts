@@ -28,12 +28,6 @@ export interface ChannelAtr {
   kickVotes?: KickVote[];
 }
 
-export interface ChatAtr {
-  id: number;
-  senderId: number;
-  senderNickname: string;
-}
-
 export interface ProfileAtr {
   id: number;
   email: string;
