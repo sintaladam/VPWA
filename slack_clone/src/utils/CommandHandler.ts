@@ -38,7 +38,7 @@ export class CommandHandler {
         const users = this.activePage.getThreadUsers(this.activePage.activePageId);
 
         if (users && users.length > 0) {
-          return { type: 'component', output: users as UserAtr[] };
+          return { type: 'component', output: users as UserAtr[]};
         } else {
           this.output.push('No users found.');
         }

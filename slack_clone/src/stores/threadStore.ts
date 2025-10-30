@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { type Message, type pageType, type messageType } from 'src/components/models';
-import type { ChannelAtr, ChatAtr, KickVote, StatusType, UserAtr } from 'src/components/models';
+import type { ChannelAtr, KickVote, StatusType, UserAtr } from 'src/components/models';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
@@ -90,33 +90,6 @@ export const useActivePage = defineStore('channelPage', {
         users: [1, 2, 3],
       },
     ] as ChannelAtr[],
-    chats: [
-      {
-        id: 0,
-        senderId: 123,
-        senderNickname: 'Alice',
-      },
-      {
-        id: 1,
-        senderId: 124,
-        senderNickname: 'Bob',
-      },
-      {
-        id: 2,
-        senderId: 125,
-        senderNickname: 'Charlie',
-      },
-      {
-        id: 3,
-        senderId: 126,
-        senderNickname: 'David',
-      },
-      {
-        id: 4,
-        senderId: 127,
-        senderNickname: 'Eve',
-      },
-    ] as ChatAtr[],
     messageGroups: [
       {
         threadId: 0,
@@ -158,50 +131,6 @@ export const useActivePage = defineStore('channelPage', {
             senderId: 1,
             senderName: 'nvm',
             content: 'second message in channel 1',
-            type: 'message',
-          },
-        ] as Message[],
-      },
-      {
-        threadId: 0,
-        threadType: 'chat' as pageType,
-        messages: [
-          {
-            id: 4,
-            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 5, // 5 days ago
-            senderId: 4,
-            senderName: 'jane',
-            content: 'first message in chat 0',
-            type: 'message',
-          },
-          {
-            id: 5,
-            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 4, // 4 days ago
-            senderId: 1,
-            senderName: 'nvm',
-            content: 'second message in chat 0',
-            type: 'message',
-          },
-        ] as Message[],
-      },
-      {
-        threadId: 1,
-        threadType: 'chat' as pageType,
-        messages: [
-          {
-            id: 6,
-            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2,
-            senderId: 2,
-            senderName: 'alice',
-            content: 'first message in chat 1',
-            type: 'message',
-          },
-          {
-            id: 7,
-            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 1,
-            senderId: 3,
-            senderName: 'bob',
-            content: 'second message in chat 1',
             type: 'message',
           },
         ] as Message[],
@@ -263,13 +192,6 @@ export const useActivePage = defineStore('channelPage', {
             createdAt: Date.now(),
           } as ChannelAtr);
           break;
-        case 'chat':
-          this.chats.push({
-            id: this.chats.length ? (this.chats[this.chats.length - 1]?.id ?? 0) + 1 : 0,
-            senderId: Math.floor(Math.random() * 100),
-            senderNickname: 'New Chat User',
-          });
-          break;
       }
     },
     createChannel({ name, type, description }: ChannelAtr) {
@@ -281,22 +203,8 @@ export const useActivePage = defineStore('channelPage', {
         createdAt: Date.now(),
       } as ChannelAtr);
     },
-    createChat(recipient: string) {
-      this.chats.push({
-        id: this.chats.length ? (this.chats[this.chats.length - 1]?.id ?? 0) + 1 : 0,
-        senderId: Math.floor(Math.random() * 100),
-        senderNickname: recipient,
-      });
-    },
-    deleteThread(id: number, type: pageType) {
-      switch (type) {
-        case 'channel':
-          this.channels = this.channels.filter((ch) => ch.id != id);
-          break;
-        case 'chat':
-          this.chats = this.chats.filter((ch) => ch.id != id);
-          break;
-      }
+    deleteThread(id: number) {
+      this.channels = this.channels.filter((ch) => ch.id != id);
     },
     updateChannel({ id, name, description, type }: ChannelAtr) {
       const channel = this.channels.find((ch) => ch.id === id);
@@ -356,26 +264,18 @@ export const useActivePage = defineStore('channelPage', {
       switch (type) {
         case 'channel':
           return state.channels.find((ch) => ch.id == id);
-        case 'chat':
-          return state.chats.find((ch) => ch.id == id);
       }
     },
     getThreadName: (state) => (id: number, type: pageType) => {
       switch (type) {
         case 'channel':
           return state.channels.find((ch) => ch.id == id)?.name;
-        case 'chat':
-          return state.chats.find((ch) => ch.id == id)?.senderNickname;
       }
     },
     searchThreads: (state) => (type: pageType, term: string) => {
       switch (type) {
         case 'channel':
           return state.channels.filter((ch) => ch.name?.toLowerCase().includes(term.toLowerCase()));
-        case 'chat':
-          return state.chats.filter((ch) =>
-            ch.senderNickname.toLowerCase().includes(term.toLowerCase()),
-          );
       }
     },
     getThreadMessages: (state) => (id: number, type: pageType) => {

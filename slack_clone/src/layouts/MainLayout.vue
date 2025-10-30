@@ -62,7 +62,6 @@
         <q-tabs v-model="activeTab" dense class="text-dark col rounded-borders"
           active-color="primary" indicator-color="primary" v-show="!miniState">
           <q-tab name="channels" label="Channels" />
-          <q-tab name="chats" label="Chats" />
           <!-- <q-tab name="profile" label="Profile" /> -->
         </q-tabs>
         <q-btn dense flat round :icon="miniState ? 'arrow_right' : 'arrow_left'" v-if="activeDevice === 'desktop'"
@@ -70,38 +69,19 @@
       </div>
 
       <div v-show="!miniState" class="q-gutter-sm q-py-sm">
-        <template v-if="activeTab === 'chats'">
-          <q-input class="" outlined dense v-model="searchChats" placeholder="Search..." clearable>
-            <template #prepend>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-
-          <ChatBadge v-for="value in chats" :key="value.id" :chatId="value.id" class=""
-            @deleteChatEvent="deleteThread(value.id, 'chat')" />
-          <div class="full-width flex justify-center q-py-md">
-            <q-btn fab-mini icon="add" color="primary" @click="chatCreatorOpen=true" />
-            <ChatCreator v-model="chatCreatorOpen"/>
-          </div>
-
-        </template>
-
-        <template v-else-if="activeTab === 'channels'">
+        <template v-if="activeTab === 'channels'">
           <q-input class="rounded-borders" outlined dense v-model="searchChannels" placeholder="Search..." clearable>
             <template #prepend>
               <q-icon name="search" />
             </template>
           </q-input>
           <ChannelBadge v-for="value in channels" :key="value.id" :channelId="value.id" class=""
-            @deleteChannelEvent="deleteThread(value.id, 'channel')" />
+            @deleteChannelEvent="deleteThread(value.id)" />
           <div class="full-width flex justify-center q-py-md">
             <q-btn fab-mini icon="add" color="primary" @click="channelCreatorOpen=true" />
             <channel-creator v-model="channelCreatorOpen"/>
           </div>
         </template>
-        <!-- <template v-else-if="activeTab === 'profile'">
-          <UserProfile class="full-width" :profile="profile" />
-        </template> -->
       </div>
     </q-drawer>
 
@@ -114,11 +94,9 @@
 
 <script lang="ts">
 import ChannelBadge from 'src/components/ChannelBadge.vue';
-import ChatBadge from 'src/components/ChatBadge.vue';
 import ChannelCreator from 'src/components/ChannelCreator.vue';
-import ChatCreator from 'src/components/ChatCreator.vue';
 import UpdatedUserProfile from 'src/components/UpdatedUserProfile.vue';
-import { type TabName, type DeviceType, type pageType, type ChannelAtr, type ChatAtr } from 'src/components/models';
+import { type TabName, type DeviceType, type ChannelAtr } from 'src/components/models';
 import { Platform } from 'quasar'
 import { useUserStore } from 'src/stores/userUserStore';
 import { useActivePage } from 'src/stores/threadStore';
@@ -126,7 +104,6 @@ import { useActivePage } from 'src/stores/threadStore';
 export default {
   data() {
     return {
-      searchChats: '',
       searchChannels: '',
       activeTab: 'channels' as TabName,
       miniState: false,
@@ -135,7 +112,6 @@ export default {
       userStore: useUserStore(),
       activePage: useActivePage(),
       channelCreatorOpen: false,
-      chatCreatorOpen: false,
       profileEditorOpen: false,
 
       // profile: {
@@ -155,15 +131,15 @@ export default {
     toggleMini() {
       this.miniState = !this.miniState;
     },
-    deleteThread(id: number, type: pageType) {
-      this.activePage.deleteThread(id, type);
-      if (this.activePage.activePageId == id && this.activePage.activePageType == type) {
-        this.$router.push('/' + type);
+    deleteThread(id: number) {
+      this.activePage.deleteThread(id);
+      if (this.activePage.activePageId == id) {
+        this.$router.push('/' + 'channel');
       }
     }
   },
   components: {
-    ChannelBadge, ChatBadge, UpdatedUserProfile, ChannelCreator, ChatCreator
+    ChannelBadge, UpdatedUserProfile, ChannelCreator
   },
   computed: {
     statusIcon() {
@@ -180,9 +156,6 @@ export default {
     },
     channels() {
       return this.activePage.searchThreads('channel', this.searchChannels) as ChannelAtr[];
-    },
-    chats() {
-      return this.activePage.searchThreads('chat', this.searchChats) as ChatAtr[];
     },
     profile() {
       return { ...this.userStore.getProfileDetails() };

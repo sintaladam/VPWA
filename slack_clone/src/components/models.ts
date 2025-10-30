@@ -56,10 +56,10 @@ export interface UserAtr {
 
 export type StatusType = 'online' | 'offline' | 'dnd';
 
-export type TabName = 'channels' | 'chats' | 'profile';
+export type TabName = 'channels' | 'profile';
 
 export type DeviceType = 'mobile' | 'desktop';
 
 export type messageType = 'command' | 'message' | 'component';
 
-export type pageType = 'channel' | 'chat';
+export type pageType = 'channel';
