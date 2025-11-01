@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center column">
-    <div class="q-pa-xl q-ma-md custom-border" style="min-width: 320px; max-width: 500px; width: 100%;"    >
+    <div class="q-pa-xl q-ma-md custom-border" style="min-width: 320px; max-width: 500px;">
       <div class="q-pb-md">
         <p class="text-center text-h4 text-weight-bold q-ma-none">Create Account</p>
         <p class="text-center text-grey-7 q-mt-sm q-mb-none">Join us today</p>
@@ -16,39 +16,30 @@
             </q-input>
           </div>
           <div class="col-12 col-sm">
-            <q-input outlined v-model="form.lastname" label="Lastname" :rules="nameRules"/>
+            <q-input outlined v-model="form.lastname" label="Lastname" :rules="nameRules" />
           </div>
         </div>
-      
+
         <q-input outlined v-model="form.username" label="Nickname" class="q-mb-sm" :rules="nameRules">
           <template v-slot:prepend>
-                <q-icon name="alternate_email" />
-              </template>
+            <q-icon name="alternate_email" />
+          </template>
         </q-input>
-        <q-input outlined v-model="form.email" label="Email" class="q-mb-sm" type="email" autocomplete="email" :rules="emailRules">
+        <q-input outlined v-model="form.email" label="Email" class="q-mb-sm" type="email" autocomplete="email"
+          :rules="emailRules">
           <template v-slot:prepend>
-                <q-icon name="email" />
-              </template>
+            <q-icon name="email" />
+          </template>
         </q-input>
 
-        <q-input
-          outlined
-          v-model="form.password"
-          label="Password"
-          :type="isPwd ? 'password' : 'text'"
-          autocomplete="new-password"
-          :rules="passwordRules"
-        >
-        <template v-slot:prepend>
-                <q-icon name="lock" />
-              </template>
+        <q-input outlined v-model="form.password" label="Password" :type="isPwd ? 'password' : 'text'"
+          autocomplete="new-password" :rules="passwordRules">
+          <template v-slot:prepend>
+            <q-icon name="lock" />
+          </template>
           <template v-slot:append>
-            
-            <q-icon
-              :name="isPwd ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              @click="isPwd=!isPwd"
-            />
+
+            <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" class="cursor-pointer" @click="isPwd = !isPwd" />
           </template>
         </q-input>
 

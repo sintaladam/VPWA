@@ -1,13 +1,12 @@
 <template>
   <q-page class="flex flex-center column">
-    <div class="q-pa-xl custom-border" style="min-width: 350px; max-width: 400px; width: 100%;">
+    <div class="q-pa-xl q-ma-md custom-border" style="min-width: 320px; max-width: 400px;">
       <div class="q-pb-md">
         <p class="text-center text-h4 text-weight-bold q-ma-none">Welcome Back</p>
         <p class="text-center text-grey-7 q-mt-sm q-mb-none">Log in to your account</p>
       </div>
       <q-form class="q-mt-lg" ref="formRef">
-        <q-input outlined v-model="email" label="Email" class="q-mb-sm" autocomplete="email"
-          :rules="emailRules">
+        <q-input outlined v-model="email" label="Email" class="q-mb-sm" autocomplete="email" :rules="emailRules">
           <template v-slot:prepend>
             <q-icon name="email" />
           </template>
