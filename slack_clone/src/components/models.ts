@@ -47,10 +47,18 @@ export interface UserAtr {
   surname: string;
   status: StatusType;
 }
+export interface InviteType {
+  id: number;
+  invitedUserId: number;
+  channelId: number;
+  status: inviteStatusType;
+}
+
+type inviteStatusType = 'accepted' | 'pending' | 'rejected';
 
 export type StatusType = 'online' | 'offline' | 'dnd';
 
-export type TabName = 'channels' | 'profile';
+export type TabName = 'channels' | 'invites';
 
 export type DeviceType = 'mobile' | 'desktop';
 

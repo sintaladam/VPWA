@@ -1,11 +1,43 @@
 import { defineStore } from 'pinia';
 import { type Message, type pageType, type messageType } from 'src/components/models';
-import type { ChannelAtr, KickVote, StatusType, UserAtr } from 'src/components/models';
+import type { ChannelAtr, KickVote, UserAtr, InviteType } from 'src/components/models';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
-    activePageId: 0 as number, // current active page or channel name
+    activePageId: 0 as number,
     activePageType: '' as pageType,
+    invites: {
+      1: {
+        id: 1,
+        invitedUserId: 1,
+        channelId: 0,
+        status: 'pending',
+      },
+      2: {
+        id: 2,
+        invitedUserId: 1,
+        channelId: 1,
+        status: 'accepted',
+      },
+      3: {
+        id: 3,
+        invitedUserId: 1,
+        channelId: 2,
+        status: 'rejected',
+      },
+      4: {
+        id: 4,
+        invitedUserId: 1,
+        channelId: 2,
+        status: 'pending',
+      },
+      5: {
+        id: 5,
+        invitedUserId: 1,
+        channelId: 3,
+        status: 'pending',
+      },
+    } as Record<number, InviteType>,
     users: {
       1: {
         id: 1,
@@ -13,7 +45,7 @@ export const useActivePage = defineStore('channelPage', {
         nickname: 'karolina_one',
         name: 'Karolina',
         surname: 'Loplotova',
-        status: 'dnd' as StatusType,
+        status: 'dnd',
       },
       2: {
         id: 2,
@@ -21,7 +53,7 @@ export const useActivePage = defineStore('channelPage', {
         nickname: 'mike_2',
         name: 'Michael',
         surname: 'Davis',
-        status: 'online' as StatusType,
+        status: 'online',
       },
       3: {
         id: 3,
@@ -29,7 +61,7 @@ export const useActivePage = defineStore('channelPage', {
         nickname: 'lucy_rocks',
         name: 'Lucy',
         surname: 'Stone',
-        status: 'offline' as StatusType,
+        status: 'offline',
       },
       4: {
         id: 4,
@@ -37,7 +69,7 @@ export const useActivePage = defineStore('channelPage', {
         nickname: 'johnny_four',
         name: 'John',
         surname: 'Doe',
-        status: 'offline' as StatusType,
+        status: 'offline',
       },
       5: {
         id: 5,
@@ -45,7 +77,7 @@ export const useActivePage = defineStore('channelPage', {
         nickname: 'emily_star',
         name: 'Emily',
         surname: 'Blake',
-        status: 'online' as StatusType,
+        status: 'online',
       },
     } as Record<number, UserAtr>,
 
@@ -61,7 +93,7 @@ export const useActivePage = defineStore('channelPage', {
       {
         id: 1,
         type: 'public',
-        name: 'Basic Public Channel',
+        name: 'Basic_public_channel',
         description: 'channel where you are basic user',
         creatorId: 2,
         users: [1, 2, 3, 4],
@@ -70,7 +102,7 @@ export const useActivePage = defineStore('channelPage', {
       {
         id: 2,
         type: 'public',
-        name: 'Generic name2',
+        name: 'marketing-campaign-q4-2025-social-media-strategy',
         description: 'generic description',
         users: [1, 2, 3],
       },
@@ -78,14 +110,14 @@ export const useActivePage = defineStore('channelPage', {
       {
         id: 3,
         type: 'public',
-        name: 'Generic name4',
+        name: 'marketing campaign q4 2025 social media strategy',
         description: 'generic description',
         users: [1, 2, 3],
       },
       {
         id: 4,
         type: 'public',
-        name: 'Generic name5',
+        name: 'generic_name_5',
         description: 'generic description',
         users: [1, 2, 3],
       },
@@ -93,7 +125,7 @@ export const useActivePage = defineStore('channelPage', {
     messageGroups: [
       {
         threadId: 0,
-        threadType: 'channel' as pageType,
+        threadType: 'channel',
         messages: [
           {
             id: 0,
@@ -115,7 +147,7 @@ export const useActivePage = defineStore('channelPage', {
       },
       {
         threadId: 1,
-        threadType: 'channel' as pageType,
+        threadType: 'channel',
         messages: [
           {
             id: 2,
@@ -260,6 +292,9 @@ export const useActivePage = defineStore('channelPage', {
     },
   },
   getters: {
+    getInvites: (state) => (userId: number) => {
+      return Object.values(state.invites).filter((invite) => invite.invitedUserId === userId);
+    },
     getThreadDetails: (state) => (id: number, type: pageType) => {
       switch (type) {
         case 'channel':
