@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { type Message, type pageType, type messageType } from 'src/components/models';
 import type { ChannelAtr, KickVote, UserAtr, InviteType } from 'src/components/models';
+import { socket } from 'src/boot/socket';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
@@ -281,6 +282,8 @@ export const useActivePage = defineStore('channelPage', {
         content,
         timestamp,
       });
+
+      this.sendMsg(content);
     },
     removeUsersFromThread(channelId: number, userIds: number | number[]) {
       const idsToRemove = new Set(Array.isArray(userIds) ? userIds : [userIds]);
@@ -290,6 +293,9 @@ export const useActivePage = defineStore('channelPage', {
 
       channel.users = channel.users.filter((userId) => !idsToRemove.has(userId));
     },
+    sendMsg(msg:string) {
+      socket.emit('message', { msg });
+    }
   },
   getters: {
     getInvites: (state) => (userId: number) => {
