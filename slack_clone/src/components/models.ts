@@ -23,7 +23,7 @@ export interface ChannelAtr {
   name: string;
   description: string;
   createdAt: number;
-  creatorId: number;
+  creator_id: number;
   users: number[];
   kickVotes?: KickVote[];
 }

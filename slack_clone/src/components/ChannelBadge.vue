@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     getUsers() {
-      this.activeUsers = this.activeStore.getThreadUsers(this.activeStore.activePageId);
+      //this.activeUsers = this.activeStore.getThreadUsers(this.activeStore.activePageId);
     },
     openUserList() {
       this.listOpen = true;

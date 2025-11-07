@@ -17,11 +17,17 @@ router.get('/', async () => {
 })
 
 router.group(() => {
-    router.post('register', '#controllers/auth_controller.register');
-    router.post('login', '#controllers/auth_controller.login');
-    router.post('logout', '#controllers/auth_controller.logout')
-      .use(middleware.auth({ guards: ['api'] }));
-    router.get('me', '#controllers/auth_controller.me')
-      .use(middleware.auth({ guards: ['api'] }));
-  })
-  .prefix('/auth');
+  router.post('register', '#controllers/auth_controller.register');
+  router.post('login', '#controllers/auth_controller.login');
+  router.post('logout', '#controllers/auth_controller.logout')
+    .use(middleware.auth({ guards: ['api'] }));
+  router.get('me', '#controllers/auth_controller.me')
+    .use(middleware.auth({ guards: ['api'] }));
+})
+.prefix('/auth');
+
+router.group(() => {
+  router.get('channels', '#controllers/home_controller.getChannels')
+    .use(middleware.auth({ guards: ['api'] }));
+})
+.prefix('/home')

@@ -34,56 +34,56 @@ export class CommandHandler {
       return { type: 'message', output: this.output };
     }
     switch (command) {
-      case 'list': {
-        const users = this.activePage.getThreadUsers(this.activePage.activePageId);
+      // case 'list': {
+      //   const users = this.activePage.getThreadUsers(this.activePage.activePageId);
 
-        if (users && users.length > 0) {
-          return { type: 'component', output: users };
-        } else {
-          this.output.push('No users found.');
-        }
-        break;
-      }
+      //   if (users && users.length > 0) {
+      //     return { type: 'component', output: users };
+      //   } else {
+      //     this.output.push('No users found.');
+      //   }
+      //   break;
+      // }
       case 'help':
         this.output.push(`available commands: ${this.commandList.join(', ')}`);
         break;
-      case 'kick':
-        if (!this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
-          if (argument && argument.length > 0 && argument.length < 2) {
-            const output = this.activePage.voteKickUser(
-              argument[0]!,
-              this.userStore.user?.id as number,
-              this.activePage.activePageId,
-            );
-            if (output) {
-              this.print(output);
-            }
-          } else {
-            this.print('Invalid number of arguments');
-          }
-        } else {
-          if (argument && argument.length > 0) {
-            const userIds = argument
-              .map((name) => {
-                const userEntry = Object.values(this.activePage.users).find(
-                  (u) => u.nickname === name,
-                );
-                return userEntry?.id;
-              })
-              .filter(Boolean) as number[]; // remove undefined (nicknames not found)
+      // case 'kick':
+      //   if (!this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
+      //     if (argument && argument.length > 0 && argument.length < 2) {
+      //       const output = this.activePage.voteKickUser(
+      //         argument[0]!,
+      //         this.userStore.user?.id as number,
+      //         this.activePage.activePageId,
+      //       );
+      //       if (output) {
+      //         this.print(output);
+      //       }
+      //     } else {
+      //       this.print('Invalid number of arguments');
+      //     }
+      //   } else {
+      //     if (argument && argument.length > 0) {
+      //       const userIds = argument
+      //         .map((name) => {
+      //           const userEntry = Object.values(this.activePage.users).find(
+      //             (u) => u.nickname === name,
+      //           );
+      //           return userEntry?.id;
+      //         })
+      //         .filter(Boolean) as number[]; // remove undefined (nicknames not found)
 
-            if (userIds.length > 0) {
-              this.activePage.removeUsersFromThread(this.activePage.activePageId, userIds);
-              const kickedNames = userIds
-                .map((id) => this.activePage.users[id]?.nickname ?? 'Unknown')
-                .join(', ');
-              this.output.push(`Kicked user(s): ${kickedNames}`);
-            } else {
-              this.output.push('No valid users found to kick by nickname.');
-            }
-          }
-        }
-        break;
+      //       if (userIds.length > 0) {
+      //         this.activePage.removeUsersFromThread(this.activePage.activePageId, userIds);
+      //         const kickedNames = userIds
+      //           .map((id) => this.activePage.users[id]?.nickname ?? 'Unknown')
+      //           .join(', ');
+      //         this.output.push(`Kicked user(s): ${kickedNames}`);
+      //       } else {
+      //         this.output.push('No valid users found to kick by nickname.');
+      //       }
+      //     }
+      //   }
+      //   break;
       case 'revoke':
         //kick users from private channel only admin
         break;
@@ -111,7 +111,7 @@ export class CommandHandler {
               name: argument[0],
               type: ChannelType.Public,
               description: 'generic description',
-            } as ChannelAtr);
+            } as ChannelAtr, this.userStore.user?.id as number);
             const channel = this.activePage.getThreadId(argument[0] as string);
             if (channel) {
               await this.router.push(`/channel/${channel.id}`);
@@ -128,7 +128,7 @@ export class CommandHandler {
               name: argument[0],
               type: argument[1] === 'private' ? ChannelType.Private : ChannelType.Public,
               description: description,
-            } as ChannelAtr);
+            } as ChannelAtr, this.userStore.user?.id as number);
 
             this.output.push(`creating channel ${argument[0]}`);
 

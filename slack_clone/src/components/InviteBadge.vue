@@ -32,7 +32,7 @@
                         <q-item>
                             <q-item-section>
                                 <q-item-label caption>Members</q-item-label>
-                                <q-item-label>{{ channel.users.length }} members</q-item-label>
+                                <!-- <q-item-label>{{ channel.users.length }} members</q-item-label> -->
                             </q-item-section>
                         </q-item>
                         <q-item>
@@ -49,7 +49,8 @@
 </template>
 
 <script lang="ts">
-import type { InviteType, ChannelAtr } from '../components/models';
+import { type Channel } from 'src/contracts';
+import type { InviteType } from '../components/models';
 import { useActivePage } from 'src/stores/threadStore';
 
 export default {
@@ -59,7 +60,7 @@ export default {
             visible: true,
             offset: 0,
             animating: false,
-            channel: null as ChannelAtr | null | undefined
+            channel: null as Channel | null | undefined
         }
     },
     props: {
@@ -102,7 +103,7 @@ export default {
             setTimeout(done, 300);
         },
         getChannelDetails() {
-            this.channel = this.channelStore.getThreadDetails(this.invite.channelId, 'channel');
+            this.channel = this.channelStore.getThreadDetails(this.invite.channelId, 'channel') as Channel;
         }
     }
 }

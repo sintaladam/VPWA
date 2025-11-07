@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     updateChannel() {
-      this.activePage.updateChannel(this.localChannel);
+      //this.activePage.updateChannel(this.localChannel);
       this.editing = false;
       this.localChannel = { ...this.channel }
     },

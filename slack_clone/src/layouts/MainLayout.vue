@@ -17,7 +17,7 @@
                   <img src="https://cdn.quasar.dev/img/avatar.png">
                 </q-avatar>
               </q-btn>
-              <q-btn unelevated rounded color="negative" @click="userStore.logout" class="p-0">
+              <q-btn unelevated rounded color="negative" @click="onLogout" class="p-0">
                 Log out
               </q-btn>
 
@@ -104,10 +104,11 @@ import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChannelCreator from 'src/components/ChannelCreator.vue';
 import UpdatedUserProfile from 'src/components/UpdatedUserProfile.vue';
 import InviteBadge from 'src/components/InviteBadge.vue';
-import { type TabName, type DeviceType, type ChannelAtr, type ProfileAtr } from 'src/components/models';
+import { type TabName, type DeviceType, type ProfileAtr } from 'src/components/models';
 import { Platform } from 'quasar'
 import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
+import { type Channel } from 'src/contracts';
 
 export default {
   data() {
@@ -149,6 +150,9 @@ export default {
       if (this.activePage.activePageId == id) {
         this.$router.push('/' + 'channel');
       }
+    },
+    async onLogout() {
+      await this.userStore.logout()
     }
   },
   components: {
@@ -172,7 +176,7 @@ export default {
       }
     },
     channels() {
-      return this.activePage.searchThreads('channel', this.searchChannels) as ChannelAtr[];
+      return this.activePage.searchThreads('channel', this.searchChannels) as Channel[];
     },
     profile() {
       return { ...this.userStore.getProfileDetails() as ProfileAtr};
@@ -180,6 +184,9 @@ export default {
     invites() {
       return this.activePage.getInvites(this.userStore.user?.id as number)
     }
+  },
+  created() {
+    this.activePage.getChannels()
   }
 }
 </script>

@@ -33,12 +33,15 @@
 <script lang="ts">
 import { useActivePage } from 'src/stores/threadStore';
 import { Platform } from 'quasar';
-import { type ChannelAtr, type DeviceType } from './models';
+import { type DeviceType } from './models';
+import type { Channel } from 'src/contracts';
+import { useAuthStore } from 'src/stores/authStore';
 
 export default {
   data() {
     return {
       activePage: useActivePage(),
+      userStore: useAuthStore(),
       newChannel: {
         name: '',
         type: '',
@@ -61,7 +64,7 @@ export default {
   },
   methods: {
     createChannel() {
-      this.activePage.createChannel(this.newChannel as ChannelAtr);
+      this.activePage.createChannel(this.newChannel as Channel, this.userStore.user?.id as number);
       this.localDialogOpen = false
     }
   },
