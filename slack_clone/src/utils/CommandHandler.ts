@@ -1,5 +1,5 @@
 import { useActivePage } from 'src/stores/threadStore';
-import { useUserStore } from 'src/stores/userUserStore';
+import { useAuthStore } from 'src/stores/authStore';
 import { useRouter } from 'vue-router';
 import {
   ChannelType,
@@ -17,7 +17,7 @@ export class CommandHandler {
   commandList = ['list', 'help', 'join'];
   router = useRouter();
   activePage = useActivePage();
-  userStore = useUserStore();
+  userStore = useAuthStore();
   output = [''];
 
   print(value: string): void {
@@ -48,11 +48,11 @@ export class CommandHandler {
         this.output.push(`available commands: ${this.commandList.join(', ')}`);
         break;
       case 'kick':
-        if (!this.activePage.isAdmin(this.activePage.activePageId, this.userStore.id)) {
+        if (!this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
           if (argument && argument.length > 0 && argument.length < 2) {
             const output = this.activePage.voteKickUser(
               argument[0]!,
-              this.userStore.id,
+              this.userStore.user?.id as number,
               this.activePage.activePageId,
             );
             if (output) {

@@ -6,12 +6,12 @@
         <p class="text-center text-grey-7 q-mt-sm q-mb-none">Log in to your account</p>
       </div>
       <q-form class="q-mt-lg" ref="formRef">
-        <q-input outlined v-model="email" label="Email" class="q-mb-sm" autocomplete="email" :rules="emailRules">
+        <q-input outlined v-model="credentials.email" label="Email" class="q-mb-sm" autocomplete="email" :rules="emailRules">
           <template v-slot:prepend>
             <q-icon name="email" />
           </template>
         </q-input>
-        <q-input outlined v-model="password" label="Password" :type="isPwd ? 'password' : 'text'"
+        <q-input outlined v-model="credentials.password" label="Password" :type="isPwd ? 'password' : 'text'"
           autocomplete="current-password" :rules="passwordRules">
           <template v-slot:prepend>
             <q-icon name="lock" />
@@ -21,13 +21,13 @@
           </template>
         </q-input>
 
-        <q-btn label="Log in" @click="login" color="primary" class="q-mt-lg full-width" />
+        <q-btn label="Log in" @click="login" color="primary" class="q-mt-lg full-width" :loading="loading"/>
 
         <q-separator class="q-my-lg" />
 
         <div class="col-12 col-sm-auto row items-center justify-center q-gutter-x-sm">
           <p class="q-mb-none">Don't have an account yet?</p>
-          <router-link to="/register" class="text-primary text-bold text-decoration-none">
+          <router-link :to="{ name: 'register'}" class="text-primary text-bold text-decoration-none">
             Register here
           </router-link>
         </div>
@@ -38,19 +38,19 @@
 
 <script lang="ts">
 import type { QForm } from 'quasar'
+import { useAuthStore } from 'src/stores/authStore';
 //import { useCookies } from 'vue3-cookies';
 
 // import CryptoJS from 'crypto-js'
+import { type RouteLocationRaw } from 'vue-router';
 
 export default {
   name: 'LoginPage',
   data() {
     return {
-      email: '' as string,
-      password: '' as string,
+
       isPwd: true as boolean,
       formRef: null as QForm | null,
-
 
       // Validation rules
       emailRules: [
@@ -60,35 +60,50 @@ export default {
       passwordRules: [
         (val: string) => !!val || 'Password is required',
         (val: string) => val.length >= 6 || 'Password must be at least 6 characters'
-      ]
+      ],
+      credentials: { email: '', password: '' },
+      userStore: useAuthStore(),
+
+    }
+  },
+  computed: {
+    redirectTo (): RouteLocationRaw {
+      return (this.$route.query.redirect as string) || { name: 'home' }
+    },
+    loading (): boolean {
+      return this.userStore.authStatus === 'pending'
     }
   },
   methods: {
-    async login() {
-      //const { cookies } = useCookies();
+    // async login() {
+    //   //const { cookies } = useCookies();
 
-      const form = this.$refs.formRef as QForm
+    //   const form = this.$refs.formRef as QForm
 
-      const isValid = await form.validate()
-      if (!isValid) {
-        this.$q.notify({ type: 'negative', message: 'Please fill in all fields correctly' })
-        return
-      }
+    //   const isValid = await form.validate()
+    //   if (!isValid) {
+    //     this.$q.notify({ type: 'negative', message: 'Please fill in all fields correctly' })
+    //     return
+    //   }
 
-      //const hashedPassword = CryptoJS.SHA256(this.password).toString()
+    //   //const hashedPassword = CryptoJS.SHA256(this.password).toString()
 
-      // Replace with real backend check
-      // Create JWT token here 
-      const loginSuccess = false;
-      //const userToken = ''
+    //   // Replace with real backend check
+    //   // Create JWT token here 
+    //   const loginSuccess = false;
+    //   //const userToken = ''
 
-      if (loginSuccess) {
-        this.$q.notify({ type: 'positive', message: 'Login successful!' })
-        //cookies.set('token', userToken, '1h', '/', '', true, 'Strict');
-        void this.$router.push('/')
-      } else {
-        this.$q.notify({ type: 'negative', message: 'Invalid email or password' })
-      }
+    //   if (loginSuccess) {
+    //     this.$q.notify({ type: 'positive', message: 'Login successful!' })
+    //     //cookies.set('token', userToken, '1h', '/', '', true, 'Strict');
+    //     void this.$router.push('/')
+    //   } else {
+    //     this.$q.notify({ type: 'negative', message: 'Invalid email or password' })
+    //   }
+    // }
+
+    login() {
+      this.userStore.login(this.credentials).then(() => this.$router.push(this.redirectTo))
     }
   }
 }

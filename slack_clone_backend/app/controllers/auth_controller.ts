@@ -3,15 +3,20 @@ import { registerValidator, loginValidator } from '#validators/register_user'
 import User from '#models/user'
 
 export default class AuthController {
-  async register({ request }: HttpContext) {
+  async register({ request, auth }: HttpContext) {
     const data = await request.validateUsing(registerValidator);
-    return User.create(data);
+    const user = await User.create(data);
+    const token = await auth.use('api').createToken(user);
+    console.log(user, token);
+    return token;
   }
 
   async login({ request, auth }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator);
     const user = await User.verifyCredentials(email, password);
-    return await auth.use('api').createToken(user);
+    const token = await auth.use('api').createToken(user);
+    console.log(user, token);
+    return token;
   }
 
   async logout({ auth }: HttpContext) {

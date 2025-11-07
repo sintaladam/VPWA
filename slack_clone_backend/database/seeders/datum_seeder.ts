@@ -1,6 +1,5 @@
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import db from '@adonisjs/lucid/services/db'
-import hash from '@adonisjs/core/services/hash'
 import Channel from '#models/channel'
 import User from '#models/user'
 import Role from '#models/role'
@@ -13,33 +12,32 @@ export default class extends BaseSeeder {
 
     await User.createMany([
       {
-        id: 1,
+        nickname: 'admin',
         name: 'Admin',
         surname: 'User',
         email: 'admin@example.com',
-        password: await hash.make('admin123'),
+        password: 'admin123',
         description: 'System administrator',
       },
       {
-        id: 2,
+        nickname: 'johnd',
         name: 'John',
         surname: 'Doe',
         email: 'john@example.com',
-        password: await hash.make('password'),
+        password: 'password',
         description: 'Regular user',
       },
       {
-        id: 3,
+        nickname: 'aliced',
         name: 'Alice',
         surname: 'Doe',
         email: 'alice@example.com',
-        password: await hash.make('heslo'),
+        password: 'heslo',
         description: 'Regular user',
       },
     ]);
 
     await Role.create({
-      id: 1,
       value: 'admin'
     });
 
@@ -49,35 +47,30 @@ export default class extends BaseSeeder {
 
     await Channel.createMany([
       {
-        id: 1,
         name: 'general',
         description: 'General discussion channel',
         type: 'public',
         creator_id: 1,
       },
       {
-        id: 2,
         name: 'random',
         description: 'Off-topic conversations and memes',
         type: 'public',
         creator_id: 1,
       },
       {
-        id: 3,
         name: 'development',
         description: 'Talk about code and projects',
         type: 'public',
         creator_id: 1,
       },
       {
-        id: 4,
         name: 'design',
         description: 'UI/UX and creative work',
         type: 'private',
         creator_id: 1,
       },
       {
-        id: 5,
         name: 'support',
         description: 'Help and support requests',
         type: 'public',

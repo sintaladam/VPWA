@@ -6,7 +6,7 @@ import {
   createWebHistory,
 } from 'vue-router';
 import routes from './routes';
-import { useUserStore } from 'src/stores/userUserStore'; 
+// import { useUserStore } from 'src/stores/userUserStore'; 
 
 export default defineRouter(function () {
   const createHistory = process.env.SERVER
@@ -21,22 +21,22 @@ export default defineRouter(function () {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  Router.beforeEach((to, from, next) => {
-    const userStore = useUserStore();
-    const isAuthenticated = userStore.isAuthenticated;
+  // Router.beforeEach((to, from, next) => {
+  //   const userStore = useUserStore();
+  //   const isAuthenticated = userStore.isAuthenticated;
     
-    if (to.path.startsWith('/channel')) {
-      if (!isAuthenticated) {
-        return next('/login');
-      }
-    }
+  //   if (to.path.startsWith('/channel')) {
+  //     if (!isAuthenticated) {
+  //       return next('/login');
+  //     }
+  //   }
 
-    if (to.path.startsWith('/login') && isAuthenticated) {
-      return next('/channel/0');
-    }
+  //   if (to.path.startsWith('/login') && isAuthenticated) {
+  //     return next('/channel/0');
+  //   }
 
-    next();
-  });
+  //   next();
+  // });
 
   return Router;
 });

@@ -9,18 +9,18 @@
       <q-form class="q-mt-lg" ref="formRef">
         <div class="row q-col-gutter-sm q-mb-sm">
           <div class="col-12 col-sm">
-            <q-input outlined v-model="form.firstname" label="Firstname" :rules="nameRules">
+            <q-input outlined v-model="form.name" label="Firstname" :rules="nameRules">
               <template v-slot:prepend>
                 <q-icon name="person" />
               </template>
             </q-input>
           </div>
           <div class="col-12 col-sm">
-            <q-input outlined v-model="form.lastname" label="Lastname" :rules="nameRules" />
+            <q-input outlined v-model="form.surname" label="Lastname" :rules="nameRules" />
           </div>
         </div>
 
-        <q-input outlined v-model="form.username" label="Nickname" class="q-mb-sm" :rules="nameRules">
+        <q-input outlined v-model="form.nickname" label="Nickname" class="q-mb-sm" :rules="nameRules">
           <template v-slot:prepend>
             <q-icon name="alternate_email" />
           </template>
@@ -49,7 +49,7 @@
 
         <div class="row items-center q-mt-md justify-center q-col-gutter-x-md">
           <p class="q-mb-none">Already have an account?</p>
-          <router-link to="/login" class="text-primary text-bold text-decoration-none">
+          <router-link :to="{ name: 'login' } " class="text-primary text-bold text-decoration-none">
             Log in
           </router-link>
         </div>
@@ -59,9 +59,10 @@
 </template>
 
 <script lang="ts">
-import type { QForm } from 'quasar'
-import { useUserStore } from 'src/stores/userUserStore'
-import type { ProfileAtr } from 'src/components/models'
+// import type { QForm } from 'quasar'
+import { useAuthStore } from 'src/stores/authStore'
+// import type { ProfileAtr } from 'src/components/models'
+import type { RouteLocationRaw } from 'vue-router';
 
 export default {
   name: 'RegisterPage',
@@ -69,14 +70,14 @@ export default {
   data() {
     return {
       form: {
-        firstname: '',
-        lastname: '',
-        username: '',
+        name: '',
+        surname: '',
+        nickname: '',
         email: '',
         password: ''
       },
       isPwd: true,
-      userStore: useUserStore(),
+      userStore: useAuthStore(),
 
       nameRules: [
         (val: string) => !!val || 'This field is required'
@@ -91,35 +92,46 @@ export default {
       ]
     }
   },
-
+  computed: {
+      redirectTo (): RouteLocationRaw {
+        return { name: 'login' }
+      },
+      loading (): boolean {
+        return this.userStore.authStatus === 'pending'
+      }
+    },
   methods: {
-    async register() {
-      const form = this.$refs.formRef as QForm
-      if (!form) {
-        this.$q.notify({ type: 'negative', message: 'Form reference not found!' })
-        return
-      }
+    // async register() {
+    //   const form = this.$refs.formRef as QForm
+    //   if (!form) {
+    //     this.$q.notify({ type: 'negative', message: 'Form reference not found!' })
+    //     return
+    //   }
 
-      const isValid = await form.validate()
-      if (!isValid) {
-        this.$q.notify({ type: 'negative', message: 'Please fill in all fields correctly' })
-        return
-      }
+    //   const isValid = await form.validate()
+    //   if (!isValid) {
+    //     this.$q.notify({ type: 'negative', message: 'Please fill in all fields correctly' })
+    //     return
+    //   }
 
-      this.userStore.login({
-        id: 1,
-        name: this.form.firstname,
-        surname: this.form.lastname,
-        nickname: this.form.username,
-        email: this.form.email,
-        description: '',
-        status: 'online',
-        token: 'sometoken',
-        isAuthenticated: true
-      } as ProfileAtr)
+    //   this.userStore.login({
+    //     id: 1,
+    //     name: this.form.firstname,
+    //     surname: this.form.lastname,
+    //     nickname: this.form.username,
+    //     email: this.form.email,
+    //     description: '',
+    //     status: 'online',
+    //     token: 'sometoken',
+    //     isAuthenticated: true
+    //   } as ProfileAtr)
 
-      this.$q.notify({ type: 'positive', message: 'Registration successful!' })
-      void this.$router.push('/')
+    //   this.$q.notify({ type: 'positive', message: 'Registration successful!' })
+    //   void this.$router.push('/')
+    // }
+    
+    register() {
+      this.userStore.register(this.form).then(() => this.$router.push(this.redirectTo))
     }
   }
 }

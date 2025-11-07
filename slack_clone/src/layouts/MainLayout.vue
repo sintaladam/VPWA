@@ -104,9 +104,9 @@ import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChannelCreator from 'src/components/ChannelCreator.vue';
 import UpdatedUserProfile from 'src/components/UpdatedUserProfile.vue';
 import InviteBadge from 'src/components/InviteBadge.vue';
-import { type TabName, type DeviceType, type ChannelAtr } from 'src/components/models';
+import { type TabName, type DeviceType, type ChannelAtr, type ProfileAtr } from 'src/components/models';
 import { Platform } from 'quasar'
-import { useUserStore } from 'src/stores/userUserStore';
+import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
 
 export default {
@@ -117,7 +117,7 @@ export default {
       miniState: false,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       leftDrawerOpen: Platform.is.desktop ? true : false,
-      userStore: useUserStore(),
+      userStore: useAuthStore(),
       activePage: useActivePage(),
       channelCreatorOpen: false,
       profileEditorOpen: false,
@@ -175,10 +175,10 @@ export default {
       return this.activePage.searchThreads('channel', this.searchChannels) as ChannelAtr[];
     },
     profile() {
-      return { ...this.userStore.getProfileDetails() };
+      return { ...this.userStore.getProfileDetails() as ProfileAtr};
     },
     invites() {
-      return this.activePage.getInvites(this.userStore.id)
+      return this.activePage.getInvites(this.userStore.user?.id as number)
     }
   }
 }

@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { useUserStore } from 'src/stores/userUserStore';
+import { useAuthStore } from 'src/stores/authStore';
 import { type ProfileAtr, type DeviceType } from './models';
 import { Platform } from 'quasar';
 import { type PropType } from 'vue';
@@ -36,7 +36,7 @@ export default {
       localProfile: { ...this.profile },
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       editing: false,
-      activePage: useUserStore(),
+      activePage: useAuthStore(),
     }
   },
   props: {

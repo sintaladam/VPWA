@@ -3,7 +3,7 @@
     <div class="col-11 column justify-end">
       <template v-for="(mess, index) in messages" :key="index">
         <q-chat-message :text="[mess.content]" :sent="mess.senderId === 1" :name="mess.senderName"
-          :bg-color="mess.type === 'command' ? 'green' : userStore.id == mess.senderId ? 'primary' : 'grey'" class="" />
+          :bg-color="mess.type === 'command' ? 'green' : userStore.user?.id == mess.senderId ? 'primary' : 'grey'" class="" />
       </template>
     </div>
   </div>
@@ -11,14 +11,14 @@
 
 <script lang="ts">
 import type { Message, messageType } from './models';
-import { useUserStore } from 'src/stores/userUserStore';
+import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
 import { nextTick } from 'vue';
 
 export default {
   data() {
     return {
-      userStore: useUserStore(),
+      userStore: useAuthStore(),
       activePage: useActivePage(),
       localMessages: [] as Message[]
     }

@@ -24,7 +24,7 @@ import MessageBoard from 'src/components/MessageBoard.vue';
 import CLI from 'src/components/CLI.vue';
 import { useActivePage } from '../stores/threadStore';
 import type { messageType, pageType, UserAtr } from 'src/components/models';
-import { useUserStore } from 'src/stores/userUserStore';
+import { useAuthStore } from 'src/stores/authStore';
 import UserList from 'src/components/UserList.vue'
 import { ref } from 'vue';
 
@@ -38,7 +38,7 @@ export default {
     addMessage(value: string, type: messageType) {
       (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addMessage({
         timestamp: Date.now(),
-        senderId: this.userStore.id as number,
+        senderId: this.userStore.user?.id as number,
         content: value,
         type: type
       });
@@ -53,7 +53,7 @@ export default {
   data() {
     return {
       activeStore: useActivePage(),
-      userStore: useUserStore(),
+      userStore: useAuthStore(),
       editorOpen: ref(false),
       activeUsers: [] as UserAtr[]
     }

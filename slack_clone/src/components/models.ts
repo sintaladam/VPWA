@@ -36,8 +36,6 @@ export interface ProfileAtr {
   surname: string;
   description: string | null;
   status: StatusType;
-  token: string;
-  isAuthenticated: boolean;
 }
 export interface UserAtr {
   id: number;

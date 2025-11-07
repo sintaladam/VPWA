@@ -8,7 +8,7 @@ declare module 'vue' {
   }
 }
 
-const socket = io('http://localhost:3333', {
+const socket = io(process.env.API_URL, {
   
 })
 
