@@ -87,7 +87,7 @@
         </template>
         <template v-else-if="activeTab === 'invites'">
           <div class="full-width flex justify-center q-pl-sm">
-            <InviteBadge v-for="value in invites" :key="value.id" :invite="value" />
+            <InviteBadge v-for="value in activePage.invites" :key="value.id" :invite="value" />
           </div>
         </template>
       </div>
@@ -182,11 +182,12 @@ export default {
       return { ...this.userStore.getProfileDetails() as ProfileAtr};
     },
     invites() {
-      return this.activePage.getInvites(this.userStore.user?.id as number)
+      return this.activePage.getInvites()
     }
   },
   created() {
-    this.activePage.getChannels()
+    this.activePage.getChannels();
+    this.activePage.getInvites();
   }
 }
 </script>

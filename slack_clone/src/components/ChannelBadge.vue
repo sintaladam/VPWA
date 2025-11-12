@@ -23,11 +23,13 @@
 </template>
 
 <script lang="ts">
+import type { Member } from 'src/contracts';
 import { useActivePage } from '../stores/threadStore';
 import ChannelEditor from './ChannelEditor.vue';
 import LeaveConfirmation from './LeaveConfirmation.vue';
 import UserList from './UserList.vue'
-import type { ChannelAtr, UserAtr } from './models';
+import type { ChannelAtr } from './models';
+import { HomeService } from 'src/services';
 
 export default {
   data() {
@@ -38,7 +40,7 @@ export default {
       deleteOpen: false,
       createOpen: false,
       listOpen: false,
-      activeUsers: [] as UserAtr[]
+      activeUsers: [] as Member[]
     }
   },
   props: {
@@ -50,12 +52,13 @@ export default {
     UserList
   },
   methods: {
-    getUsers() {
+    async getUsers() {
       //this.activeUsers = this.activeStore.getThreadUsers(this.activeStore.activePageId);
+      this.activeUsers = await HomeService.getMembers(this.channel.id) ?? [];
     },
-    openUserList() {
+    async openUserList() {
       this.listOpen = true;
-      this.getUsers();
+      await this.getUsers();
     },
     forwardDelete() {
       this.$emit('deleteChannelEvent');

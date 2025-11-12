@@ -13,17 +13,21 @@
             <!-- User List -->
             <q-card-section class="q-pt-sm" style="max-height: 300px; overflow-y: auto;">
                 <q-list bordered padding class="rounded-borders bg-grey-1">
-                    <q-item v-for="(user, index) in users" :key="index" clickable>
+                    <q-item v-for="(user, index) in users" :key="index">
                         <q-item-section avatar>
-                            <q-avatar
+                            <!-- <q-avatar
                                 :color="user.status === 'online' ? 'positive' : user.status === 'dnd' ? 'orange' : 'negative'"
                                 text-color="white" class="q-mr-sm">
+                                {{ user.nickname?.[0]?.toUpperCase() }}
+                            </q-avatar> -->
+                            <q-avatar
+                                text-color="primary" class="q-mr-sm">
                                 {{ user.nickname?.[0]?.toUpperCase() }}
                             </q-avatar>
                         </q-item-section>
 
                         <q-item-section>
-                            <q-item-label>{{ user.nickname }} {{ console.log(user.status) }}</q-item-label>
+                            <q-item-label>{{ user.nickname }}</q-item-label>
                             <q-item-label caption class="text-grey">Member</q-item-label>
                         </q-item-section>
                     </q-item>
@@ -39,12 +43,12 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
-import type { UserAtr } from './models';
+import type { Member } from 'src/contracts';
 
 export default {
     props: {
         users: {
-            type: Array as PropType<UserAtr[]>,
+            type: Array as PropType<Member[]>,
             required: true
         },
     },

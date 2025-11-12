@@ -1,132 +1,17 @@
 import { defineStore } from 'pinia';
 import { type Message, type pageType, type messageType } from 'src/components/models';
-import type { KickVote, UserAtr, InviteType } from 'src/components/models';
+import type { KickVote } from 'src/components/models';
 import { socket } from 'src/boot/socket';
-import type { Channel } from 'src/contracts';
+import type { Channel, Invite, Member } from 'src/contracts';
 import { HomeService } from 'src/services';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
     activePageId: 0 as number,
     activePageType: '' as pageType,
-    invites: {
-      1: {
-        id: 1,
-        invitedUserId: 1,
-        channelId: 0,
-        status: 'pending',
-      },
-      2: {
-        id: 2,
-        invitedUserId: 1,
-        channelId: 1,
-        status: 'accepted',
-      },
-      3: {
-        id: 3,
-        invitedUserId: 1,
-        channelId: 2,
-        status: 'rejected',
-      },
-      4: {
-        id: 4,
-        invitedUserId: 1,
-        channelId: 2,
-        status: 'pending',
-      },
-      5: {
-        id: 5,
-        invitedUserId: 1,
-        channelId: 3,
-        status: 'pending',
-      },
-    } as Record<number, InviteType>,
-    users: {
-      1: {
-        id: 1,
-        email: 'karolina1@gmail.com',
-        nickname: 'karolina_one',
-        name: 'Karolina',
-        surname: 'Loplotova',
-        status: 'dnd',
-      },
-      2: {
-        id: 2,
-        email: 'michael2@example.com',
-        nickname: 'mike_2',
-        name: 'Michael',
-        surname: 'Davis',
-        status: 'online',
-      },
-      3: {
-        id: 3,
-        email: 'lucy3@example.com',
-        nickname: 'lucy_rocks',
-        name: 'Lucy',
-        surname: 'Stone',
-        status: 'offline',
-      },
-      4: {
-        id: 4,
-        email: 'john4@example.com',
-        nickname: 'johnny_four',
-        name: 'John',
-        surname: 'Doe',
-        status: 'offline',
-      },
-      5: {
-        id: 5,
-        email: 'emily5@example.com',
-        nickname: 'emily_star',
-        name: 'Emily',
-        surname: 'Blake',
-        status: 'online',
-      },
-    } as Record<number, UserAtr>,
 
     kickvotes: [] as KickVote[],
 
-    // channels: [
-    //   {
-    //     id: 0,
-    //     type: 'public',
-    //     name: 'AdminChannel',
-    //     description: 'channel where you are admin user',
-    //     creatorId: 1,
-    //     users: [1, 2, 3],
-    //   },
-    //   {
-    //     id: 1,
-    //     type: 'public',
-    //     name: 'Basic_public_channel',
-    //     description: 'channel where you are basic user',
-    //     creatorId: 2,
-    //     users: [1, 2, 3, 4],
-    //     kickVotes: [] as KickVote[],
-    //   },
-    //   {
-    //     id: 2,
-    //     type: 'public',
-    //     name: 'marketing-campaign-q4-2025-social-media-strategy',
-    //     description: 'generic description',
-    //     users: [1, 2, 3],
-    //   },
-
-    //   {
-    //     id: 3,
-    //     type: 'public',
-    //     name: 'marketing campaign q4 2025 social media strategy',
-    //     description: 'generic description',
-    //     users: [1, 2, 3],
-    //   },
-    //   {
-    //     id: 4,
-    //     type: 'public',
-    //     name: 'generic_name_5',
-    //     description: 'generic description',
-    //     users: [1, 2, 3],
-    //   },
-    // ] as ChannelAtr[],
     messageGroups: [
       {
         threadId: 0,
@@ -174,6 +59,8 @@ export const useActivePage = defineStore('channelPage', {
       },
     ],
     channels: [] as Channel[],
+    invites: [] as Invite[],
+    members: [] as Member[],
   }),
   actions: {
     isAdmin(channel_id: number, userId: number) {
@@ -306,22 +193,32 @@ export const useActivePage = defineStore('channelPage', {
     async getChannels() {
       this.channels = await HomeService.getChannels() ?? [];
     },
+    async getInvites() {
+      this.invites = await HomeService.getInvites() ?? [];
+    },
+    async getMembers(channel_id: number) {
+      this.members = await HomeService.getMembers(channel_id) ?? [];
+    }
   },
   getters: {
-    getInvites: (state) => (userId: number) => {
-      return Object.values(state.invites).filter((invite) => invite.invitedUserId === userId);
-    },
+    // getInvites: (state) => (userId: number) => {
+    //   return Object.values(state.invites).filter((invite) => invite.invitedUserId === userId);
+    // },
     getThreadDetails: (state) => (id: number, type: pageType) => {
       switch (type) {
         case 'channel':
           return state.channels.find((ch) => ch.id == id);
       }
     },
-    getThreadName: (state) => (id: number, type: pageType) => {
-      switch (type) {
-        case 'channel':
-          return state.channels.find((ch) => ch.id == id)?.name;
-      }
+    // getThreadName: (state) => (id: number, type: pageType) => {
+    //   switch (type) {
+    //     case 'channel':
+    //       return state.channels.find((ch) => ch.id == id)?.name;
+    //   }
+    // },
+    getThreadName: (state) => () => {
+      console.log(state.activePageId)
+      return state.channels.find((ch) => ch.id == state.activePageId)?.name;
     },
     searchThreads: (state) => (type: pageType, term: string) => {
       switch (type) {

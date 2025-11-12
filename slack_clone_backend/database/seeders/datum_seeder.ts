@@ -101,6 +101,8 @@ export default class extends BaseSeeder {
     await Invite.createMany([
       { channel_id: 1, sender_id: 2, recipient_id: 3 },
       { channel_id: 5, sender_id: 3, recipient_id: 2 },
+      { channel_id: 1, sender_id: 2, recipient_id: 1 },
+      { channel_id: 5, sender_id: 3, recipient_id: 1 },
     ]);
   }
 }

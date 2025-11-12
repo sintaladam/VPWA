@@ -1,6 +1,6 @@
 <template>
     <transition @before-leave="beforeLeave" @leave="leave">
-        <q-card v-if="visible && invite.status === 'pending' && channel" flat bordered
+        <q-card v-if="visible && channel" flat bordered
             class="q-mb-sm full-width invite-card"
             :style="{ transform: `translateX(${offset}px)`, transition: animating ? 'transform 0.3s ease-out' : 'none' }">
             <q-expansion-item dense :label="channel.name" header-class="q-py-sm q-px-md">
@@ -49,8 +49,8 @@
 </template>
 
 <script lang="ts">
-import { type Channel } from 'src/contracts';
-import type { InviteType } from '../components/models';
+import type { Invite, Channel } from 'src/contracts';
+//import type { InviteType } from '../components/models';
 import { useActivePage } from 'src/stores/threadStore';
 
 export default {
@@ -65,12 +65,15 @@ export default {
     },
     props: {
         invite: {
-            type: Object as () => InviteType,
+            type: Object as () => Invite,
             required: true
         }
     },
-    mounted() {
-        this.getChannelDetails()
+    // mounted() {
+    //     this.getChannelDetails()
+    // },
+    created() {
+        this.channel= this.invite.channel
     },
     methods: {
         handleAccept() {
@@ -102,9 +105,9 @@ export default {
             }, 10);
             setTimeout(done, 300);
         },
-        getChannelDetails() {
-            this.channel = this.channelStore.getThreadDetails(this.invite.channelId, 'channel') as Channel;
-        }
+        // getChannelDetails() {
+        //     this.channel = this.channelStore.getThreadDetails(this.invite.channel_id, 'channel') as Channel;
+        // }
     }
 }
 </script>

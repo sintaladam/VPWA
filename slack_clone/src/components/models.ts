@@ -47,12 +47,12 @@ export interface UserAtr {
 }
 export interface InviteType {
   id: number;
-  invitedUserId: number;
-  channelId: number;
-  status: inviteStatusType;
+  channel_id: number;
+  sender_id: number;
+  recipient_id: number;
 }
 
-type inviteStatusType = 'accepted' | 'pending' | 'rejected';
+//type inviteStatusType = 'accepted' | 'pending' | 'rejected';
 
 export type StatusType = 'online' | 'offline' | 'dnd';
 
