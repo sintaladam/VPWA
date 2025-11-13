@@ -5,7 +5,7 @@ type ChangeListener = (newToken: string | null, oldToken: string | null) => void
 // this handles token storing to localstorage and notifying about changes
 // also triggereing listeners when storage key is changed from another browser tab
 class AuthManager {
-  private currentToken: string | null = this.getToken()
+  private currentToken: string | null
   private onChangeListeners: ChangeListener[] = []
 
   private storageListener = (evt: StorageEvent) => {
@@ -16,7 +16,8 @@ class AuthManager {
     this.notifyListeners()
   }
 
-  constructor (private storageKey: string) {
+  constructor(private storageKey: string) {
+    this.currentToken = this.getToken()
     window.addEventListener('storage', this.storageListener)
   }
 
