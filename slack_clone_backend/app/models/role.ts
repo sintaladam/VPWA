@@ -12,8 +12,8 @@ export default class Role extends BaseModel {
 
   @manyToMany(() => User, {
     pivotTable: 'user_roles',
-    pivotForeignKey: 'user_id',
-    pivotRelatedForeignKey: 'role_id'
+    pivotForeignKey: 'role_id',
+    pivotRelatedForeignKey: 'user_id'
   })
   declare users: ManyToMany<typeof User>
 

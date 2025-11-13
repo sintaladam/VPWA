@@ -12,7 +12,7 @@ export default class Channel extends BaseModel {
   declare name: string
   
   @column()
-  declare description: string
+  declare description: string | null
   
   @column()
   declare type: string
@@ -22,8 +22,8 @@ export default class Channel extends BaseModel {
 
   @manyToMany(() => User, {
     pivotTable: 'user_channels',
-    pivotForeignKey: 'user_id',
-    pivotRelatedForeignKey: 'channel_id'
+    pivotForeignKey: 'channel_id',
+    pivotRelatedForeignKey: 'user_id'
   })
   declare users: ManyToMany<typeof User>
 

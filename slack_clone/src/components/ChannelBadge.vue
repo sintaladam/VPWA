@@ -12,10 +12,10 @@
         <div class="column q-pt-md q-gutter-md">
           <q-btn color="white" text-color="black" label="Details" @click="editorOpen = true" />
           <q-btn color="white" text-color="black" label="User list" @click="openUserList" />
-          <q-btn color="white" text-color="negative" label="leave channel" @click="deleteOpen = true" />
+          <q-btn color="white" text-color="negative" :label="label" @click="deleteOpen = true" />
           <channel-editor v-if="channelId !== undefined" v-model=editorOpen :channel="channel" />
           <user-list v-model="listOpen" :users="activeUsers" />
-          <leave-confirmation v-model="deleteOpen" title="Leave Channel" @deleteEvent="forwardDelete()" />
+          <leave-confirmation v-model="deleteOpen" :title="label" @deleteEvent="forwardDelete()" />
         </div>
       </q-card-section>
     </q-card>
@@ -23,24 +23,26 @@
 </template>
 
 <script lang="ts">
-import type { Member } from 'src/contracts';
+import type { Channel, Member } from 'src/contracts';
 import { useActivePage } from '../stores/threadStore';
 import ChannelEditor from './ChannelEditor.vue';
 import LeaveConfirmation from './LeaveConfirmation.vue';
 import UserList from './UserList.vue'
-import type { ChannelAtr } from './models';
 import { HomeService } from 'src/services';
+import { useAuthStore } from 'src/stores/authStore';
 
 export default {
   data() {
     return {
       isOpen: false,
       activeStore: useActivePage(),
+      userStore: useAuthStore(),
       editorOpen: false,
       deleteOpen: false,
       createOpen: false,
       listOpen: false,
-      activeUsers: [] as Member[]
+      activeUsers: [] as Member[],
+      label: '',
     }
   },
   props: {
@@ -66,10 +68,13 @@ export default {
   },
   computed: {
     channel() {
-      return this.activeStore.getThreadDetails(this.channelId as number, 'channel') as ChannelAtr;
+      return this.activeStore.getThreadDetails(this.channelId as number, 'channel') as Channel;
     }
   },
-  emits: ['deleteChannelEvent']
+  emits: ['deleteChannelEvent'],
+  created() {
+    this.label = this.channel.creatorId===this.userStore.user!.id ? 'Delete Channel' : 'Leave Channel'
+  }
 
 }
 </script>

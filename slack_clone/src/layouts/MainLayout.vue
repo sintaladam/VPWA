@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh LpR fFf">
 
-    <q-header elevated class="bg-grey text-white" height-hint="98">
+    <q-header elevated class="bg-secondary text-white" height-hint="98">
       <q-toolbar>
         <q-btn v-if="drawerBehavior === 'mobile' && $q.platform.is.desktop" flat @click="toggleLeftDrawer" round dense
           icon="menu" class="q-mr-sm" />
@@ -93,7 +93,17 @@
       </div>
     </q-drawer>
     <q-page-container>
-      <router-view :key="$route.fullPath" />
+      <!-- <div v-show="!activePage.getThreadDetails(activePage.activePageId,'channel')">welcome back</div> -->
+       <q-page class="flex flex-center">
+        <div class="text-center">
+          <q-icon name="sentiment_very_satisfied" size="64px" color="secondary" />
+          <div class="text-h5 q-mt-md text-primary">Welcome back</div>
+          <div class="text-subtitle2 q-mt-sm text-secondary">
+            Select a channel to get started.
+          </div>
+        </div>
+      </q-page>
+      <router-view :key="$route.fullPath" v-show="activePage.getThreadDetails(activePage.activePageId,'channel')" />
     </q-page-container>
 
   </q-layout>
@@ -146,7 +156,7 @@ export default {
       this.miniState = !this.miniState;
     },
     deleteThread(id: number) {
-      this.activePage.deleteThread(id);
+      this.activePage.deleteChannel(id);
       if (this.activePage.activePageId == id) {
         this.$router.push('/' + 'channel');
       }

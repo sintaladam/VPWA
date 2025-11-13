@@ -30,6 +30,7 @@ router.group(() => {
   router.get('channels', '#controllers/home_controller.getChannels');
   router.get('invites', '#controllers/home_controller.getInvites');
   router.post('members', '#controllers/home_controller.getMembers');
+  router.delete('channels', '#controllers/home_controller.deleteChannel')
 })
 .use(middleware.auth({ guards: ['api'] }))
 .prefix('/home');

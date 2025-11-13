@@ -12,8 +12,13 @@ class HomeService {
     return response.data;
   }
 
-  async getMembers(channel_id:number):Promise<Member[] | null> {
-    const response = await api.post<Member[]>('home/members', { channel_id });
+  async getMembers(channelId:number):Promise<Member[] | null> {
+    const response = await api.post<Member[]>('home/members', { channelId });
+    return response.data;
+  }
+
+  async deleteChannel(channelId: number): Promise<{ok:boolean} | null> {
+    const response = await api.delete('home/channels', { data: { channelId } });
     return response.data;
   }
 }

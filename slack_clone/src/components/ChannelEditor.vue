@@ -25,7 +25,7 @@
           :readonly="!editing"
           hint="Type"
         />
-        <q-btn label="Edit" v-show="!editing" @click="editing=true"/>
+        <q-btn label="Edit" v-show="channel.creatorId===userStore.user?.id && !editing" @click="editing=true"/>
         <div v-show="editing" class="row q-gutter-sm full-width q-mt-lg q-pa-none">
           <q-btn label="Confirm" @click="updateChannel" class="col" text-color="positive"/>
           <q-btn label="Cancel" @click="restore" class="col"/>
@@ -37,8 +37,10 @@
 
 <script lang="ts">
 import { useActivePage } from 'src/stores/threadStore';
-import { type ChannelAtr, type DeviceType } from './models';
+import {  type DeviceType } from './models';
 import { Platform } from 'quasar'
+import { useAuthStore } from 'src/stores/authStore';
+import type { Channel } from 'src/contracts';
 
 export default {
   data() {
@@ -47,6 +49,7 @@ export default {
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       editing: false,
       activePage: useActivePage(),
+      userStore: useAuthStore(),
     }
   },
   props: {
@@ -55,7 +58,7 @@ export default {
       required: true
     },
     channel: {
-      type: Object as () => ChannelAtr,
+      type: Object as () => Channel,
       required: true,
     }
   },
@@ -84,6 +87,9 @@ export default {
       this.localChannel = { ...this.channel }
     }
   },
-  emits: ['update:modelValue']
+  emits: ['update:modelValue'],
+  created() {
+    console.log('channel',this.localChannel, 'store',this.userStore.user)
+  }
 }
 </script>

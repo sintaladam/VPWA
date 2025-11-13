@@ -65,7 +65,7 @@ export const useActivePage = defineStore('channelPage', {
   actions: {
     isAdmin(channel_id: number, userId: number) {
       //current implementation is dependant on the fact that data are hardcoded in right order
-      if (this.channels[channel_id]?.creator_id == userId) {
+      if (this.channels[channel_id]?.creatorId == userId) {
         return true;
       }
       return false;
@@ -119,18 +119,15 @@ export const useActivePage = defineStore('channelPage', {
     //       break;
     //   }
     // },
-    createChannel({ name, type, description }: Channel, creator_id:number) {
+    createChannel({ name, type, description }: Channel, creatorId:number) {
       this.channels.push({
         id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
         type,
         name,
         description,
-        creator_id,
+        creatorId,
         createdAt: Date.now(),
       } as Channel);
-    },
-    deleteThread(id: number) {
-      this.channels = this.channels.filter((ch) => ch.id != id);
     },
     // updateChannel({ id, name, description, type }: ChannelAtr) {
     //   const channel = this.channels.find((ch) => ch.id === id);
@@ -193,6 +190,12 @@ export const useActivePage = defineStore('channelPage', {
     async getChannels() {
       this.channels = await HomeService.getChannels() ?? [];
     },
+    async deleteChannel(channelId: number) {
+      const res = await HomeService.deleteChannel(channelId);
+      if (res?.ok) {
+        await this.getChannels();  
+      }
+    },
     async getInvites() {
       this.invites = await HomeService.getInvites() ?? [];
     },
@@ -207,7 +210,7 @@ export const useActivePage = defineStore('channelPage', {
     getThreadDetails: (state) => (id: number, type: pageType) => {
       switch (type) {
         case 'channel':
-          return state.channels.find((ch) => ch.id == id);
+          return state.channels.find((ch) => ch.id == id) as Channel;
       }
     },
     // getThreadName: (state) => (id: number, type: pageType) => {
@@ -217,7 +220,6 @@ export const useActivePage = defineStore('channelPage', {
     //   }
     // },
     getThreadName: (state) => () => {
-      console.log(state.activePageId)
       return state.channels.find((ch) => ch.id == state.activePageId)?.name;
     },
     searchThreads: (state) => (type: pageType, term: string) => {

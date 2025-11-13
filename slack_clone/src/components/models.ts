@@ -18,14 +18,9 @@ export interface KickVote {
 }
 
 export interface ChannelAtr {
-  id: number;
   type: ChannelType;
   name: string;
   description: string;
-  createdAt: number;
-  creator_id: number;
-  users: number[];
-  kickVotes?: KickVote[];
 }
 
 export interface ProfileAtr {
@@ -47,9 +42,9 @@ export interface UserAtr {
 }
 export interface InviteType {
   id: number;
-  channel_id: number;
-  sender_id: number;
-  recipient_id: number;
+  channelId: number;
+  senderId: number;
+  recipientId: number;
 }
 
 //type inviteStatusType = 'accepted' | 'pending' | 'rejected';

@@ -5,14 +5,14 @@ export interface Channel {
   name: string
   description?: string
   type: ChannelType
-  creator_id: number
+  creatorId: number
 }
 
 export interface Invite {
   id: number
-  channel_id: number
-  sender_id: number
-  recipient_id: number
+  channelId: number
+  senderId: number
+  recipientId: number
   channel: Channel
 }
 
