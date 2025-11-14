@@ -12,10 +12,12 @@
         <div class="column q-pt-md q-gutter-md">
           <q-btn color="white" text-color="black" label="Details" @click="editorOpen = true" />
           <q-btn color="white" text-color="black" label="User list" @click="openUserList" />
+          <q-btn color="white" text-color="black" label="Invite" @click="inviteCreatorOpen = true" />
           <q-btn color="white" text-color="negative" :label="label" @click="deleteOpen = true" />
           <channel-editor v-if="channelId !== undefined" v-model=editorOpen :channel="channel" />
           <user-list v-model="listOpen" :users="activeUsers" />
           <leave-confirmation v-model="deleteOpen" :title="label" @deleteEvent="forwardDelete()" />
+          <invite-creator v-model="inviteCreatorOpen" :channelId="channelId"/>
         </div>
       </q-card-section>
     </q-card>
@@ -30,6 +32,7 @@ import LeaveConfirmation from './LeaveConfirmation.vue';
 import UserList from './UserList.vue'
 import { HomeService } from 'src/services';
 import { useAuthStore } from 'src/stores/authStore';
+import InviteCreator from './InviteCreator.vue';
 
 export default {
   data() {
@@ -40,18 +43,23 @@ export default {
       editorOpen: false,
       deleteOpen: false,
       createOpen: false,
+      inviteCreatorOpen: false,
       listOpen: false,
       activeUsers: [] as Member[],
       label: '',
     }
   },
   props: {
-    channelId: Number
+    channelId: {
+      type: Number,
+      required: true
+    }
   },
   components: {
     ChannelEditor,
     LeaveConfirmation,
-    UserList
+    UserList,
+    InviteCreator
   },
   methods: {
     async getUsers() {

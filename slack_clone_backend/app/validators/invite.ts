@@ -10,7 +10,6 @@ export const handleInviteValidator = vine.compile(
 export const createInviteValidator = vine.compile(
   vine.object({
     channelId: vine.number(),
-    senderId: vine.number(),
-    recipientId: vine.number(),
+    slug: vine.string().trim().minLength(1).maxLength(127)
   })
 );

@@ -40,7 +40,8 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @manyToMany(() => Channel, {
     pivotTable: 'user_channels',
     pivotForeignKey: 'user_id',
-    pivotRelatedForeignKey: 'channel_id'
+    pivotRelatedForeignKey: 'channel_id',
+    pivotTimestamps: true,
   })
   declare channels: ManyToMany<typeof Channel>
 
@@ -61,8 +62,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @manyToMany(() => Role, {
     pivotTable: 'user_roles',
-    pivotForeignKey: 'role_id',
-    pivotRelatedForeignKey: 'user_id'
+    pivotForeignKey: 'user_id',
+    pivotRelatedForeignKey: 'role_id',
+    pivotTimestamps: true,
   })
   declare roles: ManyToMany<typeof Role>
 

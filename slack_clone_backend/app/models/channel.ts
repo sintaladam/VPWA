@@ -23,7 +23,8 @@ export default class Channel extends BaseModel {
   @manyToMany(() => User, {
     pivotTable: 'user_channels',
     pivotForeignKey: 'channel_id',
-    pivotRelatedForeignKey: 'user_id'
+    pivotRelatedForeignKey: 'user_id',
+    pivotTimestamps: true,
   })
   declare users: ManyToMany<typeof User>
 

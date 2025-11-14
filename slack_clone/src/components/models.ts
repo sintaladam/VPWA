@@ -20,7 +20,7 @@ export interface KickVote {
 export interface ChannelAtr {
   type: ChannelType;
   name: string;
-  description: string;
+  description?: string;
 }
 
 export interface ProfileAtr {
@@ -58,3 +58,5 @@ export type DeviceType = 'mobile' | 'desktop';
 export type messageType = 'command' | 'message' | 'component';
 
 export type pageType = 'channel';
+
+export type handleInviteType = 'accept' | 'reject';

@@ -79,6 +79,7 @@ export default class extends BaseSeeder {
     ]);
 
     await db.table('user_channels').insert([
+      { user_id: 1, channel_id: 5, created_at: new Date(), updated_at: new Date() },
       { user_id: 2, channel_id: 1, created_at: new Date(), updated_at: new Date() },
       { user_id: 2, channel_id: 2, created_at: new Date(), updated_at: new Date() },
       { user_id: 2, channel_id: 3, created_at: new Date(), updated_at: new Date() },
@@ -98,11 +99,11 @@ export default class extends BaseSeeder {
       { content: 'Ping me if anyone needs help!', channel_id: 5, sender_id: 3 },
     ]);
 
-    await Invite.createMany([
-      { channel_id: 1, sender_id: 2, recipient_id: 3 },
-      { channel_id: 5, sender_id: 3, recipient_id: 2 },
-      { channel_id: 1, sender_id: 2, recipient_id: 1 },
-      { channel_id: 5, sender_id: 3, recipient_id: 1 },
-    ]);
+    // await Invite.createMany([
+    //   { channel_id: 1, sender_id: 2, recipient_id: 3 },
+    //   { channel_id: 5, sender_id: 1, recipient_id: 2 },
+    //   { channel_id: 1, sender_id: 2, recipient_id: 1 },
+    //   { channel_id: 5, sender_id: 1, recipient_id: 1 },
+    // ]);
   }
 }

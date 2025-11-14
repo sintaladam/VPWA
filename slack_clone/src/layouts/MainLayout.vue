@@ -93,8 +93,7 @@
       </div>
     </q-drawer>
     <q-page-container>
-      <!-- <div v-show="!activePage.getThreadDetails(activePage.activePageId,'channel')">welcome back</div> -->
-       <q-page class="flex flex-center">
+       <q-page class="flex flex-center" v-show="!activePage.getThreadDetails(activePage.activePageId,'channel')">
         <div class="text-center">
           <q-icon name="sentiment_very_satisfied" size="64px" color="secondary" />
           <div class="text-h5 q-mt-md text-primary">Welcome back</div>
@@ -132,6 +131,7 @@ export default {
       activePage: useActivePage(),
       channelCreatorOpen: false,
       profileEditorOpen: false,
+      inviteCreatorOpen: false,
     };
   },
   watch: {

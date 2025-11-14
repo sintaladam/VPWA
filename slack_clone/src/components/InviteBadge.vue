@@ -56,7 +56,7 @@ import { useActivePage } from 'src/stores/threadStore';
 export default {
     data() {
         return {
-            channelStore: useActivePage(),
+            activeStore: useActivePage(),
             visible: true,
             offset: 0,
             animating: false,
@@ -76,21 +76,33 @@ export default {
         this.channel= this.invite.channel
     },
     methods: {
-        handleAccept() {
-            this.animating = true;
-            this.offset = -400;
-            setTimeout(() => {
-                this.visible = false;
-            }, 300);
-            this.$q.notify({ type: 'positive', message: `${this.channel?.name} was added to your channels` })
+        async handleAccept() {
+            const res = await this.activeStore.handleInvite(this.invite.id, 'accept');
+            if (res) {
+                this.animating = true;
+                this.offset = -400;
+                setTimeout(() => {
+                    this.visible = false;
+                }, 300);
+                this.$q.notify({ type: 'positive', message: `${this.channel?.name} was added to your channels` });
+            }
+            else {
+                this.$q.notify({ type: 'negative', message: `accept invitation to ${this.channel?.name} failed` })
+            }
         },
-        handleReject() {
-            this.animating = true;
-            this.offset = 400;
-            setTimeout(() => {
-                this.visible = false;
-            }, 300);
-            this.$q.notify({ type: 'negative', message: `invitation to ${this.channel?.name} was rejected` })
+        async handleReject() {
+            const res = await this.activeStore.handleInvite(this.invite.id, 'reject');
+            if (res) {
+                this.animating = true;
+                this.offset = 400;
+                setTimeout(() => {
+                    this.visible = false;
+                }, 300);
+                this.$q.notify({ type: 'negative', message: `invitation to ${this.channel?.name} was rejected` });
+            }
+            else {
+                this.$q.notify({ type: 'negative', message: `reject invitation to ${this.channel?.name} failed` })
+            }
 
         },
         beforeLeave(el: Element) {

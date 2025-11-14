@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { type Message, type pageType, type messageType } from 'src/components/models';
-import type { KickVote } from 'src/components/models';
+import type { handleInviteType, KickVote } from 'src/components/models';
 import { socket } from 'src/boot/socket';
 import type { Channel, Invite, Member } from 'src/contracts';
 import { HomeService } from 'src/services';
@@ -198,6 +198,15 @@ export const useActivePage = defineStore('channelPage', {
     },
     async getInvites() {
       this.invites = await HomeService.getInvites() ?? [];
+    },
+    async handleInvite(channelId: number, handle: handleInviteType) {
+      const res = await HomeService.handleInvite(channelId,handle);
+      if (res?.ok) {
+        await this.getChannels();
+        await this.getInvites();
+        return true;
+      }
+      return false;
     },
     async getMembers(channel_id: number) {
       this.members = await HomeService.getMembers(channel_id) ?? [];

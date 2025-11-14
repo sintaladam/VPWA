@@ -1,26 +1,110 @@
 import type { Channel, Invite, Member } from "src/contracts";
 import { api } from "src/boot/axios";
+import type { AxiosError } from "axios";
+import type { ChannelAtr, handleInviteType } from "src/components/models";
 
 class HomeService {
-  async getChannels():Promise<Channel[] | null> {
-    const response = await api.get<Channel[]>('home/channels');
-    return response.data;
+
+  //channels
+
+  async getChannels(): Promise<Channel[] | null> {
+    try {
+      const response = await api.get<Channel[]>('home/channels');
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
   }
 
-  async getInvites():Promise<Invite[] | null> {
-    const response = await api.get<Invite[]>('home/invites');
-    return response.data;
+  async createChannel(channel:ChannelAtr):Promise<{ ok: boolean; } | null> {
+    try {
+      const response = await api.post('home/channels/create',channel);
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
   }
 
-  async getMembers(channelId:number):Promise<Member[] | null> {
-    const response = await api.post<Member[]>('home/members', { channelId });
-    return response.data;
+  async updateChannel(channel:ChannelAtr):Promise<{ ok: boolean; } | null> {
+    try {
+      const response = await api.patch('home/channels/update',channel);
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
   }
 
-  async deleteChannel(channelId: number): Promise<{ok:boolean} | null> {
-    const response = await api.delete('home/channels', { data: { channelId } });
-    return response.data;
+  async deleteChannel(channelId: number): Promise<{ ok: boolean; } | null> {
+    try {
+    const response = await api.delete('home/channels/delete', { data: { channelId } });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
   }
+
+  async getMembers(channelId: number): Promise<Member[] | null> {
+    try {
+    const response = await api.post<Member[]>('home/channels/members', { channelId });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
+  //invites
+
+  async getInvites(): Promise<Invite[] | null> {
+    try {
+      const response = await api.get<Invite[]>('home/invites');
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
+  async createInvite(channelId:number, slug:string):Promise<{ ok: boolean; } | null> {
+    try {
+      const response = await api.post('home/invites/create',{ channelId, slug });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
+  async handleInvite(inviteId:number, handle:handleInviteType):Promise<{ ok: boolean; } | null> {
+    try {
+      const response = await api.post('home/invites/handle',{ inviteId, handle });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
 }
 
 export default new HomeService();

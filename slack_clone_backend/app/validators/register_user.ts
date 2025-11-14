@@ -17,3 +17,12 @@ export const loginValidator = vine.compile(
     password: vine.string(),
   })
 );
+
+export const updateValidator = vine.compile(
+  vine.object({
+    nickname: vine.string().trim().minLength(1).maxLength(127).optional(),
+    name: vine.string().trim().minLength(1).maxLength(127).optional(),
+    surname: vine.string().trim().minLength(1).maxLength(127).optional(),
+    description: vine.string().optional().nullable(),
+  })
+);

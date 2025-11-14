@@ -88,8 +88,5 @@ export default {
     }
   },
   emits: ['update:modelValue'],
-  created() {
-    console.log('channel',this.localChannel, 'store',this.userStore.user)
-  }
 }
 </script>

@@ -8,6 +8,14 @@ export const createChannelValidator = vine.compile(
   })
 );
 
+export const updateChannelValidator = vine.compile(
+  vine.object({
+    name: vine.string().trim().minLength(1).maxLength(127).optional(),
+    type: vine.string().in(['public', 'private']).optional(),
+    description: vine.string().optional().nullable(),
+  })
+);
+
 export const channelIdValidator = vine.compile(
   vine.object({
     channelId: vine.number()
