@@ -15,7 +15,7 @@
           <q-btn color="white" text-color="black" label="Invite" @click="inviteCreatorOpen = true" />
           <q-btn color="white" text-color="negative" :label="label" @click="deleteOpen = true" />
           <channel-editor v-if="channelId !== undefined" v-model=editorOpen :channel="channel" />
-          <user-list v-model="listOpen" :users="activeUsers" />
+          <user-list v-model="listOpen" :users="activeUsers" :creatorId="channel.creatorId" :channelId="channel.id" @kick-member-event="getUsers"/>
           <leave-confirmation v-model="deleteOpen" :title="label" @deleteEvent="forwardDelete()" />
           <invite-creator v-model="inviteCreatorOpen" :channelId="channelId"/>
         </div>

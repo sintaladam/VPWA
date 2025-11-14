@@ -20,7 +20,7 @@
 <script lang="ts">
 
 import type { PropType } from 'vue'
-import type { ProfileAtr } from 'src/components/models'   // make sure models.ts exports it
+import type { User } from 'src/contracts';
 
 
 export default {
@@ -30,7 +30,7 @@ export default {
   },
     props: {
       profile: {
-        type: Object as PropType<ProfileAtr>,
+        type: Object as PropType<User>,
         required: true
       },
     }

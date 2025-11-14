@@ -21,3 +21,10 @@ export const channelIdValidator = vine.compile(
     channelId: vine.number()
   })
 );
+
+export const channelKickValidator = vine.compile(
+  vine.object({
+    channelId: vine.number(),
+    userId: vine.number(),
+  })
+);

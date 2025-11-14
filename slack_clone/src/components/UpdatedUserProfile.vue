@@ -2,7 +2,7 @@
   <q-dialog v-model="localDialogOpen" :maximized="activeDevice=='mobile'" @hide="restore">
     <q-card>
       <q-card-section class="row items-center q-pb-none q-gutter-sm">
-        <div class="text-h6">{{ localProfile.email }}</div>
+        <div class="text-h6">{{ profile.email }}</div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
@@ -29,11 +29,12 @@ import { useAuthStore } from 'src/stores/authStore';
 import { type ProfileAtr, type DeviceType } from './models';
 import { Platform } from 'quasar';
 import { type PropType } from 'vue';
+import type { User } from 'src/contracts';
 
 export default {
   data() {
     return {
-      localProfile: { ...this.profile },
+      localProfile: this.profile as User,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       editing: false,
       activePage: useAuthStore(),
@@ -45,7 +46,7 @@ export default {
       required: true
     },
     profile: {
-      type: Object as PropType<ProfileAtr>,
+      type: Object as PropType<User>,
       required: true,
     }
   },
@@ -64,14 +65,28 @@ export default {
     },
   },
   methods: {
-    updateProfile() {
-      this.activePage.updateProfile(this.localProfile);
-      this.editing = false;
-      this.localProfile = { ...this.profile }
+    async updateProfile() {
+      const res = await this.activePage.updateProfile(this.extractAtr(this.localProfile) as ProfileAtr);
+      if (res) {
+        this.editing = false;
+        this.localProfile = this.profile;
+        this.$q.notify({ type: 'positive', message: `updated successfuly` });
+      }
+      else {
+        this.$q.notify({ type: 'negative', message: `update failed` })
+      }
     },
     restore() {
       this.editing = false;
-      this.localProfile = { ...this.profile }
+      this.localProfile = this.profile
+    },
+    extractAtr(profile: User) {
+      return {
+        nickname: profile.nickname,
+        name: profile.name,
+        surname: profile.surname,
+        description: profile.description
+      }
     }
   },
   emits: ['update:modelValue']

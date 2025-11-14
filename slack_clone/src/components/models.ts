@@ -24,13 +24,10 @@ export interface ChannelAtr {
 }
 
 export interface ProfileAtr {
-  id: number;
-  email: string;
   nickname: string;
   name: string;
   surname: string;
-  description: string | null;
-  status: StatusType;
+  description?: string;
 }
 export interface UserAtr {
   id: number;

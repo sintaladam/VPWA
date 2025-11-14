@@ -2,13 +2,13 @@ import { useActivePage } from 'src/stores/threadStore';
 import { useAuthStore } from 'src/stores/authStore';
 import { useRouter } from 'vue-router';
 import {
-  ChannelType,
+  //ChannelType,
   type messageType,
   // type ChannelAtr,
   type StatusType,
   type UserAtr,
 } from '../components/models';
-import type { Channel } from 'src/contracts';
+//import type { Channel } from 'src/contracts';
 
 function isStatusType(value: string): value is StatusType {
   return ['online', 'offline', 'dnd'].includes(value);
@@ -100,36 +100,36 @@ export class CommandHandler {
         // }
         break;
       case 'join':
-        if (argument) {
-          const channel_name = argument.join(' ');
-          const channel = this.activePage.getThreadId(channel_name);
-          if (channel) {
-            this.output.push(`joining channel ${argument[0]}`);
-            await this.router.push(`/channel/${channel.id}`);
-          } else {
-            this.output.push(`creating channel ${argument[0]}`);
-            this.activePage.createChannel({
-              name: argument[0],
-              type: ChannelType.Public,
-              description: 'generic description',
-            } as Channel, this.userStore.user?.id as number);
-            const channel = this.activePage.getThreadId(argument[0] as string);
-            if (channel) {
-              await this.router.push(`/channel/${channel.id}`);
-            }
-          }
-        }
+        // if (argument) {
+        //   const channel_name = argument.join(' ');
+        //   const channel = this.activePage.getThreadId(channel_name);
+        //   if (channel) {
+        //     this.output.push(`joining channel ${argument[0]}`);
+        //     await this.router.push(`/channel/${channel.id}`);
+        //   } else {
+        //     this.output.push(`creating channel ${argument[0]}`);
+        //     this.activePage.createChannel({
+        //       name: argument[0],
+        //       type: ChannelType.Public,
+        //       description: 'generic description',
+        //     } as Channel, this.userStore.user?.id as number);
+        //     const channel = this.activePage.getThreadId(argument[0] as string);
+        //     if (channel) {
+        //       await this.router.push(`/channel/${channel.id}`);
+        //     }
+        //   }
+        // }
         break;
       case 'channel':
         if (argument) {
           if (argument.length >= 3) {
-            const description = argument.slice(2).join(' ');
+            // const description = argument.slice(2).join(' ');
 
-            this.activePage.createChannel({
-              name: argument[0],
-              type: argument[1] === 'private' ? ChannelType.Private : ChannelType.Public,
-              description: description,
-            } as Channel, this.userStore.user?.id as number);
+            // this.activePage.createChannel({
+            //   name: argument[0],
+            //   type: argument[1] === 'private' ? ChannelType.Private : ChannelType.Public,
+            //   description: description,
+            // } as Channel, this.userStore.user?.id as number);
 
             this.output.push(`creating channel ${argument[0]}`);
 

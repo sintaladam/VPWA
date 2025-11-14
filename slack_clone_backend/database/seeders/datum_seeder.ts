@@ -4,7 +4,7 @@ import Channel from '#models/channel'
 import User from '#models/user'
 import Role from '#models/role'
 import Message from '#models/message'
-import Invite from '#models/invite'
+//import Invite from '#models/invite'
 
 export default class extends BaseSeeder {
   async run() {

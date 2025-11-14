@@ -100,11 +100,16 @@ export const useAuthStore = defineStore('auth', {
     },
 
     changeStatus(status: StatusType) {
-          this.status = status;
-        },
-        updateProfile({nickname, name, surname, description }:ProfileAtr) {
-          console.log(nickname, name, surname, description)
-        }
+      this.status = status;
+    },
+    async updateProfile(profile:ProfileAtr) {
+      const res = await AuthService.update(profile);
+      if (res?.ok) {
+        this.user = await AuthService.me();
+        return true;
+      }
+      return false;
+}
   },
 
   persist: true,

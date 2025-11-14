@@ -37,7 +37,8 @@
 
 <script lang="ts">
 import { useActivePage } from 'src/stores/threadStore';
-import {  type DeviceType } from './models';
+import type {  ChannelAtr} from './models';
+import { type DeviceType } from './models';
 import { Platform } from 'quasar'
 import { useAuthStore } from 'src/stores/authStore';
 import type { Channel } from 'src/contracts';
@@ -45,7 +46,7 @@ import type { Channel } from 'src/contracts';
 export default {
   data() {
     return {
-      localChannel: { ...this.channel },
+      localChannel: this.channel as Channel,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       editing: false,
       activePage: useActivePage(),
@@ -77,14 +78,28 @@ export default {
     },
   },
   methods: {
-    updateChannel() {
-      //this.activePage.updateChannel(this.localChannel);
-      this.editing = false;
-      this.localChannel = { ...this.channel }
+    async updateChannel() {
+      const res = await this.activePage.updateChannel(this.extractAtr(this.localChannel) as ChannelAtr);
+      if (res) {
+        this.editing = false;
+        this.localChannel = this.channel
+        this.$q.notify({ type: 'positive', message: `updated successfuly` });
+      }
+      else {
+        this.$q.notify({ type: 'negative', message: `update failed` })
+      }
     },
     restore() {
       this.editing = false;
-      this.localChannel = { ...this.channel }
+      this.localChannel = this.channel
+    },
+    extractAtr(channel: Channel) {
+      return {
+        channelId: channel.id,
+        name: channel.name,
+        type: channel.type,
+        description: channel.description
+      }
     }
   },
   emits: ['update:modelValue'],

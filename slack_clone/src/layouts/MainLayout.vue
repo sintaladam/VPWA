@@ -98,7 +98,7 @@
           <q-icon name="sentiment_very_satisfied" size="64px" color="secondary" />
           <div class="text-h5 q-mt-md text-primary">Welcome back</div>
           <div class="text-subtitle2 q-mt-sm text-secondary">
-            Select a channel to get started.
+            Select a channel to get started
           </div>
         </div>
       </q-page>
@@ -113,11 +113,11 @@ import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChannelCreator from 'src/components/ChannelCreator.vue';
 import UpdatedUserProfile from 'src/components/UpdatedUserProfile.vue';
 import InviteBadge from 'src/components/InviteBadge.vue';
-import { type TabName, type DeviceType, type ProfileAtr } from 'src/components/models';
+import type { TabName, DeviceType } from 'src/components/models';
 import { Platform } from 'quasar'
 import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
-import { type Channel } from 'src/contracts';
+import type { User, Channel } from 'src/contracts';
 
 export default {
   data() {
@@ -189,7 +189,7 @@ export default {
       return this.activePage.searchThreads('channel', this.searchChannels) as Channel[];
     },
     profile() {
-      return { ...this.userStore.getProfileDetails() as ProfileAtr};
+      return { ...this.userStore.getProfileDetails() as User};
     },
     invites() {
       return this.activePage.getInvites()

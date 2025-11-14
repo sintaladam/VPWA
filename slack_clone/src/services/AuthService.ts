@@ -1,6 +1,7 @@
 import type { AxiosError, AxiosRequestConfig } from 'axios'
 import type { ApiToken, LoginCredentials, RegisterData, User } from 'src/contracts'
 import { api } from 'src/boot/axios'
+import type { ProfileAtr } from 'src/components/models';
 
 class AuthService {
   async me (dontTriggerLogout = false): Promise<User | null> {
@@ -30,6 +31,18 @@ class AuthService {
 
   async logout (): Promise<void> {
     await api.post('auth/logout')
+  }
+
+  async update (profile:ProfileAtr):Promise<{ ok: boolean; } | null> {
+    try {
+      const response = await api.post('auth/update',profile);
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
   }
 }
 

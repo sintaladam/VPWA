@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { type Message, type pageType, type messageType } from 'src/components/models';
-import type { handleInviteType, KickVote } from 'src/components/models';
+import type { ChannelAtr, handleInviteType, KickVote } from 'src/components/models';
 import { socket } from 'src/boot/socket';
 import type { Channel, Invite, Member } from 'src/contracts';
 import { HomeService } from 'src/services';
@@ -106,29 +106,6 @@ export const useActivePage = defineStore('channelPage', {
       this.activePageId = id;
       this.activePageType = type;
     },
-    // createThread(type: pageType) {
-    //   switch (type) {
-    //     case 'channel':
-    //       this.channels.push({
-    //         id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
-    //         type: 'public',
-    //         name: 'New Channel',
-    //         description: 'New channel description',
-    //         createdAt: Date.now(),
-    //       } as ChannelAtr);
-    //       break;
-    //   }
-    // },
-    createChannel({ name, type, description }: Channel, creatorId:number) {
-      this.channels.push({
-        id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
-        type,
-        name,
-        description,
-        creatorId,
-        createdAt: Date.now(),
-      } as Channel);
-    },
     // updateChannel({ id, name, description, type }: ChannelAtr) {
     //   const channel = this.channels.find((ch) => ch.id === id);
     //   if (channel) {
@@ -190,6 +167,22 @@ export const useActivePage = defineStore('channelPage', {
     async getChannels() {
       this.channels = await HomeService.getChannels() ?? [];
     },
+    async createChannel(channel: ChannelAtr) {
+      const res = await HomeService.createChannel(channel);
+      if (res?.ok) {
+        await this.getChannels();
+        return true;
+      }
+      return false;
+    },
+    async updateChannel(channel: ChannelAtr) {
+      const res = await HomeService.updateChannel(channel);
+      if (res?.ok) {
+        await this.getChannels();
+        return true;
+      }
+      return false;
+    },
     async deleteChannel(channelId: number) {
       const res = await HomeService.deleteChannel(channelId);
       if (res?.ok) {
@@ -213,21 +206,12 @@ export const useActivePage = defineStore('channelPage', {
     }
   },
   getters: {
-    // getInvites: (state) => (userId: number) => {
-    //   return Object.values(state.invites).filter((invite) => invite.invitedUserId === userId);
-    // },
     getThreadDetails: (state) => (id: number, type: pageType) => {
       switch (type) {
         case 'channel':
           return state.channels.find((ch) => ch.id == id) as Channel;
       }
     },
-    // getThreadName: (state) => (id: number, type: pageType) => {
-    //   switch (type) {
-    //     case 'channel':
-    //       return state.channels.find((ch) => ch.id == id)?.name;
-    //   }
-    // },
     getThreadName: (state) => () => {
       return state.channels.find((ch) => ch.id == state.activePageId)?.name;
     },
@@ -242,8 +226,6 @@ export const useActivePage = defineStore('channelPage', {
         (group) => group.threadId === id && group.threadType === type,
       );
       return (group?.messages ?? []) as Message[];
-      // console.log(state, id, type);
-      // return [] as Message[];
     },
     getThreadId: (state) => (argument: string) => {
       const channel = state.channels.find((c) => c.name === argument);
@@ -252,14 +234,6 @@ export const useActivePage = defineStore('channelPage', {
       }
       return 0;
     },
-    // getThreadUsers: (state) => (id: number) => {
-    //   const channel = state.channels.find((c) => c.id === id);
-    //   if (!channel) return [];
-
-    //   return channel.users
-    //     .map((userId) => state.users[userId])
-    //     .filter((u): u is UserAtr => u !== undefined);
-    // },
   },
   // persist: {
   //   key: 'threadStore',

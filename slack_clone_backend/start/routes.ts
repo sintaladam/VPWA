@@ -23,7 +23,7 @@ router.group(() => {
     .use(middleware.auth({ guards: ['api'] }));
   router.get('me', '#controllers/auth_controller.me')
     .use(middleware.auth({ guards: ['api'] }));
-  router.patch('update', '#controllers/auth_controller.update')
+  router.post('update', '#controllers/auth_controller.update')
     .use(middleware.auth({ guards: ['api'] }));
 })
 .prefix('/auth');
@@ -31,10 +31,11 @@ router.group(() => {
 router.group(() => {
   router.get('channels', '#controllers/channel_controller.getChannels');
   router.post('channels/create', '#controllers/channel_controller.createChannel');
-  router.patch('channels/update', '#controllers/channel_controller.updateChannel');
+  router.post('channels/update', '#controllers/channel_controller.updateChannel');
   router.delete('channels/delete', '#controllers/channel_controller.deleteChannel');
   router.post('channels/join', '#controllers/channel_controller.joinChannel');
   router.post('channels/members', '#controllers/channel_controller.getMembers');
+  router.post('channels/kick', '#controllers/channel_controller.kickMember');
 
   router.get('invites', '#controllers/invite_controller.getInvites');
   router.post('invites/handle', '#controllers/invite_controller.handleInvite');

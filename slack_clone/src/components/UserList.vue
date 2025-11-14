@@ -30,6 +30,10 @@
                             <q-item-label>{{ user.nickname }}</q-item-label>
                             <q-item-label caption class="text-grey">Member</q-item-label>
                         </q-item-section>
+                        <q-item-section side v-show="creatorId===userStore.user!.id && user.id!==userStore.user!.id">
+                            <q-btn round flat color="negative" icon="cancel" size="sm" @click.stop="kickMember(user.id)"/>
+                        </q-item-section>
+                        
                     </q-item>
                 </q-list>
 
@@ -44,6 +48,8 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Member } from 'src/contracts';
+import { useAuthStore } from 'src/stores/authStore';
+import { HomeService } from 'src/services';
 
 export default {
     props: {
@@ -51,10 +57,33 @@ export default {
             type: Array as PropType<Member[]>,
             required: true
         },
+        creatorId: {
+            type: Number,
+            required:true
+        },
+        channelId: {
+            type: Number,
+            required:true
+        },
     },
     data() {
-        return {}
-    }
+        return {
+            userStore: useAuthStore(),
+        }
+    },
+    methods: {
+        async kickMember(userId: number) {
+            const res = await HomeService.kickMember(this.channelId, userId);
+            if (res?.ok) {
+                this.$emit('kickMemberEvent');
+                this.$q.notify({ type: 'positive', message: `user ${userId} was removed` });
+            }
+            else {
+                this.$q.notify({ type: 'negative', message: `remove user ${userId} failed` })
+            }
+        }
+    },
+    emits: ['kickMemberEvent'],
 
 }
 </script>

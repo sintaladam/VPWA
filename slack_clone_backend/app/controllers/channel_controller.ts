@@ -1,6 +1,6 @@
 import Channel from '#models/channel';
 import type { HttpContext } from '@adonisjs/core/http'
-import { channelIdValidator, createChannelValidator, updateChannelValidator } from '#validators/channel';
+import { channelIdValidator, channelKickValidator, createChannelValidator, updateChannelValidator } from '#validators/channel';
 import db from '@adonisjs/lucid/services/db';
 
 export default class ChannelController {
@@ -115,6 +115,22 @@ export default class ChannelController {
         'description',
         'email'
       ]);
+  }
+
+  async kickMember({ auth, request }: HttpContext) {
+    console.log('kick member');
+    const user = auth.getUserOrFail();
+    const { channelId, userId } = await request.validateUsing(channelKickValidator);
+
+    const channel = await Channel
+      .query()
+      .where('id', channelId)
+      .andWhere('creator_id', user.id)
+      .firstOrFail();
+    
+    await channel.related('users').detach([userId]);
+
+    return { ok: true };
   }
 
 }

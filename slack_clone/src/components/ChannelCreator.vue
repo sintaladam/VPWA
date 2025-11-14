@@ -33,8 +33,7 @@
 <script lang="ts">
 import { useActivePage } from 'src/stores/threadStore';
 import { Platform } from 'quasar';
-import { type DeviceType } from './models';
-import type { Channel } from 'src/contracts';
+import type { ChannelAtr, DeviceType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
 
 export default {
@@ -63,9 +62,16 @@ export default {
     }
   },
   methods: {
-    createChannel() {
-      this.activePage.createChannel(this.newChannel as Channel, this.userStore.user?.id as number);
-      this.localDialogOpen = false
+    async createChannel() {
+      const res = await this.activePage.createChannel(this.newChannel as ChannelAtr);
+      if (res) {
+        this.localDialogOpen = false;
+        this.newChannel = { name: '', type: '', description: '' };
+        this.$q.notify({ type: 'positive', message: `updated successfuly` });
+      }
+      else {
+        this.$q.notify({ type: 'negative', message: `update failed` })
+      }
     }
   },
   emits: ['update:modelValue']

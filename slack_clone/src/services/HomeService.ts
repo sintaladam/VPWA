@@ -33,7 +33,7 @@ class HomeService {
 
   async updateChannel(channel:ChannelAtr):Promise<{ ok: boolean; } | null> {
     try {
-      const response = await api.patch('home/channels/update',channel);
+      const response = await api.post('home/channels/update',channel);
       return response.data;
     } catch (err) {
       const error = err as AxiosError;
@@ -58,6 +58,18 @@ class HomeService {
   async getMembers(channelId: number): Promise<Member[] | null> {
     try {
     const response = await api.post<Member[]>('home/channels/members', { channelId });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
+  async kickMember(channelId: number, userId:number ): Promise<{ ok: boolean; } | null> {
+    try {
+    const response = await api.post('home/channels/kick', { channelId, userId });
       return response.data;
     } catch (err) {
       const error = err as AxiosError;
