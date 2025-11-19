@@ -36,12 +36,14 @@ export default {
   },
   methods: {
     addMessage(value: string, type: messageType) {
-      (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addMessage({
-        timestamp: Date.now(),
-        senderId: this.userStore.user?.id as number,
-        content: value,
-        type: type
-      });
+      // (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addMessage({
+      //   timestamp: Date.now(),
+      //   senderId: this.userStore.user?.id as number,
+      //   content: value,
+      //   type: type
+      // });
+      console.log('sending', type, value);
+      this.$socket.emit('message', { type: 'sendMessage', channelId: 1, body: { senderId: this.userStore.user?.id ?? -1,message: value }})
     },
     showList(data: UserAtr[], messageType: messageType) {
       if (messageType === 'component') {
