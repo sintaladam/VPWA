@@ -38,6 +38,11 @@ export class BroadcastingChannels {
       });
     }
   }
+
+  getChannelOfListener(client: Socket) {
+    const channel = this.channels.find(ch => ch.listeners.includes(client));
+    return channel?.channelId ?? null;
+  }
 }
 
 export class ChannelListener {
@@ -61,12 +66,20 @@ export class ChannelListener {
     this.unsubscribeFn = null;
   }
 
-  send(event: eventType, body: object) {
+  broadcast(event: eventType, body: object) {
     this.channels.broadcast(event, body, this.client);
+  }
+
+  send(event: eventType, body: object) {
+    this.client.emit(event, body);
   }
 
   getUser: () => User = () => {
     return this.client.data.user;
+  }
+
+  getChannelId() {
+    return this.channels.getChannelOfListener(this.client);
   }
   
 }

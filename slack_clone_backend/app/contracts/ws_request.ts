@@ -1,4 +1,4 @@
-export type eventType = 'message';
+export type eventType = 'message' | 'error';
 
 export interface request {
   channelId?: number

@@ -107,7 +107,8 @@ export const useActivePage = defineStore('channelPage', {
       this.activePageId = id;
       this.activePageType = type;
       this.messages = [];
-      socket.emit('subscribe', { channelId: id })
+      socket.emit('subscribe', { channelId: id });
+      socket.emit('loadMessages');
     },
     // addMessage({
     //   threadId,

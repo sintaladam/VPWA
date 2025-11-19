@@ -21,7 +21,7 @@ socket.on('connect', () => console.log('[WS] connected', socket.id))
 socket.on('disconnect', (r) => console.log('[WS] disconnected', r))
 socket.on('connect_error', (e) => console.error('[WS] error', e.message))
 
-socket.on('message', (data: Message) => activePage.loadMessages([data]))
+socket.on('message', (data: { messages: Message[] }) => activePage.loadMessages(data.messages))
 
 
 AuthManager.onChange((newToken) => {
