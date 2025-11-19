@@ -2,7 +2,6 @@ import { eventType, messageBody, request } from "../contracts/ws_request.js";
 import { ChannelListener } from "../misc/channelEvents.js";
 import db from "@adonisjs/lucid/services/db";
 import Channel from "#models/channel";
-import bodyParserConfig from "#config/bodyparser";
 
 class SocketService {
   async handle(event: string, data: request, listener: ChannelListener) {
@@ -54,7 +53,6 @@ class SocketService {
   }
 
   private async loadMessages(listener: ChannelListener) {
-    const user = listener.getUser();
     const channel_id = listener.getChannelId();
 
     if (!channel_id) {
