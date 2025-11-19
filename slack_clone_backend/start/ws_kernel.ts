@@ -3,7 +3,6 @@ import server from '@adonisjs/core/services/server'
 import { Server } from 'socket.io'
 import { BroadcastingChannels, ChannelListener } from '../app/misc/channelEvents.js';
 import socket_service from '#services/socket_service';
-import { args } from '@adonisjs/core/ace';
 
 app.ready(() => {
     const io = new Server(server.getNodeServer(), {
@@ -19,8 +18,6 @@ app.ready(() => {
     io.on('connection', (socket) => {
         const listener = new ChannelListener(socket, broadcasts);
         console.log('new connection', socket.id);
-
-        listener.subscribe(1);
 
         // socket.on('message', (data) => {
         //     console.log('new message:', data);

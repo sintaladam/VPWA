@@ -29,5 +29,13 @@ export interface User {
   description?: string
   email: string
   createdAt: string
-  updatedAt: string
+  updatedAt?: string
+}
+
+export interface Message {
+  id: number
+  sender: User
+  content: string
+  createdAt: string
+  updatedAt?: string
 }

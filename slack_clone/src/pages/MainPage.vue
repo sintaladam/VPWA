@@ -27,6 +27,8 @@ import type { messageType, pageType, UserAtr } from 'src/components/models';
 import { useAuthStore } from 'src/stores/authStore';
 //import UserList from 'src/components/UserList.vue'
 import { ref } from 'vue';
+import type { User } from 'src/contracts';
+import SocketService from 'src/services/SocketService';
 
 export default {
   components: {
@@ -42,8 +44,21 @@ export default {
       //   content: value,
       //   type: type
       // });
-      console.log('sending', type, value);
-      this.$socket.emit('message', { type: 'sendMessage', channelId: 1, body: { senderId: this.userStore.user?.id ?? -1,message: value }})
+      if (type === 'message') {
+        console.log('sending', type, value);
+        // this.$socket.emit('message', { body: { senderId: this.userStore.user?.id, message: value } })
+        SocketService.send('message', { senderId: this.userStore.user?.id, message: value })
+      }
+      else {
+        (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addLocalMessage({
+          id: -1,
+          sender: this.userStore.user as User,
+          content: value,
+          createdAt: new Date().toISOString(),
+          type
+        });
+      }
+      
     },
     showList(data: UserAtr[], messageType: messageType) {
       if (messageType === 'component') {

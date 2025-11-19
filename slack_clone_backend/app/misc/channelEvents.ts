@@ -1,5 +1,5 @@
 import { Socket } from "socket.io";
-import type { requestType } from "../contracts/ws_request.js";
+import type { eventType } from "../contracts/ws_request.js";
 
 export class BroadcastingChannels {
   private channels: {
@@ -29,11 +29,11 @@ export class BroadcastingChannels {
     }
   }
 
-  broadcast(channelId:number, type: requestType, body: object) {
-    const channel = this.channels.find(ch => ch.channelId === channelId);
+  broadcast(event: eventType, body: object, client: Socket) {
+    const channel = this.channels.find(ch => ch.listeners.includes(client));
     if (channel) {
       channel.listeners.forEach(client => {
-        client.emit('message', body);
+        client.emit(event, body);
       });
     }
   }
@@ -60,8 +60,8 @@ export class ChannelListener {
     this.unsubscribeFn = null;
   }
 
-  broadcast(channelId: number, type: requestType, body: object) {
-    this.channels.broadcast(channelId, type, body);
+  send(event: eventType, body: object) {
+    this.channels.broadcast(event, body, this.client);
   }
   
 }

@@ -2,40 +2,31 @@
   <div class="row full-height justify-evenly overflow-auto" ref="messageContainer">
     <div class="col-11 column justify-end">
       <template v-for="(mess, index) in messages" :key="index">
-        <q-chat-message :text="[mess.content]" :sent="mess.senderId === 1" :name="mess.senderName"
-          :bg-color="mess.type === 'command' ? 'green' : userStore.user?.id == mess.senderId ? 'primary' : 'grey'" class="" />
+        <q-chat-message :text="[mess.content]" :sent="mess.sender.id === userStore.user?.id" :name="mess.sender.nickname"
+          :bg-color="mess?.type === 'command' ? 'green' : userStore.user?.id == mess.sender.id ? 'primary' : 'grey'" class="" />
       </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import type { Message, messageType } from './models';
+import type { messageType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
 import { nextTick } from 'vue';
+import type { Message } from 'src/contracts';
 
 export default {
   data() {
     return {
       userStore: useAuthStore(),
       activePage: useActivePage(),
-      localMessages: [] as Message[]
+      localMessages: [] as (Message & {type:messageType})[]
     }
   },
   methods: {
-    addMessage(newMessage: {
-      timestamp: number,
-      senderId: number,
-      content: string,
-      type: messageType;
-    }) {
-      if (newMessage.type === 'command') {
-        this.localMessages.push({ ...newMessage, id: -1, senderName: 'System' });
-      }
-      else if (newMessage.type === 'message') {
-        this.activePage.addMessage({ threadId: this.activePage.activePageId, threadType: this.activePage.activePageType, ...newMessage });
-      }
+    addLocalMessage(newMessage: (Message & {type:messageType})) {
+      this.localMessages.push(newMessage);
     },
     async scrollToBottom() {
       await nextTick()
@@ -50,11 +41,11 @@ export default {
   },
   computed: {
     messages() {
-      const allMessages: Message[] = [
-        ...this.activePage.getThreadMessages(this.activePage.activePageId, this.activePage.activePageType),
+      const allMessages: (Message & {type?: messageType})[] = [
+        ...this.activePage.messages,
         ...this.localMessages
       ];
-      return allMessages.sort((a, b) => a.timestamp - b.timestamp);
+      return allMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     }
   },
   mounted() {

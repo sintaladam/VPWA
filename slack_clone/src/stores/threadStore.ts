@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
-import { type Message, type pageType, type messageType } from 'src/components/models';
+import { type pageType } from 'src/components/models';
 import type { ChannelAtr, handleInviteType, KickVote } from 'src/components/models';
 import { socket } from 'src/boot/socket';
-import type { Channel, Invite, Member } from 'src/contracts';
+import type { Channel, Invite, Member, Message } from 'src/contracts';
 import { HomeService } from 'src/services';
 
 export const useActivePage = defineStore('channelPage', {
@@ -12,55 +12,56 @@ export const useActivePage = defineStore('channelPage', {
 
     kickvotes: [] as KickVote[],
 
-    messageGroups: [
-      {
-        threadId: 0,
-        threadType: 'channel',
-        messages: [
-          {
-            id: 0,
-            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 3, // 3 days ago
-            senderId: 1,
-            senderName: 'nvm',
-            content: 'first message in channel 0',
-            type: 'message',
-          },
-          {
-            id: 1,
-            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
-            senderId: 2,
-            senderName: 'alice',
-            content: 'second message in channel 0',
-            type: 'message',
-          },
-        ] as Message[],
-      },
-      {
-        threadId: 1,
-        threadType: 'channel',
-        messages: [
-          {
-            id: 2,
-            timestamp: Date.now() - 1000 * 60 * 60 * 24 * 1, // 1 day ago
-            senderId: 3,
-            senderName: 'bob',
-            content: 'first message in channel 1',
-            type: 'message',
-          },
-          {
-            id: 3,
-            timestamp: Date.now(),
-            senderId: 1,
-            senderName: 'nvm',
-            content: 'second message in channel 1',
-            type: 'message',
-          },
-        ] as Message[],
-      },
-    ],
+    // messageGroups: [
+    //   {
+    //     threadId: 0,
+    //     threadType: 'channel',
+    //     messages: [
+    //       {
+    //         id: 0,
+    //         timestamp: Date.now() - 1000 * 60 * 60 * 24 * 3, // 3 days ago
+    //         senderId: 1,
+    //         senderName: 'nvm',
+    //         content: 'first message in channel 0',
+    //         type: 'message',
+    //       },
+    //       {
+    //         id: 1,
+    //         timestamp: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
+    //         senderId: 2,
+    //         senderName: 'alice',
+    //         content: 'second message in channel 0',
+    //         type: 'message',
+    //       },
+    //     ] as Message[],
+    //   },
+    //   {
+    //     threadId: 1,
+    //     threadType: 'channel',
+    //     messages: [
+    //       {
+    //         id: 2,
+    //         timestamp: Date.now() - 1000 * 60 * 60 * 24 * 1, // 1 day ago
+    //         senderId: 3,
+    //         senderName: 'bob',
+    //         content: 'first message in channel 1',
+    //         type: 'message',
+    //       },
+    //       {
+    //         id: 3,
+    //         timestamp: Date.now(),
+    //         senderId: 1,
+    //         senderName: 'nvm',
+    //         content: 'second message in channel 1',
+    //         type: 'message',
+    //       },
+    //     ] as Message[],
+    //   },
+    // ],
     channels: [] as Channel[],
     invites: [] as Invite[],
     members: [] as Member[],
+    messages: [] as Message[],
   }),
   actions: {
     isAdmin(channel_id: number, userId: number) {
@@ -105,53 +106,47 @@ export const useActivePage = defineStore('channelPage', {
     setActivePage(id: number, type: pageType) {
       this.activePageId = id;
       this.activePageType = type;
+      this.messages = [];
+      socket.emit('subscribe', { channelId: id })
     },
-    // updateChannel({ id, name, description, type }: ChannelAtr) {
-    //   const channel = this.channels.find((ch) => ch.id === id);
-    //   if (channel) {
-    //     channel.name = name;
-    //     channel.description = description;
-    //     channel.type = type;
+    // addMessage({
+    //   threadId,
+    //   threadType,
+    //   timestamp,
+    //   senderId,
+    //   content,
+    //   type,
+    // }: {
+    //   threadId: number;
+    //   threadType: pageType;
+    //   timestamp: number;
+    //   senderId: number;
+    //   content: string;
+    //   type: messageType;
+    // }) {
+    //   let group = this.messageGroups.find(
+    //     (group) => group.threadId === threadId && group.threadType === threadType,
+    //   );
+    //   if (!group) {
+    //     group = {
+    //       threadId: threadId,
+    //       threadType: threadType,
+    //       messages: [] as Message[],
+    //     };
+    //     this.messageGroups.push(group);
     //   }
+
+    //   group.messages.push({
+    //     id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
+    //     senderId,
+    //     senderName: 'nvm',
+    //     type,
+    //     content,
+    //     timestamp,
+    //   });
+
+    //   this.sendMsg(content);
     // },
-    addMessage({
-      threadId,
-      threadType,
-      timestamp,
-      senderId,
-      content,
-      type,
-    }: {
-      threadId: number;
-      threadType: pageType;
-      timestamp: number;
-      senderId: number;
-      content: string;
-      type: messageType;
-    }) {
-      let group = this.messageGroups.find(
-        (group) => group.threadId === threadId && group.threadType === threadType,
-      );
-      if (!group) {
-        group = {
-          threadId: threadId,
-          threadType: threadType,
-          messages: [] as Message[],
-        };
-        this.messageGroups.push(group);
-      }
-
-      group.messages.push({
-        id: this.channels.length ? (this.channels[this.channels.length - 1]?.id ?? 0) + 1 : 0,
-        senderId,
-        senderName: 'nvm',
-        type,
-        content,
-        timestamp,
-      });
-
-      this.sendMsg(content);
-    },
     // removeUsersFromThread(channelId: number, userIds: number | number[]) {
     //   const idsToRemove = new Set(Array.isArray(userIds) ? userIds : [userIds]);
     //   const channel = this.channels.find((c) => c.id === channelId);
@@ -161,8 +156,11 @@ export const useActivePage = defineStore('channelPage', {
     //   //channel.users = channel.users.filter((userId) => !idsToRemove.has(userId));
       
     // },
-    sendMsg(msg:string) {
-      socket.emit('message', { msg });
+    // sendMsg(msg:string) {
+    //   socket.emit('message', { msg });
+    // },
+    loadMessages(messages: Message[]) {
+      this.messages = this.messages.concat(messages);
     },
     async getChannels() {
       this.channels = await HomeService.getChannels() ?? [];
@@ -221,12 +219,13 @@ export const useActivePage = defineStore('channelPage', {
           return state.channels.filter((ch) => ch.name?.toLowerCase().includes(term.toLowerCase()));
       }
     },
-    getThreadMessages: (state) => (id: number, type: pageType) => {
-      const group = state.messageGroups.find(
-        (group) => group.threadId === id && group.threadType === type,
-      );
-      return (group?.messages ?? []) as Message[];
-    },
+    // getThreadMessages: (state) => (id: number, type: pageType) => {
+    //   const group = state.messageGroups.find(
+    //     (group) => group.threadId === id && group.threadType === type,
+    //   );
+    //   return (group?.messages ?? []) as Message[];
+    // },
+
     getThreadId: (state) => (argument: string) => {
       const channel = state.channels.find((c) => c.name === argument);
       if (channel) {
@@ -234,6 +233,7 @@ export const useActivePage = defineStore('channelPage', {
       }
       return 0;
     },
+
   },
   // persist: {
   //   key: 'threadStore',

@@ -3,14 +3,14 @@ export enum ChannelType {
   Private = 'private',
 }
 
-export interface Message {
-  id: number;
-  timestamp: number;
-  senderId: number;
-  senderName: string;
-  content: string;
-  type: messageType;
-}
+// export interface Message {
+//   id: number;
+//   timestamp: number;
+//   senderId: number;
+//   senderName: string;
+//   content: string;
+//   type: messageType;
+// }
 
 export interface KickVote {
   targetUserId: number;

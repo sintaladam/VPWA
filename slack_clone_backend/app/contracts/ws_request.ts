@@ -1,12 +1,15 @@
-export type requestType = 'sendMessage';
+export type eventType = 'message';
 
 export interface request {
-  type: requestType,
-  channelId: number,
-  body: messageBody
+  channelId?: number
+  body: messageBody | subscribeBody
 }
 
 export interface messageBody {
-  senderId: number,
-  message: string,
+  senderId: number
+  message: string
+}
+
+export interface subscribeBody {
+  channelId: number
 }
