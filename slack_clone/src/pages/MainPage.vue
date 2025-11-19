@@ -46,8 +46,7 @@ export default {
       // });
       if (type === 'message') {
         console.log('sending', type, value);
-        // this.$socket.emit('message', { body: { senderId: this.userStore.user?.id, message: value } })
-        SocketService.send('message', { senderId: this.userStore.user?.id, message: value })
+        SocketService.send('message', { message: value })
       }
       else {
         (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addLocalMessage({

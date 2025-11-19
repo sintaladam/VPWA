@@ -39,7 +39,6 @@ export const useAuthStore = defineStore('auth', {
     _success(user: User | null) {
       this.authStatus = 'success';
       this.user = user;
-      console.log(user);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _error(errors: any) {

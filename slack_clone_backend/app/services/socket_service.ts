@@ -10,7 +10,7 @@ class SocketService {
       const body = data.body as messageBody;
       this.send(event, {
         id: this.id++,
-        sender: await User.query().where('id', body.senderId).first(),
+        sender: await User.query().where('id', listener.getUser().id).first(),
         content: body.message,
         createdAt: new Date().toISOString()
       }, listener);

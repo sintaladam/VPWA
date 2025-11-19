@@ -1,5 +1,6 @@
 import { Socket } from "socket.io";
 import type { eventType } from "../contracts/ws_request.js";
+import User from "#models/user";
 
 export class BroadcastingChannels {
   private channels: {
@@ -62,6 +63,10 @@ export class ChannelListener {
 
   send(event: eventType, body: object) {
     this.channels.broadcast(event, body, this.client);
+  }
+
+  getUser: () => User = () => {
+    return this.client.data.user;
   }
   
 }

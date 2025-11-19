@@ -6,7 +6,6 @@ export interface request {
 }
 
 export interface messageBody {
-  senderId: number
   message: string
 }
 
