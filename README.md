@@ -4,24 +4,31 @@
 Akékoľvek iné vylepšenia sú vítané a potešia ma : )
 
 1. registrácia, prihlásenie a odhlásenie používateľa
-   - [ ]  používateľ má meno a priezvisko, nickName a email
+   - [x]  používateľ má meno a priezvisko, nickName a email
 2. používateľ vidí zoznam kanálov, v ktorých je členom
-   - [ ]  pri opustení kanála, alebo trvalom vyhodení z kanála je daný kanál odobratý zo zoznamu
-   - [ ]  pri pozvánke do kanála je daný kanál zvýraznený a topovaný
-   - [ ]  v zozname môže cez používateľské rozhranie kanál vytvoriť, opustiť, a ak je správcom aj zrušiť
-   - [ ]  dva typy kanálov - [ ]  súkromný (private channel) a verejný kanál (public channel)
-   - [ ]  správcom kanála je používateľ, ktorý kanál vytvoril
+   - [x]  pri opustení kanála, alebo trvalom vyhodení z kanála je daný kanál odobratý zo zoznamu
+      - [x] funguje zatial iba pri refresh
+      - [ ] funguje normalne
+   - [x]  pri pozvánke do kanála je daný kanál zvýraznený a topovaný
+      - zobrazuje invite v sekvcii invites    
+   - [x]  v zozname môže cez používateľské rozhranie kanál vytvoriť, opustiť, a ak je správcom aj zrušiť
+   - [x]  dva typy kanálov - [ ]  súkromný (private channel) a verejný kanál (public channel)
+   - [x]  správcom kanála je používateľ, ktorý kanál vytvoril 
    - [ ]  ak nie je kanál aktívny (nie je pridaná nová správa) viac ako 30 dní, kanál prestáva existovať (následne je možné použiť channelName kanála pre "nový" kanál)
 3. používateľ odosiela správy a príkazy cez "príkazový riadok", ktorý je "fixným" prvkom aplikácie. používateľ môže odoslať správu v kanáli, ktorého je členom
+- [x] 
 4. vytvorenie komunikačného kanála (channel) cez príkazový riadok
+   - zatial nefunguje cez CMD iba GUI
    - [ ]  kanál môže vytvoriť ľubovolný používateľ cez príkaz /join channelName [private]
    - [ ]  do súkromného kanála môže pridávať/odoberať používateľov iba správca kanála cez príkazy /invite nickName a /revoke nickName
    - [ ]  do verejného kanála sa môže pridať ľubovolný používateľ cez príkaz /join channelName (ak kanál neexistuje, automaticky sa vytvorí)
    - [ ]  do verejného kanála môže člen kanála pozvať iného používateľa príkazom /invite nickName
    - [ ]  vo verejnom kanáli môže člen "vyhodiť" iného člena príkazom /kick nickName. ak tak spravia aspoň 3 členovia, používateľ má "trvalý" ban pre daný kanál. správca môže používateľa vyhodiť "natrvalo" kedykoľvek príkazom /kick nickName, alebo naopak "obnovit" používateľovi prístup do kanála cez príkaz /invite
-   - [ ]  nickName ako aj channelName sú unikátne
+   - [x]  nickName ako aj channelName sú unikátne
+   - [ ]  treba vratit spravny error (custom)
    - [ ]  správca môže kanál zatvoriť/zrušiť príkazom /quit
 5. používateľ môže zrušiť svoje členstvo v kanáli príkazom /cancel, ak tak spraví správca kanála, kanál zaniká
+   - [ ]
 6. správu v kanáli je možné adresovať konkrétnemu používateľovi cez príkaz @nickname
    - [ ]  správa je zvýraznená danému používateľovi v zozname správ
 7. používateľ si môže pozrieť kompletnú históriu správ
@@ -35,6 +42,7 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [ ]  ak je nastavený DND stav, neprichádzajú notifikácie
    - [ ]  ak je nastavený offline stav, neprichádzajú používateľovi správy, po prepnutí do online sú kanály automaticky aktualizované
 10. používateľ si môže pozrieť zoznam členov kanála (ak je tiež členom kanála) príkazom /list
+   - [ ] pridat do db (custom)
 11. - [ ] ak má používateľ aktívny niektorý z kanálov (nachádza sa v okne správ pre daný kanál) vidí v stavovej lište informáciu o tom, kto aktuálne píše správu (napr. Ed is typing)
-    - [ ] po kliknutí na nickName si môže pozrieť rozpísaný text v reálnom čase, predtým, ako ju odosielateľ odošle (každá zmena je viditeľná) :- [ ] ) 
+    - [ ] po kliknutí na nickName si môže pozrieť rozpísaný text v reálnom čase, predtým, ako ju odosielateľ odošle (každá zmena je viditeľná)) 
 
