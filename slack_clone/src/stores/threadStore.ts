@@ -182,6 +182,14 @@ export const useActivePage = defineStore('channelPage', {
       }
       return false;
     },
+    async joinChannel(channelId: number) {
+      const res = await HomeService.joinChannel(channelId);
+      if (res?.ok) {
+        await this.getChannels();
+        return true;
+      }
+      return false;
+    },
     async deleteChannel(channelId: number) {
       const res = await HomeService.deleteChannel(channelId);
       if (res?.ok) {

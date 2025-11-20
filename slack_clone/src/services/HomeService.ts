@@ -19,6 +19,30 @@ class HomeService {
     }
   }
 
+  async searchChannels(slug: string): Promise<Channel[] | null> {
+    try {
+      const response = await api.post<Channel[]>('home/channels/search', { slug });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
+  async joinChannel(channelId: number): Promise<{ ok: boolean; } | null> {
+    try {
+    const response = await api.post('home/channels/join', { channelId });
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
   async createChannel(channel:ChannelAtr):Promise<{ ok: boolean; } | null> {
     try {
       const response = await api.post('home/channels/create',channel);

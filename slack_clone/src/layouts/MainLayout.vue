@@ -80,14 +80,22 @@
           </q-input>
           <ChannelBadge v-for="value in channels" :key="value.id" :channelId="value.id" class=""
             @deleteChannelEvent="deleteThread(value.id)" />
-          <div class="full-width flex justify-center q-py-md">
-            <q-btn fab-mini icon="add" color="primary" @click="channelCreatorOpen = true" />
+          <div class="full-width flex justify-center q-py-md text-secondary" v-show="!channels.length">
+            Your channels will appear here
+          </div>
+          <div class="full-width flex justify-center q-py-md q-gutter-md">
+            <q-btn fab-mini icon="create" color="primary" @click="channelCreatorOpen = true" />
+            <q-btn fab-mini icon="add" color="primary" @click="channelSearchOpen = true" />
             <channel-creator v-model="channelCreatorOpen" />
+            <channel-search v-model="channelSearchOpen" />
           </div>
         </template>
         <template v-else-if="activeTab === 'invites'">
           <div class="full-width flex justify-center q-pl-sm">
             <InviteBadge v-for="value in activePage.invites" :key="value.id" :invite="value" />
+          </div>
+          <div class="full-width flex justify-center q-py-md text-secondary" v-show="!activePage.invites.length">
+            No pending invites
           </div>
         </template>
       </div>
@@ -118,6 +126,7 @@ import { Platform } from 'quasar'
 import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
 import type { User, Channel } from 'src/contracts';
+import ChannelSearch from 'src/components/ChannelSearch.vue';
 
 export default {
   data() {
@@ -132,6 +141,7 @@ export default {
       channelCreatorOpen: false,
       profileEditorOpen: false,
       inviteCreatorOpen: false,
+      channelSearchOpen: false,
     };
   },
   watch: {
@@ -166,7 +176,7 @@ export default {
     }
   },
   components: {
-    ChannelBadge, UpdatedUserProfile, ChannelCreator, InviteBadge
+    ChannelBadge, UpdatedUserProfile, ChannelCreator, InviteBadge, ChannelSearch
   },
   computed: {
     drawerBehavior(): DeviceType {

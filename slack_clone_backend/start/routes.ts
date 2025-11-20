@@ -36,6 +36,7 @@ router.group(() => {
   router.post('channels/join', '#controllers/channel_controller.joinChannel');
   router.post('channels/members', '#controllers/channel_controller.getMembers');
   router.post('channels/kick', '#controllers/channel_controller.kickMember');
+  router.post('channels/search', '#controllers/channel_controller.searchChannels');
 
   router.get('invites', '#controllers/invite_controller.getInvites');
   router.post('invites/handle', '#controllers/invite_controller.handleInvite');

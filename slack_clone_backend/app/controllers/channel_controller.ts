@@ -1,6 +1,6 @@
 import Channel from '#models/channel';
 import type { HttpContext } from '@adonisjs/core/http'
-import { channelIdValidator, channelKickValidator, createChannelValidator, updateChannelValidator } from '#validators/channel';
+import { channelIdValidator, channelKickValidator, channelSearchValidator, createChannelValidator, updateChannelValidator } from '#validators/channel';
 import db from '@adonisjs/lucid/services/db';
 
 export default class ChannelController {
@@ -12,6 +12,22 @@ export default class ChannelController {
     const channels = await user
       .related('channels')
       .query();
+    
+    return channels;
+  }
+
+  async searchChannels({ auth, request }: HttpContext) {
+    console.log('search channels');
+    const user = auth.getUserOrFail();
+    const { slug } = await request.validateUsing(channelSearchValidator);
+
+    const channels = await Channel
+      .query()
+      .where('type', 'public')
+      .whereDoesntHave('users', (query) => {
+        query.where('users.id', user.id);
+      })
+      .whereILike('name', `%${slug}%`);
     
     return channels;
   }

@@ -83,6 +83,7 @@ export default class InviteController {
       .related('channels')
       .query()
       .where('channels.id', channelId)
+      .andWhere('channels.creator_id', user.id)
       .firstOrFail();
 
     const recipient = await User

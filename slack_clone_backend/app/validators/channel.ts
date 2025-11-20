@@ -28,3 +28,9 @@ export const channelKickValidator = vine.compile(
     userId: vine.number(),
   })
 );
+
+export const channelSearchValidator = vine.compile(
+  vine.object({
+    slug: vine.string().trim().minLength(1),
+  })
+);
