@@ -101,7 +101,7 @@
       </div>
     </q-drawer>
     <q-page-container>
-       <q-page class="flex flex-center" v-show="!activePage.getThreadDetails(activePage.activePageId,'channel')">
+       <q-page class="flex flex-center" v-show="!activePage.getThreadDetails(activePage.activePageId)">
         <div class="text-center">
           <q-icon name="sentiment_very_satisfied" size="64px" color="secondary" />
           <div class="text-h5 q-mt-md text-primary">Welcome back</div>
@@ -110,7 +110,7 @@
           </div>
         </div>
       </q-page>
-      <router-view :key="$route.fullPath" v-show="activePage.getThreadDetails(activePage.activePageId,'channel')" />
+      <router-view :key="$route.fullPath" v-show="activePage.getThreadDetails(activePage.activePageId)" />
     </q-page-container>
 
   </q-layout>
@@ -196,7 +196,7 @@ export default {
       }
     },
     channels() {
-      return this.activePage.searchThreads('channel', this.searchChannels) as Channel[];
+      return this.activePage.searchThreads(this.searchChannels) as Channel[];
     },
     profile() {
       return { ...this.userStore.getProfileDetails() as User};

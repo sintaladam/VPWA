@@ -23,7 +23,7 @@
 import MessageBoard from 'src/components/MessageBoard.vue';
 import CLI from 'src/components/CLI.vue';
 import { useActivePage } from '../stores/threadStore';
-import type { messageType, pageType, UserAtr } from 'src/components/models';
+import type { messageType, UserAtr } from 'src/components/models';
 import { useAuthStore } from 'src/stores/authStore';
 //import UserList from 'src/components/UserList.vue'
 import { ref } from 'vue';
@@ -75,7 +75,7 @@ export default {
     }
   },
   created() {
-    this.activeStore.setActivePage(Number(this.$route.params.id), this.$route.name as pageType)
+    this.activeStore.setActivePage(Number(this.$route.params.id))
   },
   computed: {
     channelName() {

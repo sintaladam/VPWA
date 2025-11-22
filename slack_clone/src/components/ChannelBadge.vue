@@ -76,7 +76,7 @@ export default {
   },
   computed: {
     channel() {
-      return this.activeStore.getThreadDetails(this.channelId as number, 'channel') as Channel;
+      return this.activeStore.getThreadDetails(this.channelId as number) as Channel;
     }
   },
   emits: ['deleteChannelEvent'],

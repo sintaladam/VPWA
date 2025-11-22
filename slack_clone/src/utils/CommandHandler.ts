@@ -30,10 +30,6 @@ export class CommandHandler {
     argument?: string[],
   ): Promise<{ type?: messageType; output: string | string[] | UserAtr[] }> => {
     this.output = [];
-    if (this.activePage.activePageType != 'channel') {
-      this.print('Commands can be used only inside channels');
-      return { type: 'message', output: this.output };
-    }
     switch (command) {
       // case 'list': {
       //   const users = this.activePage.getThreadUsers(this.activePage.activePageId);
@@ -42,7 +38,7 @@ export class CommandHandler {
       //     return { type: 'component', output: users };
       //   } else {
       //     this.output.push('No users found.');
-      //   }
+      //   }  
       //   break;
       // }
       case 'help':

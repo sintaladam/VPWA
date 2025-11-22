@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { type pageType } from 'src/components/models';
 import type { ChannelAtr, handleInviteType, KickVote } from 'src/components/models';
 import { socket } from 'src/boot/socket';
 import type { Channel, Invite, Member, Message } from 'src/contracts';
@@ -8,7 +7,6 @@ import { HomeService } from 'src/services';
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
     activePageId: 0 as number,
-    activePageType: '' as pageType,
 
     kickvotes: [] as KickVote[],
 
@@ -103,9 +101,8 @@ export const useActivePage = defineStore('channelPage', {
     //     }
     //   }
     // },
-    setActivePage(id: number, type: pageType) {
+    setActivePage(id: number) {
       this.activePageId = id;
-      this.activePageType = type;
       this.messages = [];
       socket.emit('subscribe', { channelId: id });
       socket.emit('loadMessages');
@@ -213,20 +210,14 @@ export const useActivePage = defineStore('channelPage', {
     }
   },
   getters: {
-    getThreadDetails: (state) => (id: number, type: pageType) => {
-      switch (type) {
-        case 'channel':
-          return state.channels.find((ch) => ch.id == id) as Channel;
-      }
+    getThreadDetails: (state) => (id: number) => {
+      return state.channels.find((ch) => ch.id == id) as Channel;
     },
     getThreadName: (state) => () => {
       return state.channels.find((ch) => ch.id == state.activePageId)?.name;
     },
-    searchThreads: (state) => (type: pageType, term: string) => {
-      switch (type) {
-        case 'channel':
-          return state.channels.filter((ch) => ch.name?.toLowerCase().includes(term.toLowerCase()));
-      }
+    searchThreads: (state) => (term: string) => {
+      return state.channels.filter((ch) => ch.name?.toLowerCase().includes(term.toLowerCase()));
     },
     // getThreadMessages: (state) => (id: number, type: pageType) => {
     //   const group = state.messageGroups.find(

@@ -54,6 +54,4 @@ export type DeviceType = 'mobile' | 'desktop';
 
 export type messageType = 'command' | 'message' | 'component';
 
-export type pageType = 'channel';
-
 export type handleInviteType = 'accept' | 'reject';
