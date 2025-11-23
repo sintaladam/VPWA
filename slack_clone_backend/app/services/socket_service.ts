@@ -11,7 +11,8 @@ class SocketService {
       this.handleMessage(body, listener);
     }
     else if (event === 'subscribe') listener.subscribe(data.channelId!);
-    else if (event === 'loadMessages') this.loadMessages(listener);
+    // pass data so pagination params can be read
+    else if (event === 'loadMessages') this.loadMessages(listener, data);
   }
 
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
@@ -52,7 +53,7 @@ class SocketService {
     }
   }
 
-  private async loadMessages(listener: ChannelListener) {
+  private async loadMessages(listener: ChannelListener, data?: request) {
     const channel_id = listener.getChannelId();
 
     if (!channel_id) {
@@ -60,6 +61,10 @@ class SocketService {
       this.send('error', { message: 'No subscription to channel' }, listener);
       return;
     }
+    // read pagination params only from top-level
+    // we need only limit (perPage) and createdAt (cursor)
+    const perPageRaw = (data && data.perPage) ?? 25;
+    const perPage = Math.max(1, Number(perPageRaw) || 25);
 
     const channel = await Channel
       .query()
@@ -71,19 +76,34 @@ class SocketService {
       this.send('error', { message: 'Invalid channel' }, listener);
       return;
     }
+
+    
+    const cutoff = (() => {
+      if (!data?.createdAt) {
+        // first page
+        return new Date().toISOString();
+      }
+
+      const parsed = new Date(data.createdAt);
+
+      if (isNaN(parsed.getTime())) {
+        // invalid input sent by the client
+        this.send('error', { message: 'Invalid createdAt format' }, listener);
+      }
+
+      return parsed.toISOString();
+    })();
+
     const messages = await channel
       .related('messages')
       .query()
-      .preload('sender');
+      .preload('sender')
+      .where('created_at', '<', cutoff)
+      .orderBy('created_at', 'desc')
+      .limit(perPage);
+
     this.send('message', { messages }, listener);
   }
 }
 
 export default new SocketService();
-
-// {
-//   id: this.id++,
-//     sender: await User.query().where('id', listener.getUser().id).first(),
-//       content: body.message,
-//         createdAt: new Date().toISOString();
-// }

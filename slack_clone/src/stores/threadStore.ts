@@ -7,7 +7,7 @@ import { HomeService } from 'src/services';
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
     activePageId: 0 as number,
-
+    perPage: 25 as number, // how many chats are going to be loader per request
     kickvotes: [] as KickVote[],
 
     // messageGroups: [
@@ -104,8 +104,8 @@ export const useActivePage = defineStore('channelPage', {
     setActivePage(id: number) {
       this.activePageId = id;
       this.messages = [];
-      socket.emit('subscribe', { channelId: id });
-      socket.emit('loadMessages');
+      socket.emit('subscribe', { channelId: id});//maybe not a good idea :/
+      //socket.emit('loadMessages', { perPage: this.perPage });
     },
     // addMessage({
     //   threadId,

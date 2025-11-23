@@ -38,4 +38,5 @@ export interface Message {
   content: string
   createdAt: string
   updatedAt?: string
+  perPage?: number
 }
