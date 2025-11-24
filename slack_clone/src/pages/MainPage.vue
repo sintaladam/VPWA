@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <!-- <UserList :users="activeUsers" v-model="editorOpen" /> -->
+    <UserList :users="activeUsers" :channelId="activeStore.activePageId" v-model="editorOpen" />
 
 
   </q-page>
@@ -25,7 +25,7 @@ import CLI from 'src/components/CLI.vue';
 import { useActivePage } from '../stores/threadStore';
 import type { messageType, UserAtr } from 'src/components/models';
 import { useAuthStore } from 'src/stores/authStore';
-//import UserList from 'src/components/UserList.vue'
+import UserList from 'src/components/UserList.vue'
 import { ref } from 'vue';
 import type { User } from 'src/contracts';
 import SocketService from 'src/services/SocketService';
@@ -34,7 +34,7 @@ export default {
   components: {
     MessageBoard,
     CLI,
-    //UserList
+    UserList
   },
   methods: {
     addMessage(value: string, type: messageType) {

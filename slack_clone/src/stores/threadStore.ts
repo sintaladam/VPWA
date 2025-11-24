@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import type { ChannelAtr, handleInviteType, KickVote } from 'src/components/models';
 import { socket } from 'src/boot/socket';
 import type { Channel, Invite, Member, Message } from 'src/contracts';
-import { HomeService } from 'src/services';
+import HomeService from "src/services/HomeService";
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({

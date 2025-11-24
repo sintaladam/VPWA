@@ -30,9 +30,9 @@
                             <q-item-label>{{ user.nickname }}</q-item-label>
                             <q-item-label caption class="text-grey">Member</q-item-label>
                         </q-item-section>
-                        <q-item-section side v-show="creatorId===userStore.user!.id && user.id!==userStore.user!.id">
+                        <!-- <q-item-section side v-show="creatorId===userStore.user!.id && user.id!==userStore.user!.id">
                             <q-btn round flat color="negative" icon="cancel" size="sm" @click.stop="kickMember(user.id)"/>
-                        </q-item-section>
+                        </q-item-section> -->
                         
                     </q-item>
                 </q-list>
@@ -57,10 +57,10 @@ export default {
             type: Array as PropType<Member[]>,
             required: true
         },
-        creatorId: {
-            type: Number,
-            required:true
-        },
+        // creatorId: {
+        //     type: Number,
+        //     required:true
+        // },
         channelId: {
             type: Number,
             required:true
@@ -70,6 +70,9 @@ export default {
         return {
             userStore: useAuthStore(),
         }
+    },
+    mounted() {
+        console.log("UserList mounted with users:", this.users);
     },
     methods: {
         async kickMember(userId: number) {

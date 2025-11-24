@@ -8,6 +8,7 @@ import {
   type StatusType,
   type UserAtr,
 } from '../components/models';
+
 //import type { Channel } from 'src/contracts';
 
 function isStatusType(value: string): value is StatusType {
@@ -31,16 +32,17 @@ export class CommandHandler {
   ): Promise<{ type?: messageType; output: string | string[] | UserAtr[] }> => {
     this.output = [];
     switch (command) {
-      // case 'list': {
-      //   const users = this.activePage.getThreadUsers(this.activePage.activePageId);
-
-      //   if (users && users.length > 0) {
-      //     return { type: 'component', output: users };
-      //   } else {
-      //     this.output.push('No users found.');
-      //   }  
-      //   break;
-      // }
+      case 'list': {
+        await this.activePage.getMembers(this.activePage.activePageId);
+        const users: UserAtr[] = this.activePage.members as UserAtr[];
+        console.log("ahoj toto su users: ", users);
+        if (users && users.length > 0) {
+          return { type: 'component', output: users };
+        } else {
+          this.output.push('No users found.');
+        }  
+        break;
+      }
       case 'help':
         this.output.push(`available commands: ${this.commandList.join(', ')}`);
         break;
