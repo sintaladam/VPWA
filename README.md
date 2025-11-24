@@ -16,8 +16,8 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [x]  správcom kanála je používateľ, ktorý kanál vytvoril 
    - [ ]  ak nie je kanál aktívny (nie je pridaná nová správa) viac ako 30 dní, kanál prestáva existovať (následne je možné použiť channelName kanála pre "nový" kanál)
 3. používateľ odosiela správy a príkazy cez "príkazový riadok", ktorý je "fixným" prvkom aplikácie. používateľ môže odoslať správu v kanáli, ktorého je členom
-   - [x] 
-4. vytvorenie komunikačného kanála (channel) cez príkazový riadok
+   - [x] uc3 
+5. vytvorenie komunikačného kanála (channel) cez príkazový riadok
    - zatial nefunguje cez CMD iba GUI
    - [ ]  kanál môže vytvoriť ľubovolný používateľ cez príkaz /join channelName [private]
    - [ ]  do súkromného kanála môže pridávať/odoberať používateľov iba správca kanála cez príkazy /invite nickName a /revoke nickName
@@ -27,23 +27,23 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [x]  nickName ako aj channelName sú unikátne
    - [ ]  treba vratit spravny error (custom)
    - [ ]  správca môže kanál zatvoriť/zrušiť príkazom /quit
-5. používateľ môže zrušiť svoje členstvo v kanáli príkazom /cancel, ak tak spraví správca kanála, kanál zaniká
-   - [ ]
-6. správu v kanáli je možné adresovať konkrétnemu používateľovi cez príkaz @nickname
+6. používateľ môže zrušiť svoje členstvo v kanáli príkazom /cancel, ak tak spraví správca kanála, kanál zaniká
+   - [ ] uc6
+7. správu v kanáli je možné adresovať konkrétnemu používateľovi cez príkaz @nickname
    - [ ]  správa je zvýraznená danému používateľovi v zozname správ
-7. používateľ si môže pozrieť kompletnú históriu správ
+8. používateľ si môže pozrieť kompletnú históriu správ
    - [ ]  efektívny inifinite scroll
-8. používateľ je informovaný o každej novej správe prostredníctvom notifikácie
+9. používateľ je informovaný o každej novej správe prostredníctvom notifikácie
    - [ ]  notifikácia sa vystavuje iba ak aplikácia nie je v stave "visible" (pozrite quasar docu App Visibility)
    - [ ]  notifikácia obsahuje časť zo správy a odosielateľa
    - [ ]  používateľ si môže nastaviť, aby mu chodili notifikácie iba pre správy, ktoré sú mu adresované
-9. používateľ si môže nastaviť stav (online, DND, offline)
+10. používateľ si môže nastaviť stav (online, DND, offline)
    - [ ]  stav sa zobrazuje používateľom
    - [ ]  ak je nastavený DND stav, neprichádzajú notifikácie
    - [ ]  ak je nastavený offline stav, neprichádzajú používateľovi správy, po prepnutí do online sú kanály automaticky aktualizované
-10. používateľ si môže pozrieť zoznam členov kanála (ak je tiež členom kanála) príkazom /list
+11. používateľ si môže pozrieť zoznam členov kanála (ak je tiež členom kanála) príkazom /list
    - [ ] pridat do db (custom)
 11. ak má používateľ aktívny niektorý z kanálov (nachádza sa v okne správ pre daný kanál) vidí v stavovej lište informáciu o tom, kto aktuálne píše správu (napr. Ed is typing)
    - po kliknutí na nickName si môže pozrieť rozpísaný text v reálnom čase, predtým, ako ju odosielateľ odošle (každá zmena je viditeľná))
-   - [ ] 
+   - [ ] uc11
 
