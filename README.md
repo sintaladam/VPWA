@@ -16,7 +16,7 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [x]  správcom kanála je používateľ, ktorý kanál vytvoril 
    - [ ]  ak nie je kanál aktívny (nie je pridaná nová správa) viac ako 30 dní, kanál prestáva existovať (následne je možné použiť channelName kanála pre "nový" kanál)
 3. používateľ odosiela správy a príkazy cez "príkazový riadok", ktorý je "fixným" prvkom aplikácie. používateľ môže odoslať správu v kanáli, ktorého je členom
-- [x] 
+   - [x] 
 4. vytvorenie komunikačného kanála (channel) cez príkazový riadok
    - zatial nefunguje cez CMD iba GUI
    - [ ]  kanál môže vytvoriť ľubovolný používateľ cez príkaz /join channelName [private]
@@ -43,6 +43,7 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [ ]  ak je nastavený offline stav, neprichádzajú používateľovi správy, po prepnutí do online sú kanály automaticky aktualizované
 10. používateľ si môže pozrieť zoznam členov kanála (ak je tiež členom kanála) príkazom /list
    - [ ] pridat do db (custom)
-11. - [ ] ak má používateľ aktívny niektorý z kanálov (nachádza sa v okne správ pre daný kanál) vidí v stavovej lište informáciu o tom, kto aktuálne píše správu (napr. Ed is typing)
-    - [ ] po kliknutí na nickName si môže pozrieť rozpísaný text v reálnom čase, predtým, ako ju odosielateľ odošle (každá zmena je viditeľná)) 
+11. ak má používateľ aktívny niektorý z kanálov (nachádza sa v okne správ pre daný kanál) vidí v stavovej lište informáciu o tom, kto aktuálne píše správu (napr. Ed is typing)
+   - po kliknutí na nickName si môže pozrieť rozpísaný text v reálnom čase, predtým, ako ju odosielateľ odošle (každá zmena je viditeľná))
+   - [ ] 
 
