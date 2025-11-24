@@ -34,7 +34,8 @@ export default {
       userStore: useAuthStore(),
       activePage: useActivePage(),
       localMessages: [] as (Message & { type: messageType })[],
-      ignoreInitialLoad: true,
+      // when true, skip auto-scrolling to bottom for the next update (used by onLoad)
+      preventAutoScroll: false,
     }
   },
   methods: {
@@ -47,6 +48,8 @@ export default {
       }
 
       this.loading = true;
+      // mark that we're loading older messages so the watcher won't scroll to bottom
+      this.preventAutoScroll = true;
       const minDisplayMs = 800; // minimum time to show the loader (increase to show loader longer)
       const start = Date.now();
 
@@ -105,8 +108,13 @@ export default {
   watch: {
     'activePage.messages': {
       async handler() {
-        await nextTick()
-        this.scrollToBottom()
+        await nextTick();
+        // if an infinite-load just happened, skip a single auto-scroll
+        if (this.preventAutoScroll) {
+          this.preventAutoScroll = false;
+          return;
+        }
+        this.scrollToBottom();
       },
       deep: true,
     }
