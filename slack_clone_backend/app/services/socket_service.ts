@@ -11,8 +11,8 @@ class SocketService {
       this.handleMessage(body, listener);
     }
     else if (event === 'subscribe') listener.subscribe(data.channelId!);
-    // pass data so pagination params can be read
     else if (event === 'loadMessages') this.loadMessages(listener, data);
+    else if (event === 'deleteChannel') this.deleteChannel(listener, data.channelId);
   }
 
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
@@ -103,6 +103,36 @@ class SocketService {
       .limit(perPage);
 
     this.send('message', { messages }, listener);
+  }
+
+  private async deleteChannel(listener: ChannelListener, channelId?: number) {
+    if (!channelId) {
+      this.send('error', { message: 'No channelId provided' }, listener);
+      return;
+    }
+
+    const channel = await Channel.query().where('id', channelId).first();
+    if (!channel) {
+      this.send('error', { message: 'Invalid channel' }, listener);
+      return;
+    }
+
+    //permission check
+    //for now frontend only allows admin to delete channel
+    const txn = await db.transaction();
+    try {
+      // delete channel
+      await channel.useTransaction(txn).delete();
+      await txn.commit();
+
+      // notify all listeners in the channel (and the requester)
+      this.broadcast('channelDeleted', { channelId }, listener);
+      this.send('channelDeleted', { channelId }, listener);
+    } catch (error) {
+      await txn.rollback();
+      console.error('deleteChannel error', error);
+      this.send('error', { message: 'Failed to delete channel' }, listener);
+    }
   }
 }
 

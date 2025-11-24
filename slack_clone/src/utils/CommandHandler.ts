@@ -8,6 +8,8 @@ import {
   type StatusType,
   type UserAtr,
 } from '../components/models';
+import { socket } from 'src/boot/socket';
+import { Notify } from 'quasar'
 
 //import type { Channel } from 'src/contracts';
 
@@ -91,9 +93,14 @@ export class CommandHandler {
         break;
       case 'cancel':
         if (this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
-          console.log('deleting channel...')
+          socket.emit('deleteChannel', { channelId: this.activePage.activePageId });
+          Notify.create({
+            type: 'positive',
+            message: `You successfully deleted the channel!`
+          })
         } else {
           console.log('leaving channel...')
+          //
         }
         break;
       case 'join':

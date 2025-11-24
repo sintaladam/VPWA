@@ -3,6 +3,8 @@ import type { ChannelAtr, handleInviteType, KickVote } from 'src/components/mode
 import { socket } from 'src/boot/socket';
 import type { Channel, Invite, Member, Message } from 'src/contracts';
 import HomeService from "src/services/HomeService";
+import { Notify } from 'quasar';
+import { useAuthStore } from 'src/stores/authStore';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
@@ -207,7 +209,30 @@ export const useActivePage = defineStore('channelPage', {
     },
     async getMembers(channel_id: number) {
       this.members = await HomeService.getMembers(channel_id) ?? [];
-    }
+    },
+    removeChannel(channelId: number) {
+      const auth = useAuthStore();
+      const currentUserId = auth.user?.id ?? null;
+
+      const isCurrentUserAdmin = this.isAdmin(channelId, currentUserId as number);
+
+      this.channels = this.channels.filter(c => c.id !== channelId);
+      this.invites = this.invites.filter(i => i.channelId !== channelId);
+      this.members = this.members.filter(m => m.id !== channelId);
+
+      if (this.activePageId === channelId) {
+        this.activePageId = 0;
+        this.messages = [];
+      }
+
+      // notify non-admin users that the channel was deleted by owner
+      if (currentUserId !== null && !isCurrentUserAdmin) {
+        Notify.create({
+          type: 'negative',
+          message: 'Channel you were in was deleted by its owner'
+        });
+      }
+    },
   },
   getters: {
     getThreadDetails: (state) => (id: number) => {

@@ -22,7 +22,13 @@ socket.on('disconnect', (r) => console.log('[WS] disconnected', r))
 socket.on('connect_error', (e) => console.error('[WS] error', e.message))
 
 socket.on('message', (data: { messages: Message[] }) => activePage.loadMessages(data.messages))
-
+socket.on('channelDeleted', (data: { channelId: number }) => {
+  try {
+    activePage.removeChannel(data.channelId);
+  } catch (e) {
+    console.error('channelDeleted handler error', e);
+  }
+});
 
 AuthManager.onChange((newToken) => {
   if (newToken !== null) {
