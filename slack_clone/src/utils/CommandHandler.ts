@@ -35,7 +35,6 @@ export class CommandHandler {
       case 'list': {
         await this.activePage.getMembers(this.activePage.activePageId);
         const users: UserAtr[] = this.activePage.members as UserAtr[];
-        console.log("ahoj toto su users: ", users);
         if (users && users.length > 0) {
           return { type: 'component', output: users };
         } else {

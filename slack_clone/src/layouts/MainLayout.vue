@@ -62,10 +62,20 @@
       class="q-pa-sm no-scrollbar">
 
       <div class="row justify-center q-gutter-xs">
-        <q-tabs v-model="activeTab" dense class="text-dark col rounded-borders" active-color="primary"
-          indicator-color="primary" v-show="!miniState">
+        <q-tabs
+          v-model="activeTab"
+          dense
+          class="text-dark col rounded-borders row items-center"
+          active-color="primary"
+          indicator-color="primary"
+          v-show="!miniState"
+        >
           <q-tab name="channels" label="Channels" />
-          <q-tab name="invites" label="Invites" />
+          <q-tab name="invites" label="Invites">
+              <q-badge v-if="activePage.invites.length != 0" color="red" floating class="float-right" style="top: 3px;right: -28px" >
+                {{ activePage.invites.length }}
+              </q-badge>
+          </q-tab>
         </q-tabs>
         <q-btn dense flat round :icon="miniState ? 'arrow_right' : 'arrow_left'" v-if="activeDevice === 'desktop'"
           @click="handleDrawerToggle" class="" />

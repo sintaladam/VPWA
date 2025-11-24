@@ -15,25 +15,22 @@
                 <q-list bordered padding class="rounded-borders bg-grey-1">
                     <q-item v-for="(user, index) in users" :key="index">
                         <q-item-section avatar>
-                            <!-- <q-avatar
-                                :color="user.status === 'online' ? 'positive' : user.status === 'dnd' ? 'orange' : 'negative'"
-                                text-color="white" class="q-mr-sm">
-                                {{ user.nickname?.[0]?.toUpperCase() }}
-                            </q-avatar> -->
-                            <q-avatar
-                                text-color="primary" class="q-mr-sm">
+                            <q-avatar text-color="primary" class="q-mr-sm">
                                 {{ user.nickname?.[0]?.toUpperCase() }}
                             </q-avatar>
                         </q-item-section>
 
                         <q-item-section>
                             <q-item-label>{{ user.nickname }}</q-item-label>
-                            <q-item-label caption class="text-grey">Member</q-item-label>
+                            <q-item-label caption class="text-grey">
+                                {{ user.id === creatorId ? "Creator" : "Member" }}
+
+                            </q-item-label>
                         </q-item-section>
-                        <!-- <q-item-section side v-show="creatorId===userStore.user!.id && user.id!==userStore.user!.id">
-                            <q-btn round flat color="negative" icon="cancel" size="sm" @click.stop="kickMember(user.id)"/>
-                        </q-item-section> -->
-                        
+                        <q-item-section side v-if="userStore.user!.id === creatorId && user.id !== creatorId">
+                            <q-btn round flat color="negative" icon="cancel" size="sm"
+                                @click.stop="kickMember(user.id)" />
+                        </q-item-section>
                     </q-item>
                 </q-list>
 
@@ -50,6 +47,8 @@ import type { PropType } from 'vue';
 import type { Member } from 'src/contracts';
 import { useAuthStore } from 'src/stores/authStore';
 import { HomeService } from 'src/services';
+import { useActivePage } from '../stores/threadStore';
+import type { Channel } from '../contracts/Home';
 
 export default {
     props: {
@@ -57,22 +56,25 @@ export default {
             type: Array as PropType<Member[]>,
             required: true
         },
-        // creatorId: {
-        //     type: Number,
-        //     required:true
-        // },
         channelId: {
             type: Number,
-            required:true
+            required: true
         },
     },
     data() {
         return {
             userStore: useAuthStore(),
+            activePage: useActivePage(),
+            details: null as Channel | null,
         }
     },
-    mounted() {
-        console.log("UserList mounted with users:", this.users);
+    created() {
+        this.details = this.activePage.getThreadDetails(this.channelId);
+    },
+    computed: {
+        creatorId() {
+            return this.details?.creatorId || null;
+        },
     },
     methods: {
         async kickMember(userId: number) {
