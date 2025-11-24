@@ -63,8 +63,8 @@ export const useActivePage = defineStore('channelPage', {
   }),
   actions: {
     isAdmin(channel_id: number, userId: number) {
-      //current implementation is dependant on the fact that data are hardcoded in right order
-      if (this.channels[channel_id]?.creatorId == userId) {
+      const threadDetails = this.getThreadDetails(channel_id);
+      if (threadDetails.creatorId == userId) {
         return true;
       }
       return false;

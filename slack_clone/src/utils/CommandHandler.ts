@@ -90,11 +90,11 @@ export class CommandHandler {
         //everyone can invite to public channel
         break;
       case 'cancel':
-        //if (user) {
-        //     console.log('leaving channel...')
-        // } else {
-        //     console.log('deleting channel...')
-        // }
+        if (this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
+          console.log('deleting channel...')
+        } else {
+          console.log('leaving channel...')
+        }
         break;
       case 'join':
         // if (argument) {
