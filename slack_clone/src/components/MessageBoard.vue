@@ -1,21 +1,18 @@
 <template>
   <div class="row full-height justify-evenly overflow-auto" ref="messageContainer">
     <div class="col-11 column justify-end">
-      <q-infinite-scroll
-              :offset="100"
-              @load="onLoad"
-              class="column"
-              reverse
-      >
-      <template v-slot:loading>
-        <div class="row justify-center q-my-md">
-          <q-spinner-dots color="primary" size="40px" />
-        </div>
-      </template>
-        
+      <q-infinite-scroll :offset="250" @load="onLoad" class="column" reverse>
+        <template v-slot:loading>
+          <div class="row justify-center q-my-md">
+            <q-spinner-dots color="primary" size="40px" />
+          </div>
+        </template>
+
         <template v-for="(mess, index) in messages" :key="index">
-            <q-chat-message :text="[mess.content]" :sent="mess.sender.id === userStore.user?.id" :name="mess.sender.nickname"
-              :bg-color="mess?.type === 'command' ? 'green' : userStore.user?.id == mess.sender.id ? 'primary' : 'grey'" class="" />
+          <q-chat-message :text="[mess.content]" :sent="mess.sender.id === userStore.user?.id"
+            :name="mess.sender.nickname"
+            :bg-color="mess?.type === 'command' ? 'green' : userStore.user?.id == mess.sender.id ? 'primary' : 'grey'"
+            class="" />
         </template>
       </q-infinite-scroll>
     </div>
@@ -28,15 +25,15 @@ import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
 import type { Message } from 'src/contracts';
 import { socket } from 'src/boot/socket';
+import { nextTick } from 'vue';
 
 export default {
   data() {
     return {
       loading: false,
-      page: 1,
       userStore: useAuthStore(),
       activePage: useActivePage(),
-      localMessages: [] as (Message & {type:messageType})[],
+      localMessages: [] as (Message & { type: messageType })[],
       ignoreInitialLoad: true,
     }
   },
@@ -68,7 +65,7 @@ export default {
         };
 
         socket.on('message', handler);
-        socket.emit('loadMessages', { perPage , createdAt: this.messages[0]?.createdAt });
+        socket.emit('loadMessages', { perPage, createdAt: this.messages[0]?.createdAt });
 
         const timeoutId = setTimeout(() => {
           if (settled) return;
@@ -83,27 +80,40 @@ export default {
       if (elapsed < minDisplayMs) {
         await new Promise(res => setTimeout(res, minDisplayMs - elapsed));
       }
-      
+
       this.loading = false;
       // stop infinite-scroll if server returned no more messages
       done(olderMessages.length === 0);
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async fetchOlderMessages(page: number) {
-
+    async fetchOlderMessages() {
       return new Promise<(Message & { type: messageType })[]>(resolve => {
         const perPage = (this.activePage && this.activePage.perPage) ?? 25;
-        socket.emit('loadMessages', { page: this.page, perPage: perPage});
+        socket.emit('loadMessages', { perPage: perPage });
         setTimeout(() => resolve([]), 500);
       });
     },
-    addLocalMessage(newMessage: (Message & {type:messageType})) {
+    async addLocalMessage(newMessage: (Message & { type: messageType })) {
       this.activePage.messages.push(newMessage);
     },
+    scrollToBottom() {
+      const container = this.$refs.messageContainer as HTMLElement | null;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    },
+  },
+  watch: {
+    'activePage.messages': {
+      async handler() {
+        await nextTick()
+        this.scrollToBottom()
+      },
+      deep: true,
+    }
   },
   computed: {
     messages() {
-      const allMessages: (Message & {type?: messageType})[] = [
+      const allMessages: (Message & { type?: messageType })[] = [
         ...this.activePage.messages,
         ...this.localMessages
       ];
@@ -111,15 +121,15 @@ export default {
     }
   },
   async mounted() {
-  // wait until messages exist
-  if (this.messages.length === 0) {
-    const waitForMessages = async () => {
-      while (this.messages.length === 0) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-    };
-    await waitForMessages();
-  }
-},
+    // wait until messages exist
+    if (this.messages.length === 0) {
+      const waitForMessages = async () => {
+        while (this.messages.length === 0) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+      };
+      await waitForMessages();
+    }
+  },
 }
 </script>
