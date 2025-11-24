@@ -8,7 +8,18 @@
           </div>
         </template>
 
+      <q-infinite-scroll :offset="250" @load="onLoad" class="column" reverse>
+        <template v-slot:loading>
+          <div class="row justify-center q-my-md">
+            <q-spinner-dots color="primary" size="40px" />
+          </div>
+        </template>
+
         <template v-for="(mess, index) in messages" :key="index">
+          <q-chat-message :text="[mess.content]" :sent="mess.sender.id === userStore.user?.id"
+            :name="mess.sender.nickname"
+            :bg-color="mess?.type === 'command' ? 'green' : userStore.user?.id == mess.sender.id ? 'primary' : 'grey'"
+            class="" />
           <q-chat-message :text="[mess.content]" :sent="mess.sender.id === userStore.user?.id"
             :name="mess.sender.nickname"
             :bg-color="mess?.type === 'command' ? 'green' : userStore.user?.id == mess.sender.id ? 'primary' : 'grey'"
