@@ -18,6 +18,7 @@ export default class extends BaseSeeder {
         email: 'admin@example.com',
         password: 'admin123',
         description: 'System administrator',
+        mentionsOnly: false,
       },
       {
         nickname: 'johnd',
@@ -26,6 +27,7 @@ export default class extends BaseSeeder {
         email: 'john@example.com',
         password: 'password',
         description: 'Regular user',
+        mentionsOnly: false,
       },
       {
         nickname: 'aliced',
@@ -34,6 +36,7 @@ export default class extends BaseSeeder {
         email: 'alice@example.com',
         password: 'heslo',
         description: 'Regular user',
+        mentionsOnly: true,
       },
     ]);
 
@@ -79,9 +82,9 @@ export default class extends BaseSeeder {
     ]);
 
     await db.table('user_channels').insert([
-      { user_id: 1, channel_id: 5, created_at: new Date(), updated_at: new Date() },
       { user_id: 2, channel_id: 1, created_at: new Date(), updated_at: new Date() },
       { user_id: 2, channel_id: 2, created_at: new Date(), updated_at: new Date() },
+      { user_id: 1, channel_id: 5, created_at: new Date(), updated_at: new Date() },
       { user_id: 2, channel_id: 3, created_at: new Date(), updated_at: new Date() },
       { user_id: 3, channel_id: 3, created_at: new Date(), updated_at: new Date() },
       { user_id: 3, channel_id: 4, created_at: new Date(), updated_at: new Date() },

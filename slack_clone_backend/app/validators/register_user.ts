@@ -24,5 +24,6 @@ export const updateValidator = vine.compile(
     name: vine.string().trim().minLength(1).maxLength(127).optional(),
     surname: vine.string().trim().minLength(1).maxLength(127).optional(),
     description: vine.string().optional().nullable(),
+    mentionsOnly: vine.boolean().optional(),
   })
 );

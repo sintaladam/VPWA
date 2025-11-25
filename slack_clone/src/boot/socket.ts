@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import type { Message } from 'src/contracts';
 import { AuthManager } from 'src/services';
 import { useActivePage } from 'src/stores/threadStore';
+import { useNotifications } from 'src/composables/useNotifications'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -12,6 +13,8 @@ declare module 'vue' {
 }
 
 const activePage = useActivePage();
+const { notifyForMessage } = useNotifications()
+
 
 const socket = io(process.env.API_URL, {
   autoConnect: false,
@@ -21,7 +24,17 @@ socket.on('connect', () => console.log('[WS] connected', socket.id))
 socket.on('disconnect', (r) => console.log('[WS] disconnected', r))
 socket.on('connect_error', (e) => console.error('[WS] error', e.message))
 
-socket.on('message', (data: { messages: Message[] }) => activePage.loadMessages(data.messages))
+socket.on('message', (data: { messages: Message[] }) => {
+    try {
+      activePage.loadMessages(data.messages)
+      data.messages?.forEach(m => {
+        void notifyForMessage(m)
+      })
+    } catch (e) {
+      console.error('message handler error', e)
+    }
+
+});
 socket.on('channelDeleted', (data: { channelId: number }) => {
   try {
     activePage.removeChannel(data.channelId);

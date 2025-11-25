@@ -35,6 +35,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare password: string
 
   @column()
+  declare mentionsOnly: boolean
+
+  @column()
   declare description: string | null
 
   @manyToMany(() => Channel, {

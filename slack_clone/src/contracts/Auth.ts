@@ -12,13 +12,11 @@ export interface RegisterData {
   email: string
   password: string
   description?: string
-  //passwordConfirmation?: string
 }
 
 export interface LoginCredentials {
   email: string
   password: string
-  //remember?: boolean
 }
 
 export interface User {
@@ -30,6 +28,7 @@ export interface User {
   email: string
   createdAt: string
   updatedAt?: string
+  mentionsOnly: boolean
 }
 
 export interface Message {
