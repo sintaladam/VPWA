@@ -1,22 +1,41 @@
 <template>
-  <div class="row full-height justify-evenly overflow-auto" ref="messageContainer">
+  <div class="q-pr-sm full-height overflow-auto" ref="messageContainer">
     <div class="col-11 column justify-end">
-      <q-infinite-scroll :offset="250" @load="onLoad" class="column" reverse>
+      <q-infinite-scroll
+        :offset="250"
+        @load="onLoad"
+        class="column"
+        reverse
+      >
         <template v-slot:loading>
-          <div class="row justify-center q-my-md">
-            <q-spinner-dots color="primary" size="40px" />
+          <div class="row justify-center q-my-md" style="height:40px;">
+            <q-spinner-dots color="primary" size="40px" v-show="loading" />
           </div>
         </template>
 
-        <template v-for="(mess, index) in messages" :key="index">
+        <template v-for="mess in messages" :key="mess.id">
           <q-chat-message
             :text="[mess.content]"
             :sent="mess.sender.id === userStore.user?.id"
             :name="mess.sender.nickname"
             :bg-color="getMessageBgColor(mess)"
-            :class="mess?.type === 'command' ? 'text-weight-bold' : 'text-weight-regular'"
-          />
+          >
+            <template v-slot:avatar>
+              <q-avatar
+                square
+                class="q-mx-sm"
+                :text-color="getMessageBgColor(mess)"
+                :style="{
+                  border: '1px solid ' + colors.getPaletteColor(getMessageBgColor(mess)),
+                  borderRadius: '4px'
+                }"
+              >
+                {{ mess.sender.nickname?.[0]?.toUpperCase() }}
+              </q-avatar>
+            </template>
+          </q-chat-message>
         </template>
+
       </q-infinite-scroll>
     </div>
   </div>
@@ -29,6 +48,7 @@ import { useActivePage } from 'src/stores/threadStore';
 import type { Message } from 'src/contracts';
 import { socket } from 'src/boot/socket';
 import { nextTick } from 'vue';
+import { colors } from 'quasar'
 
 export default {
   data() {
@@ -37,11 +57,17 @@ export default {
       userStore: useAuthStore(),
       activePage: useActivePage(),
       localMessages: [] as (Message & { type: messageType })[],
+      // Quasar colors helper exposed to the template
+      colors,
       // when true, skip auto-scrolling to bottom for the next update (used by onLoad)
       preventAutoScroll: false,
     }
   },
   methods: {
+    isPing(mess: Message & { type?: messageType }): boolean {
+      const currentUsername = this.userStore.user?.nickname;
+      return currentUsername ? mess.content.includes(`@${currentUsername}`) : false;
+    },
     getMessageBgColor(mess: Message & { type?: messageType }): string {
       // check if message is a command
       if (mess?.type === 'command') {
@@ -49,9 +75,8 @@ export default {
       }
       
       // check if message mentions current user
-      const currentUsername = this.userStore.user?.nickname;
-      if (currentUsername && mess.content.includes(`@${currentUsername}`)) {
-        return 'yellow-3'; // highlight color for mentions
+      if (this.isPing(mess)) {
+        return 'yellow-9'; // highlight color for mentions
       }
       
       // default colors based on sender
