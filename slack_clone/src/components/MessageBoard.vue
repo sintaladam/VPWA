@@ -9,10 +9,13 @@
         </template>
 
         <template v-for="(mess, index) in messages" :key="index">
-          <q-chat-message :text="[mess.content]" :sent="mess.sender.id === userStore.user?.id"
+          <q-chat-message
+            :text="[mess.content]"
+            :sent="mess.sender.id === userStore.user?.id"
             :name="mess.sender.nickname"
-            :bg-color="mess?.type === 'command' ? 'green' : userStore.user?.id == mess.sender.id ? 'primary' : 'grey'"
-            class="" />
+            :bg-color="getMessageBgColor(mess)"
+            :class="mess?.type === 'command' ? 'text-weight-bold' : 'text-weight-regular'"
+          />
         </template>
       </q-infinite-scroll>
     </div>
@@ -39,6 +42,21 @@ export default {
     }
   },
   methods: {
+    getMessageBgColor(mess: Message & { type?: messageType }): string {
+      // check if message is a command
+      if (mess?.type === 'command') {
+        return 'green';
+      }
+      
+      // check if message mentions current user
+      const currentUsername = this.userStore.user?.nickname;
+      if (currentUsername && mess.content.includes(`@${currentUsername}`)) {
+        return 'yellow-3'; // highlight color for mentions
+      }
+      
+      // default colors based on sender
+      return this.userStore.user?.id === mess.sender.id ? 'primary' : 'grey';
+    },
     async onLoad(index: number, done: (stop?: boolean) => void) {
 
       // Prevent concurrent loads

@@ -30,7 +30,7 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
 5. používateľ môže zrušiť svoje členstvo v kanáli príkazom /cancel, ak tak spraví správca kanála, kanál zaniká
    - [ ] uc6
 6. správu v kanáli je možné adresovať konkrétnemu používateľovi cez príkaz @nickname
-   - [ ]  správa je zvýraznená danému používateľovi v zozname správ
+   - [x]  správa je zvýraznená danému používateľovi v zozname správ
 7. používateľ si môže pozrieť kompletnú históriu správ
    - [x]  efektívny infinite scroll
 8. používateľ je informovaný o každej novej správe prostredníctvom notifikácie
