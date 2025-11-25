@@ -1,4 +1,4 @@
-export type eventType = 'message' | 'error'| 'subscribe' | 'loadMessages' | 'channelDeleted';
+export type eventType = 'message' | 'error'| 'subscribe' | 'loadMessages' | 'channelDeleted' | 'leaveChannel';
 
 export interface request {
   channelId?: number

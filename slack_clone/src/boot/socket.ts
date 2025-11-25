@@ -29,6 +29,13 @@ socket.on('channelDeleted', (data: { channelId: number }) => {
     console.error('channelDeleted handler error', e);
   }
 });
+socket.on('leaveChannel', (data: { channelId: number; userId: number }) => {
+  try {
+    activePage.removeMember(data.channelId, data.userId);
+  } catch (e) {
+    console.error('leaveChannel handler error', e);
+  }
+});
 
 AuthManager.onChange((newToken) => {
   if (newToken !== null) {

@@ -2,6 +2,7 @@ import Channel from '#models/channel';
 import type { HttpContext } from '@adonisjs/core/http'
 import { channelIdValidator, channelKickValidator, channelSearchValidator, createChannelValidator, updateChannelValidator } from '#validators/channel';
 import db from '@adonisjs/lucid/services/db';
+import { broadcastingChannels } from '../misc/channelEvents.js';
 
 export default class ChannelController {
 
@@ -147,6 +148,36 @@ export default class ChannelController {
     await channel.related('users').detach([userId]);
 
     return { ok: true };
+  }
+
+  /**
+   * Leave channel (remove pivot row and notify listeners)
+   * POST /home/channels/:id/leave
+   */
+  public async leaveChannel({ auth, params, response }: HttpContext) {
+    const user = auth.getUserOrFail();
+    const channelId = Number(params.id);
+
+    try {
+      await db
+        .from('user_channels')
+        .where('channel_id', channelId)
+        .andWhere('user_id', user.id)
+        .delete();
+
+      // broadcast to channel listeners that a user left
+      try {
+        broadcastingChannels.broadcastToChannel(channelId, 'leaveChannel', { channelId, userId: user.id });
+      } catch (err) {
+        // don't fail the request if broadcasting fails
+        console.error('broadcast leaveChannel error', err);
+      }
+
+      return { ok: true };
+    } catch (err) {
+      console.error('leave channel error', err);
+      return response.internalServerError({ ok: false });
+    }
   }
 
 }

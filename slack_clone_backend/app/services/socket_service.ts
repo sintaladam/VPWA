@@ -1,5 +1,5 @@
 import { eventType, messageBody, request } from "../contracts/ws_request.js";
-import { ChannelListener } from "../misc/channelEvents.js";
+import { ChannelListener, broadcastingChannels } from "../misc/channelEvents.js";
 import db from "@adonisjs/lucid/services/db";
 import Channel from "#models/channel";
 
@@ -13,8 +13,8 @@ class SocketService {
     else if (event === 'subscribe') listener.subscribe(data.channelId!);
     else if (event === 'loadMessages') this.loadMessages(listener, data);
     else if (event === 'deleteChannel') this.deleteChannel(listener, data.channelId);
+    else if (event === 'leaveChannel') this.leaveChannel(listener, data.channelId);
   }
-
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
     listener.broadcast(event, data);
   }
@@ -132,6 +132,34 @@ class SocketService {
       await txn.rollback();
       console.error('deleteChannel error', error);
       this.send('error', { message: 'Failed to delete channel' }, listener);
+    }
+  }
+
+  private async leaveChannel(listener: ChannelListener, channelId?: number) {
+    if (!channelId) {
+      this.send('error', { message: 'No channelId provided' }, listener);
+      return;
+    }
+
+    const user = listener.getUser();
+    if (!user) {
+      this.send('error', { message: 'Not authenticated' }, listener);
+      return;
+    }
+
+    try {
+      await db
+        .from('user_channels')
+        .where('channel_id', channelId)
+        .andWhere('user_id', user.id)
+        .delete();
+
+      broadcastingChannels.broadcastToChannel(channelId, 'leaveChannel', { channelId, userId: user.id });
+
+      this.send('leaveChannel', { channelId, userId: user.id }, listener);
+    } catch (error) {
+      console.error('leaveChannel error', error);
+      this.send('error', { message: 'Failed to leave channel' }, listener);
     }
   }
 }

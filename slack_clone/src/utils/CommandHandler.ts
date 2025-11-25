@@ -41,7 +41,7 @@ export class CommandHandler {
           return { type: 'component', output: users };
         } else {
           this.output.push('No users found.');
-        }  
+        } 
         break;
       }
       case 'help':
@@ -100,6 +100,15 @@ export class CommandHandler {
           })
         } else {
           console.log('leaving channel...')
+          if (this.userStore.user) {
+            socket.emit('leaveChannel', {channelId: this.activePage.activePageId, userId: this.userStore.user.id});
+            Notify.create({
+              type: 'positive',
+              message: `You successfully left the channel!`
+            })
+          } else {
+            console.error('User is not logged in.');
+          }
           //
         }
         break;

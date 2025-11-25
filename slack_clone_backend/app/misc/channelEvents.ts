@@ -39,11 +39,20 @@ export class BroadcastingChannels {
     }
   }
 
+  broadcastToChannel(channelId: number, event: eventType, body: object) {
+    const channel = this.channels.find(ch => ch.channelId === channelId);
+    if (!channel) return;
+    channel.listeners.forEach(client => client.emit(event, body));
+  }
+
   getChannelOfListener(client: Socket) {
     const channel = this.channels.find(ch => ch.listeners.includes(client));
     return channel?.channelId ?? null;
   }
 }
+
+// export a singleton for app-wide use
+export const broadcastingChannels = new BroadcastingChannels();
 
 export class ChannelListener {
   private unsubscribeFn: (() => void) | null;

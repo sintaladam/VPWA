@@ -103,6 +103,18 @@ class HomeService {
     }
   }
 
+  async leaveChannel(channelId: number): Promise<{ ok: boolean; } | null> {
+    try {
+      const response = await api.post(`home/channels/${channelId}/leave`);
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Leave channel failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
   //invites
 
   async getInvites(): Promise<Invite[] | null> {
