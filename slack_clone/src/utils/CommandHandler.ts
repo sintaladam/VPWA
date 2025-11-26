@@ -8,26 +8,20 @@ import {
   type StatusType,
   type UserAtr,
 } from '../components/models';
+import { notify, isStatusType, print } from './helperFunctions';
+
 import { socket } from 'src/boot/socket';
 import { Notify } from 'quasar'
 
 import type { Channel } from 'src/contracts';
 import { HomeService } from 'src/services';
 
-function isStatusType(value: string): value is StatusType {
-  return ['online', 'offline', 'dnd'].includes(value);
-}
-
 export class CommandHandler {
-  commandList = ['list', 'help', 'join'];
+  commandList = ['list', 'help', 'join', 'kick', 'invite', 'cancel', 'status'];
   router = useRouter();
   activePage = useActivePage();
   userStore = useAuthStore();
-  output = [''];
-
-  print(value: string): void {
-    this.output.push(value);
-  }
+  output = [''];  
 
   handle = async (
     command: string,
@@ -41,50 +35,37 @@ export class CommandHandler {
         if (users && users.length > 0) {
           return { type: 'component', output: users };
         } else {
-          this.output.push('No users found.');
-        } 
+          print('No users found.', this.output);
+        }
         break;
       }
       case 'help':
-        this.output.push(`available commands: ${this.commandList.join(', ')}`);
+        print(`available commands: ${this.commandList.join(', ')}`, this.output);
         break;
-      // case 'kick':
-      //   if (!this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
-      //     if (argument && argument.length > 0 && argument.length < 2) {
-      //       const output = this.activePage.voteKickUser(
-      //         argument[0]!,
-      //         this.userStore.user?.id as number,
-      //         this.activePage.activePageId,
-      //       );
-      //       if (output) {
-      //         this.print(output);
-      //       }
-      //     } else {
-      //       this.print('Invalid number of arguments');
-      //     }
-      //   } else {
-      //     if (argument && argument.length > 0) {
-      //       const userIds = argument
-      //         .map((name) => {
-      //           const userEntry = Object.values(this.activePage.users).find(
-      //             (u) => u.nickname === name,
-      //           );
-      //           return userEntry?.id;
-      //         })
-      //         .filter(Boolean) as number[]; // remove undefined (nicknames not found)
+      case 'kick':
+        if (argument && argument.length === 1) {
+          const targetNickname = argument[0];
+          const isAdmin = this.activePage.isAdmin(
+            this.activePage.activePageId,
+            this.userStore.user?.id as number
+          );
 
-      //       if (userIds.length > 0) {
-      //         this.activePage.removeUsersFromThread(this.activePage.activePageId, userIds);
-      //         const kickedNames = userIds
-      //           .map((id) => this.activePage.users[id]?.nickname ?? 'Unknown')
-      //           .join(', ');
-      //         this.output.push(`Kicked user(s): ${kickedNames}`);
-      //       } else {
-      //         this.output.push('No valid users found to kick by nickname.');
-      //       }
-      //     }
-      //   }
-      //   break;
+          // emit kick event cez socket (backend rozhodne či je to admin-kick alebo vote-kick)
+          socket.emit('kickUser', {
+            channelId: this.activePage.activePageId,
+            targetNickname,
+            isAdmin
+          });
+
+          if (isAdmin) {
+            print(`Kicked user ${targetNickname} from channel.`, this.output);
+          } else {
+            print(`Voted to kick ${targetNickname}. 3 votes needed for ban.`, this.output);
+          }
+        } else {
+          this.output.push('Usage: /kick <nickname>');
+        }
+        break;
       case 'revoke':
         //kick users from private channel only admin
         break;
@@ -92,31 +73,23 @@ export class CommandHandler {
         if (argument && argument.length > 0) {
           const invitedUser = argument.join(' ').trim();
           if (!invitedUser) {
-            this.output.push('User nickname or email cannot be empty.');
+            print('User nickname or email cannot be empty.', this.output);
             break;
           }
-
           // get current channel id
           const currentChannelId = this.activePage.activePageId;
           if (!currentChannelId) {
-            this.output.push('You must be in a channel to invite someone.');
+            print('You must be in a channel to invite someone.', this.output);
             break;
           }
-
           // send invite
           const res = await HomeService.createInvite(currentChannelId, invitedUser);
           if (res) {
-            Notify.create({ 
-              type: 'positive', 
-              message: `Invitation sent to ${invitedUser}` 
-            });
-            this.output.push(`Invitation sent to ${invitedUser}`);
+            notify(`Invitation sent to ${invitedUser}`, 'positive');
+            print(`Invitation sent to ${invitedUser}`, this.output);
           } else {
-            Notify.create({ 
-              type: 'negative', 
-              message: `Failed to invite ${invitedUser}` 
-            });
-            this.output.push(`Failed to invite ${invitedUser}`);
+            notify(`Failed to invite ${invitedUser}`, 'negative');
+            print(`Failed to invite ${invitedUser}`, this.output);
           }
         } else {
           this.output.push('Usage: /invite <nickname or email>');
@@ -125,18 +98,12 @@ export class CommandHandler {
       case 'cancel':
         if (this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
           socket.emit('deleteChannel', { channelId: this.activePage.activePageId });
-          Notify.create({
-            type: 'positive',
-            message: `You successfully deleted the channel!`
-          })
+          notify(`You successfully deleted the channel!`, 'positive');
         } else {
           console.log('leaving channel...')
           if (this.userStore.user) {
-            socket.emit('leaveChannel', {channelId: this.activePage.activePageId, userId: this.userStore.user.id});
-            Notify.create({
-              type: 'positive',
-              message: `You successfully left the channel!`
-            })
+            socket.emit('leaveChannel', { channelId: this.activePage.activePageId, userId: this.userStore.user.id });
+            notify(`You successfully left the channel!`, 'positive');
           } else {
             console.error('User is not logged in.');
           }
@@ -146,7 +113,7 @@ export class CommandHandler {
         if (argument && argument.length > 0) {
           const channelName = argument.join(' ').trim();
           if (!channelName) {
-            this.output.push('Channel name cannot be empty.');
+            print('Channel name cannot be empty.', this.output);
             break;
           }
           // try to find existing channel by name
@@ -155,7 +122,7 @@ export class CommandHandler {
             // channel exists, just join it
             this.activePage.activePageId = channel.id;
             await this.router.push(`/channel/${channel.id}`);
-            this.output.push(`Joined channel ${channel.name}`);
+            print(`Joined channel ${channel.name}`, this.output);
           } else {
             // create new channel
             const newChannel = {
@@ -163,7 +130,7 @@ export class CommandHandler {
               type: ChannelType.Public,
               description: '',
             } as Partial<Channel>;
-            
+
             const res = await this.activePage.createChannel(newChannel as ChannelAtr);
             if (res) {
               // find the newly created channel
@@ -171,50 +138,19 @@ export class CommandHandler {
               if (channel) {
                 this.activePage.activePageId = channel.id;
                 await this.router.push(`/channel/${channel.id}`);
-                Notify.create({ 
-                  type: 'positive', 
-                  message: `Channel '${channelName}' created successfully` 
-                });
-                this.output.push(`Created and joined channel ${channel.name}`);
+                notify(`Channel '${channelName}' created successfully`, 'positive');
+                print(`Created and joined channel ${channel.name}`, this.output);
               } else {
-                this.output.push('Channel created but failed to join.');
+                print('Channel created but failed to join.', this.output);
               }
             } else {
-              Notify.create({ 
-                type: 'negative', 
-                message: `Failed to create channel '${channelName}'` 
-              });
-              this.output.push('Failed to create channel.');
+              notify(`Failed to create channel '${channelName}'`, 'negative');
+              print('Failed to create channel.', this.output);
             }
           }
         } else {
           this.output.push('Usage: /join <channel name>');
         }
-        break;
-      case 'channel':
-        if (argument) {
-          if (argument.length >= 3) {
-            // const description = argument.slice(2).join(' ');
-
-            // this.activePage.createChannel({
-            //   name: argument[0],
-            //   type: argument[1] === 'private' ? ChannelType.Private : ChannelType.Public,
-            //   description: description,
-            // } as Channel, this.userStore.user?.id as number);
-
-            this.output.push(`creating channel ${argument[0]}`);
-
-            const channel = this.activePage.getThreadId(argument[0] as string);
-            if (channel) {
-              await this.router.push(`/channel/${channel.id}`);
-            }
-          } else {
-            this.output.push(`You provided ${argument.length} arguments but at least 3 are needed`);
-          }
-        }
-        break;
-      case 'quit':
-        //admin can cancel channel
         break;
       case 'status':
         if (argument) {
@@ -222,16 +158,16 @@ export class CommandHandler {
             if (isStatusType(argument[0] as string)) {
               this.output.push(`changing status to ${argument[0]}`);
               this.userStore.changeStatus(argument[0] as StatusType);
-            } else this.output.push('Wrong status type: online, offline, dnd');
+            } else print('Wrong status type: online, offline, dnd', this.output);
           } else {
-            this.output.push(`You provided ${argument.length} arguments but only 3 were needed`);
+            print(`You provided ${argument.length} arguments but only 3 were needed`, this.output);
           }
         } else {
-          this.output.push('No arguments provided');
+          print('No arguments provided', this.output);
         }
         break;
       default:
-        this.output.push('Unknown command. type /help for available commands');
+        print('Unknown command. type /help for available commands', this.output);
     }
     return { type: 'message', output: this.output.join('\n') };
   };

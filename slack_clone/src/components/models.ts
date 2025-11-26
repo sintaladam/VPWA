@@ -46,6 +46,8 @@ export interface InviteType {
 
 //type inviteStatusType = 'accepted' | 'pending' | 'rejected';
 
+export type NotificationType = 'positive' | 'negative' | 'warning' | 'info';
+
 export type StatusType = 'online' | 'offline' | 'dnd';
 
 export type TabName = 'channels' | 'invites';
