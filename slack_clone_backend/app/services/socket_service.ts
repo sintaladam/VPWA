@@ -2,6 +2,9 @@ import { eventType, messageBody, request } from "../contracts/ws_request.js";
 import { ChannelListener, broadcastingChannels } from "../misc/channelEvents.js";
 import db from "@adonisjs/lucid/services/db";
 import Channel from "#models/channel";
+import User from "#models/user";
+import KickVote from "#models/kick_vote";
+import ChannelBan from "#models/channel_ban";
 
 class SocketService {
   async handle(event: string, data: request, listener: ChannelListener) {
@@ -14,6 +17,7 @@ class SocketService {
     else if (event === 'loadMessages') this.loadMessages(listener, data);
     else if (event === 'deleteChannel') this.deleteChannel(listener, data.channelId);
     else if (event === 'leaveChannel') this.leaveChannel(listener, data.channelId);
+    else if (event === 'kickUser') this.kickUser(listener, data);
   }
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
     listener.broadcast(event, data);
@@ -160,6 +164,152 @@ class SocketService {
     } catch (error) {
       console.error('leaveChannel error', error);
       this.send('error', { message: 'Failed to leave channel' }, listener);
+    }
+  }
+
+  private async kickUser(listener: ChannelListener, data?: request) {
+    const requester = listener.getUser();
+    const payload: any = data ?? {};
+    const channelId = Number(payload.channelId);
+    const targetNickname = payload.targetNickname;
+    const isAdmin = !!payload.isAdmin;
+
+    if (!channelId || !targetNickname) {
+      this.send('error', { message: 'channelId and targetNickname required' }, listener);
+      return;
+    }
+
+    // find target user
+    const targetUser = await User.query().where('nickname', targetNickname).first();
+    if (!targetUser) {
+      this.send('error', { message: 'User not found' }, listener);
+      return;
+    }
+
+    // check if target is banned
+    const existingBan = await ChannelBan.query()
+      .where('channel_id', channelId)
+      .where('user_id', targetUser.id)
+      .first();
+
+    if (existingBan) {
+      this.send('error', { message: 'User is already banned from this channel' }, listener);
+      return;
+    }
+
+    const txn = await db.transaction();
+    try {
+      if (isAdmin) {
+        // admin instant kick
+        const channel = await Channel.query({ client: txn }).where('id', channelId).first();
+        if (!channel) {
+          await txn.rollback();
+          this.send('error', { message: 'Channel not found' }, listener);
+          return;
+        }
+
+        // remove user from channel
+        await txn
+          .from('user_channels')
+          .where('channel_id', channelId)
+          .andWhere('user_id', targetUser.id)
+          .delete();
+
+        // create ban record
+        await ChannelBan.create({
+          channel_id: channelId,
+          user_id: targetUser.id,
+        }, { client: txn });
+
+        // clear all kick votes for this user
+        await KickVote.query({ client: txn })
+          .where('channel_id', channelId)
+          .where('target_user_id', targetUser.id)
+          .delete();
+
+        await txn.commit();
+
+        // broadcast kick event
+        broadcastingChannels.broadcastToChannel(channelId, 'userKicked', { 
+          channelId, 
+          userId: targetUser.id, 
+          nickname: targetNickname, 
+          permanent: true 
+        });
+        this.send('userKicked', { channelId, userId: targetUser.id, nickname: targetNickname, permanent: true }, listener);
+      } else {
+        // member vote-kick: register vote
+        const existing = await KickVote.query({ client: txn })
+          .where('channel_id', channelId)
+          .where('target_user_id', targetUser.id)
+          .where('voter_user_id', requester.id)
+          .first();
+
+        if (existing) {
+          await txn.rollback();
+          this.send('error', { message: 'You already voted to kick this user' }, listener);
+          return;
+        }
+
+        // create vote
+        await KickVote.create({
+          channel_id: channelId,
+          target_user_id: targetUser.id,
+          voter_user_id: requester.id,
+        }, { client: txn });
+
+        const voteCount = await KickVote.query({ client: txn })
+          .where('channel_id', channelId)
+          .where('target_user_id', targetUser.id)
+          .count('* as total');
+        
+        const total = Number(voteCount[0].$extras?.total ?? 0);
+        console.log("Vote count for user", targetNickname, ":", total);
+
+        if (total >= 3) {
+          await txn
+            .from('user_channels')
+            .where('channel_id', channelId)
+            .andWhere('user_id', targetUser.id)
+            .delete();
+
+          await ChannelBan.create({
+            channel_id: channelId,
+            user_id: targetUser.id,
+          }, { client: txn });
+
+          // clear votes
+          await KickVote.query({ client: txn })
+            .where('channel_id', channelId)
+            .where('target_user_id', targetUser.id)
+            .delete();
+
+          await txn.commit();
+
+          broadcastingChannels.broadcastToChannel(channelId, 'userKicked', { 
+            channelId, 
+            userId: targetUser.id, 
+            nickname: targetNickname, 
+            permanent: true, 
+            voteKick: true 
+          });
+          this.send('userKicked', { channelId, userId: targetUser.id, nickname: targetNickname, permanent: true, voteKick: true }, listener);
+        } else {
+          await txn.commit();
+          // notify channel members about vote progress
+          broadcastingChannels.broadcastToChannel(channelId, 'kickVoteAdded', { 
+            channelId, 
+            targetUserId: targetUser.id, 
+            nickname: targetNickname, 
+            voteCount: total 
+          });
+          this.send('kickVoteAdded', { channelId, targetUserId: targetUser.id, nickname: targetNickname, voteCount: total }, listener);
+        }
+      }
+    } catch (err) {
+      await txn.rollback();
+      console.error('kickUser error', err);
+      this.send('error', { message: 'Failed to kick user' }, listener);
     }
   }
 }

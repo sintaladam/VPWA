@@ -18,7 +18,7 @@ function isStatusType(value: string): value is StatusType {
 }
 
 export class CommandHandler {
-  commandList = ['list', 'help', 'join'];
+  commandList = ['list', 'help', 'join', 'kick', 'cancel', 'status'];
   router = useRouter();
   activePage = useActivePage();
   userStore = useAuthStore();
@@ -47,43 +47,30 @@ export class CommandHandler {
       case 'help':
         this.output.push(`available commands: ${this.commandList.join(', ')}`);
         break;
-      // case 'kick':
-      //   if (!this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
-      //     if (argument && argument.length > 0 && argument.length < 2) {
-      //       const output = this.activePage.voteKickUser(
-      //         argument[0]!,
-      //         this.userStore.user?.id as number,
-      //         this.activePage.activePageId,
-      //       );
-      //       if (output) {
-      //         this.print(output);
-      //       }
-      //     } else {
-      //       this.print('Invalid number of arguments');
-      //     }
-      //   } else {
-      //     if (argument && argument.length > 0) {
-      //       const userIds = argument
-      //         .map((name) => {
-      //           const userEntry = Object.values(this.activePage.users).find(
-      //             (u) => u.nickname === name,
-      //           );
-      //           return userEntry?.id;
-      //         })
-      //         .filter(Boolean) as number[]; // remove undefined (nicknames not found)
+      case 'kick':
+        if (argument && argument.length === 1) {
+          const targetNickname = argument[0];
+          const isAdmin = this.activePage.isAdmin(
+            this.activePage.activePageId,
+            this.userStore.user?.id as number
+          );
 
-      //       if (userIds.length > 0) {
-      //         this.activePage.removeUsersFromThread(this.activePage.activePageId, userIds);
-      //         const kickedNames = userIds
-      //           .map((id) => this.activePage.users[id]?.nickname ?? 'Unknown')
-      //           .join(', ');
-      //         this.output.push(`Kicked user(s): ${kickedNames}`);
-      //       } else {
-      //         this.output.push('No valid users found to kick by nickname.');
-      //       }
-      //     }
-      //   }
-      //   break;
+          // emit kick event cez socket (backend rozhodne či je to admin-kick alebo vote-kick)
+          socket.emit('kickUser', {
+            channelId: this.activePage.activePageId,
+            targetNickname,
+            isAdmin
+          });
+
+          if (isAdmin) {
+            this.output.push(`Kicked user ${targetNickname} from channel.`);
+          } else {
+            this.output.push(`Voted to kick ${targetNickname}. 3 votes needed for ban.`);
+          }
+        } else {
+          this.output.push('Usage: /kick <nickname>');
+        }
+        break;
       case 'revoke':
         //kick users from private channel only admin
         break;

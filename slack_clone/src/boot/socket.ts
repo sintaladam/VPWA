@@ -5,6 +5,7 @@ import type { Message } from 'src/contracts';
 import { AuthManager } from 'src/services';
 import { useActivePage } from 'src/stores/threadStore';
 import { useNotifications } from 'src/composables/useNotifications'
+import { Notify } from 'quasar'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -47,6 +48,32 @@ socket.on('leaveChannel', (data: { channelId: number; userId: number }) => {
     activePage.removeMember(data.channelId, data.userId);
   } catch (e) {
     console.error('leaveChannel handler error', e);
+  }
+});
+
+socket.on('userKicked', (data: { channelId: number; userId: number; nickname: string; permanent?: boolean; voteKick?: boolean }) => {
+  try {
+    activePage.removeMember(data.channelId, data.userId);
+    const reason = data.voteKick ? '(vote-kick threshold reached)' : data.permanent ? '(admin kick)' : '';
+    Notify.create({
+      type: 'negative',
+      message: `User ${data.nickname} was kicked from channel ${reason}`,
+      position: 'top',
+    });
+  } catch (e) {
+    console.error('userKicked handler error', e);
+  }
+});
+
+socket.on('kickVoteAdded', (data: { channelId: number; targetUserId: number; nickname: string; voteCount: number }) => {
+  try {
+    Notify.create({
+      type: 'warning',
+      message: `Kick vote for ${data.nickname}: ${data.voteCount}/3`,
+      position: 'top',
+    });
+  } catch (e) {
+    console.error('kickVoteAdded handler error', e);
   }
 });
 
