@@ -67,10 +67,10 @@ export default {
       if (res) {
         this.localDialogOpen = false;
         this.newChannel = { name: '', type: '', description: '' };
-        this.$q.notify({ type: 'positive', message: `updated successfuly` });
+        this.$q.notify({ type: 'positive', message: `Channel created successfully` });
       }
       else {
-        this.$q.notify({ type: 'negative', message: `update failed` })
+        this.$q.notify({ type: 'negative', message: `Channel creation failed` })
       }
     }
   },
