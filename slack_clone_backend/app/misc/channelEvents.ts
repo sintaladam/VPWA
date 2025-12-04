@@ -2,7 +2,7 @@ import { Socket } from "socket.io";
 import type { eventType } from "../contracts/ws_request.js";
 import User from "#models/user";
 
-export class BroadcastingChannels {
+class BroadcastingChannels {
   private channels: {
     channelId: number,
     listeners: Socket[];

@@ -1,4 +1,5 @@
 import type { ChannelType } from "src/components/models";
+import type { User } from 'src/contracts/Auth'
 
 export interface Channel {
   id: number
@@ -23,4 +24,18 @@ export interface Member {
   surname: string
   description?: string
   email: string
+}
+
+export interface Message {
+  id: number
+  sender: User
+  content: string
+  createdAt: string
+  updatedAt?: string
+  perPage?: number
+}
+
+export interface Activity {
+  sender: User
+  content: string
 }

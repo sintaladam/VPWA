@@ -30,12 +30,3 @@ export interface User {
   updatedAt?: string
   mentionsOnly: boolean
 }
-
-export interface Message {
-  id: number
-  sender: User
-  content: string
-  createdAt: string
-  updatedAt?: string
-  perPage?: number
-}

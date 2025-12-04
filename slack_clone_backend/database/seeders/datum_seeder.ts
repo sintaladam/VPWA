@@ -4,6 +4,7 @@ import Channel from '#models/channel'
 import User from '#models/user'
 import Role from '#models/role'
 import Message from '#models/message'
+import { DateTime } from 'luxon';
 //import Invite from '#models/invite'
 
 export default class extends BaseSeeder {
@@ -79,6 +80,13 @@ export default class extends BaseSeeder {
         type: 'public',
         creator_id: 1,
       },
+      {
+        name: 'inactive channel',
+        description: 'nothing here',
+        type: 'public',
+        creator_id: 1,
+        createdAt: DateTime.now().minus({ days: 30 })
+      }
     ]);
 
     await db.table('user_channels').insert([
@@ -100,6 +108,9 @@ export default class extends BaseSeeder {
       { content: 'Lets discuss design ideas here.', channel_id: 4, sender_id: 3 },
       { content: 'Support channel looking good.', channel_id: 5, sender_id: 3 },
       { content: 'Ping me if anyone needs help!', channel_id: 5, sender_id: 3 },
+
+      { content: 'nvm', channel_id: 6, sender_id: 3, createdAt: DateTime.now().minus({ days: 30 }) },
+      { content: 'nvm2', channel_id: 6, sender_id: 3, createdAt: DateTime.now().minus({ days: 29, hours: 23, minutes: 59, seconds: 30 }) },
     ]);
 
     // await Invite.createMany([

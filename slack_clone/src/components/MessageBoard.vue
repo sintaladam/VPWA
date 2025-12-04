@@ -1,6 +1,6 @@
 <template>
   <div class="q-pr-sm full-height overflow-auto" ref="messageContainer">
-    <div class="col-11 column justify-end">
+    <div class="col-11 column">
       <q-infinite-scroll
         :offset="250"
         @load="onLoad"
@@ -37,7 +37,32 @@
         </template>
 
       </q-infinite-scroll>
+
+      <div v-for="item in activity" :key="item.sender.id" class="column">
+        <q-chat-message v-show="showTyping"
+          :text="[item.content]"
+          :sent="false"
+          :name="item.sender.nickname + ' is typing...'"
+          bg-color="grey"
+        >
+          <template v-slot:avatar>
+            <q-avatar
+              square
+              class="q-mx-sm"
+              text-color="grey"
+              :style="{
+                border: '1px solid ' + 'grey',
+                borderRadius: '4px'
+              }"
+            >
+              {{ item.sender.nickname?.[0]?.toUpperCase() }}
+            </q-avatar>
+          </template>
+        </q-chat-message>
+      </div>
+      <q-item-label v-show="activity.length" v-on:click="showTyping = !showTyping" class="cursor-pointer text-secondary q-hoverable">{{ peopleTyping }}</q-item-label>
     </div>
+
   </div>
 </template>
 
@@ -61,6 +86,7 @@ export default {
       colors,
       // when true, skip auto-scrolling to bottom for the next update (used by onLoad)
       preventAutoScroll: false,
+      showTyping: false,
     }
   },
   methods: {
@@ -143,7 +169,16 @@ export default {
     },
     scrollToBottom() {
       const container = this.$refs.messageContainer as HTMLElement | null;
-      if (container) {
+      if (!container) return;
+
+      const threshold = 80;
+      const distanceFromBottom =
+        container.scrollHeight - (container.scrollTop + container.clientHeight);
+      console.log(distanceFromBottom)
+
+      const isAtBottom = distanceFromBottom <= threshold;
+
+      if (isAtBottom) {
         container.scrollTop = container.scrollHeight;
       }
     },
@@ -151,6 +186,32 @@ export default {
   watch: {
     'activePage.messages': {
       async handler() {
+        await nextTick();
+        // if an infinite-load just happened, skip a single auto-scroll
+        if (this.preventAutoScroll) {
+          this.preventAutoScroll = false;
+          return;
+        }
+        this.scrollToBottom();
+      },
+      deep: true,
+    },
+    showTyping: {
+      async handler() {
+        await nextTick();
+        // if an infinite-load just happened, skip a single auto-scroll
+        if (this.preventAutoScroll) {
+          this.preventAutoScroll = false;
+          return;
+        }
+        this.scrollToBottom();
+      },
+      deep: true,
+    },
+    activity: {
+      async handler(newVal) {
+        if (!newVal.length) this.showTyping = false;
+
         await nextTick();
         // if an infinite-load just happened, skip a single auto-scroll
         if (this.preventAutoScroll) {
@@ -169,7 +230,16 @@ export default {
         ...this.localMessages
       ];
       return allMessages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-    }
+    },
+    activity() {
+      return this.activePage.typingActivity.map(el => el.activity).filter(el => el.sender.id !== this.userStore.user!.id);
+    },
+    peopleTyping() {
+      if (this.activePage.typingActivity.length > 3) {
+        return 'multiple people typing';
+      }
+      return this.activity.map(el => el.sender.name).join(', ') + ' typing...';
+    },
   },
   async mounted() {
     // wait until messages exist

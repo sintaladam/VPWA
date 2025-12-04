@@ -1,7 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import server from '@adonisjs/core/services/server'
 import { Server } from 'socket.io'
-import { BroadcastingChannels, ChannelListener } from '../app/misc/channelEvents.js';
+import { broadcastingChannels, ChannelListener } from '../app/misc/channelEvents.js';
 import socket_service from '#services/socket_service';
 import auth_service from '#services/auth_service';
 
@@ -31,7 +31,7 @@ app.ready(() => {
         }
     });
 
-    const broadcasts = new BroadcastingChannels();
+    const broadcasts = broadcastingChannels;
 
     io.on('connection', (socket) => {
         const listener = new ChannelListener(socket, broadcasts);
