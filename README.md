@@ -43,4 +43,4 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [x] uc11
 
 - [ ] error handling and system notis
-- [ ] dont login directly on register
+- [x] dont login directly on register
