@@ -15,6 +15,8 @@ export function useNotifications() {
     const user = auth.user
     if (!user) return
 
+    if (user.status === 'DND') return
+    
     // check if user wants notifications only when mentioned
     if ((user as User).mentionsOnly === true && !message.content.includes(`@${user.nickname}`)) return
 

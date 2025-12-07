@@ -29,4 +29,5 @@ export interface User {
   createdAt: string
   updatedAt?: string
   mentionsOnly: boolean
+  status: 'online' | 'offline' | 'DND'
 }

@@ -29,6 +29,10 @@ export const useActivePage = defineStore('channelPage', {
     setActivePage(id: number) {
       this.activePageId = id;
       this.messages = [];
+      const userStore = useAuthStore();
+      if (userStore.user?.status === 'offline') {
+        return;
+      }
       socket.emit('subscribe', { channelId: id});//maybe not a good idea :/
     },
     loadMessages(messages: Message[]) {

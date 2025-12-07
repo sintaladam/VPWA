@@ -15,7 +15,7 @@
           <q-btn color="white" text-color="black" label="Invite" @click="inviteCreatorOpen = true" v-show="channel.creatorId===userStore.user?.id"/>
           <q-btn color="white" text-color="negative" :label="label" @click="deleteOpen = true" />
           <channel-editor v-if="channelId !== undefined" v-model=editorOpen :channel="channel" />
-          <user-list v-model="listOpen" :users="activeUsers" :creatorId="channel.creatorId" :channelId="channel.id" @kick-member-event="getUsers"/>
+          <UserList v-model="listOpen" :channelId="channel.id" @kick-member-event="getUsers"/>
           <leave-confirmation v-model="deleteOpen" :title="label" @deleteEvent="forwardDelete()" />
           <invite-creator v-model="inviteCreatorOpen" :channelId="channelId"/>
         </div>
@@ -66,9 +66,8 @@ export default {
       //this.activeUsers = this.activeStore.getThreadUsers(this.activeStore.activePageId);
       this.activeUsers = await HomeService.getMembers(this.channel.id) ?? [];
     },
-    async openUserList() {
+    openUserList() {
       this.listOpen = true;
-      await this.getUsers();
     },
     forwardDelete() {
       this.$emit('deleteChannelEvent');

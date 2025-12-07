@@ -1,4 +1,4 @@
-import type { ChannelType } from "src/components/models";
+import type { ChannelType, StatusType } from "src/components/models";
 import type { User } from 'src/contracts/Auth'
 
 export interface Channel {
@@ -24,6 +24,7 @@ export interface Member {
   surname: string
   description?: string
   email: string
+  status: StatusType
 }
 
 export interface Message {

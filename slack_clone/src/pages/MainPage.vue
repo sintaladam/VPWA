@@ -1,6 +1,5 @@
 <template>
-  <q-page class="q-pa-sm" style="height: calc(100vh - 50px)"> <!-- this just sucks but it will have to do -->
-    <!-- content -->
+  <q-page class="q-pa-sm" style="height: calc(100vh - 50px)">
     <div class="column full-height no-wrap">
       <div class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
         {{ channelName }}
@@ -13,7 +12,9 @@
       </div>
     </div>
 
-    <UserList v-model="editorOpen" />
+    <UserList 
+      v-model="editorOpen"  
+    />
   </q-page>
 </template>
 
@@ -53,8 +54,7 @@ export default {
     },
     showList(data: UserAtr[], messageType: messageType) {
       if (messageType === 'component') {
-        this.editorOpen = !this.editorOpen;
-        this.activeUsers = data;
+        this.editorOpen = true;
       }
     }
   },
@@ -63,7 +63,6 @@ export default {
       activeStore: useActivePage(),
       userStore: useAuthStore(),
       editorOpen: ref(false),
-      activeUsers: [] as UserAtr[]
     }
   },
   created() {
@@ -72,6 +71,10 @@ export default {
   computed: {
     channelName() {
       return this.activeStore.getThreadName();
+    },
+    getCreatorId(): number {
+      const channel = this.activeStore.getThreadDetails(this.activeStore.activePageId);
+      return channel?.creatorId ?? this.userStore.user?.id ?? 0;
     }
   },
 }

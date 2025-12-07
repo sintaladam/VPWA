@@ -1,9 +1,12 @@
 import { defineBoot } from '#q-app/wrappers';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
-import type { Activity, Message } from 'src/contracts';
+import type { Activity, Member, Message } from 'src/contracts';
+import type { StatusType } from 'src/components/models'
+
 import { AuthManager } from 'src/services';
 import { useActivePage } from 'src/stores/threadStore';
+import { useAuthStore } from 'src/stores/authStore';
 import { useNotifications } from 'src/composables/useNotifications'
 import { Notify } from 'quasar'
 
@@ -21,8 +24,14 @@ const socket = io(process.env.API_URL, {
   autoConnect: false,
 })
 
-socket.on('connect', () => console.log('[WS] connected', socket.id))
-socket.on('disconnect', (r) => console.log('[WS] disconnected', r))
+socket.on('connect', () => {
+  console.log('[WS] connected', socket.id);
+  // status is set to online automatically by the backend on connect
+})
+socket.on('disconnect', (r) => {
+  console.log('[WS] disconnected', r);
+  // status is set to offline automatically by the backend on disconnect
+})
 socket.on('connect_error', (e) => console.error('[WS] error', e.message))
 socket.on('newActivity', (data: Activity) => activePage.addActivity(data))
 
@@ -75,6 +84,25 @@ socket.on('kickVoteAdded', (data: { channelId: number; targetUserId: number; nic
     });
   } catch (e) {
     console.error('kickVoteAdded handler error', e);
+  }
+});
+socket.on('userStatusChanged', (data: { userId: number; nickname: string; status: StatusType }) => {
+  try {
+    const auth = useAuthStore();
+    
+    // update authStore if this is the current user
+    if (auth.user && auth.user.id === data.userId) {
+      auth.changeStatus(data.status);
+    }
+    // update in members list for display in UI
+    const member = activePage.members.find(m => m.id === data.userId);
+    if (member) {
+      (member as Member).status = data.status;
+    }
+    
+    console.log(`User ${data.nickname} status changed to ${data.status}`);
+  } catch (e) {
+    console.error('userStatusChanged handler error', e);
   }
 });
 

@@ -157,13 +157,15 @@ export class CommandHandler {
           if (argument.length == 1) {
             if (isStatusType(argument[0] as string)) {
               this.output.push(`changing status to ${argument[0]}`);
-              this.userStore.changeStatus(argument[0] as StatusType);
-            } else print('Wrong status type: online, offline, dnd', this.output);
+              
+              // emit socket event to broadcast status change
+              socket.emit('updateStatus', { status: argument[0] as StatusType });
+            } else this.output.push('Wrong status type: online, offline, DND');
           } else {
-            print(`You provided ${argument.length} arguments but only 3 were needed`, this.output);
+            this.output.push(`You provided ${argument.length} arguments but only 1 is needed`);
           }
         } else {
-          print('No arguments provided', this.output);
+          this.output.push('No arguments provided');
         }
         break;
       default:

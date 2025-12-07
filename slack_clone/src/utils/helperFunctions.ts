@@ -10,7 +10,7 @@ export function notify(message: string, type: NotificationType, position: Positi
 }
 
 export function isStatusType(value: string): value is StatusType {
-  return ['online', 'offline', 'dnd'].includes(value);
+  return ['online', 'offline', 'DND'].includes(value);
 }
 
 export function print(value: string, output: string[]): void {

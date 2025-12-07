@@ -55,7 +55,7 @@ export interface TypingActivity {
 
 export type NotificationType = 'positive' | 'negative' | 'warning' | 'info';
 
-export type StatusType = 'online' | 'offline' | 'dnd';
+export type StatusType = 'online' | 'offline' | 'DND';
 
 export type TabName = 'channels' | 'invites';
 

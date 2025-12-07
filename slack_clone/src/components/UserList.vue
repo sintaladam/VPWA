@@ -1,11 +1,11 @@
 <template>
-    <q-dialog>
+    <q-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)">
         <q-card style="min-width: 300px; max-width: 400px;">
             <!-- Header -->
             <q-card-section class="row items-center q-pb-none q-gutter-sm">
                 <div class="text-h6">Users in this channel</div>
                 <q-space />
-                <q-btn icon="close" flat round dense v-close-popup />
+                <q-btn icon="close" flat round dense @click="$emit('update:modelValue', false)" />
             </q-card-section>
 
             <q-separator />
@@ -15,7 +15,12 @@
                 <q-list bordered padding class="rounded-borders bg-grey-1">
                     <q-item v-for="(user, index) in users" :key="index">
                         <q-item-section avatar>
-                            <q-avatar text-color="primary" class="q-mr-sm">
+                            <q-avatar 
+                                rounded
+                                :text-color="getStatusColor(user)" 
+                                class="q-mr-sm flex items-center justify-center"
+                                :class="`border-${getStatusColor(user)}`"
+                            >
                                 {{ user.nickname?.[0]?.toUpperCase() }}
                             </q-avatar>
                         </q-item-section>
@@ -24,9 +29,21 @@
                             <q-item-label>{{ user.nickname }}</q-item-label>
                             <q-item-label caption class="text-grey">
                                 {{ user.id === creatorId ? "Creator" : "Member" }}
-
                             </q-item-label>
                         </q-item-section>
+
+                        <!-- Activity Bubble -->
+                        <q-item-section side>
+                            <div 
+                                class="activity-bubble q-mr-sm"
+                                :style="{ backgroundColor: getStatusColor(user) }"
+                            >
+                                <q-tooltip>
+                                    {{ ((user.status || 'offline') as string).charAt(0).toUpperCase() + ((user.status || 'offline') as string).slice(1) }}
+                                </q-tooltip>
+                            </div>
+                        </q-item-section>
+
                         <q-item-section side v-if="userStore.user!.id === creatorId && user.id !== creatorId">
                             <q-btn round flat color="negative" icon="cancel" size="sm"
                                 @click.stop="kickMember(user.id)" />
@@ -50,6 +67,16 @@ import { useActivePage } from '../stores/threadStore';
 import type { Channel } from '../contracts/Home';
 
 export default {
+    props: {
+        modelValue: {
+            type: Boolean,
+            required: true
+        },
+        channelId: {
+            type: Number,
+            required: false
+        }
+    },
     data() {
         return {
             userStore: useAuthStore(),
@@ -58,8 +85,26 @@ export default {
         }
     },
     computed: {
-        channelId(): number {
-          return this.details?.id as number;
+        getStatusColor() {
+            return (user: Member): string => {
+                const status = (user.status || 'offline').toLowerCase();
+                switch (status) {
+                    case 'online':
+                        return 'green';
+                    case 'offline':
+                        return 'grey';
+                    case 'dnd':
+                        return 'orange';
+                    default:
+                        return 'grey';
+                }
+            }
+        },
+        resolvedChannelId(): number {
+            if (this.$props.channelId !== undefined) {
+                return this.$props.channelId as number;
+            }
+            return (this.details?.id ?? this.activePage.activePageId ?? 0) as number;
         },
         creatorId(): number | null {
             return this.details?.creatorId || null;
@@ -68,25 +113,52 @@ export default {
             return this.activePage.members || [];
         },        
     },
+    
     async mounted() {
-        if (this.channelId) {
-        await this.activePage.getMembers(this.channelId);
-        this.details = this.activePage.getThreadDetails(this.channelId);
+        const id = this.resolvedChannelId || this.activePage.activePageId;
+        if (id) {
+            await this.activePage.getMembers(id);
+            this.details = this.activePage.getThreadDetails(id);
+        } else {
+            console.error('Channel ID is undefined');
+        }
+    },
+    watch: {
+        async modelValue(newVal: boolean) {
+            if (newVal) {
+                const id = this.resolvedChannelId || this.activePage.activePageId;
+                if (id) {
+                    await this.activePage.getMembers(id);
+                    this.details = this.activePage.getThreadDetails(id);
+                }
+            }
         }
     },
     methods: {
         async kickMember(userId: number) {
-            const res = await HomeService.kickMember(this.channelId, userId);
+            const id = this.resolvedChannelId || this.activePage.activePageId;
+            const res = await HomeService.kickMember(id, userId);
             if (res?.ok) {
                 this.$emit('kickMemberEvent');
                 this.$q.notify({ type: 'positive', message: `user ${userId} was removed` });
+                // refresh list
+                await this.activePage.getMembers(id);
             }
             else {
                 this.$q.notify({ type: 'negative', message: `remove user ${userId} failed` })
             }
         }
     },
-    emits: ['kickMemberEvent'],
-
+    emits: ['kickMemberEvent', 'update:modelValue', 'subscribe '],
 }
 </script>
+
+<style scoped>
+.activity-bubble {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+}
+</style>

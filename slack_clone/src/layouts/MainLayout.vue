@@ -30,19 +30,19 @@
                 <q-icon :name="statusIcon.icon" />
               </template>
               <q-list>
-                <q-item clickable v-close-popup @click="userStore.changeStatus('online')">
+                <q-item clickable v-close-popup @click="changeStatusAndEmit('online')">
                   <q-item-section>
                     <q-item-label class="flex justify-center">Online</q-item-label>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup @click="userStore.changeStatus('dnd')">
+                <q-item clickable v-close-popup @click="changeStatusAndEmit('DND')">
                   <q-item-section>
                     <q-item-label class="flex justify-center">DND</q-item-label>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup @click="userStore.changeStatus('offline')">
+                <q-item clickable v-close-popup @click="changeStatusAndEmit('offline')">
                   <q-item-section>
                     <q-item-label class="flex justify-center">Offline</q-item-label>
                   </q-item-section>
@@ -131,7 +131,7 @@ import ChannelBadge from 'src/components/ChannelBadge.vue';
 import ChannelCreator from 'src/components/ChannelCreator.vue';
 import UpdatedUserProfile from 'src/components/UpdatedUserProfile.vue';
 import InviteBadge from 'src/components/InviteBadge.vue';
-import type { TabName, DeviceType } from 'src/components/models';
+import type { TabName, DeviceType, StatusType } from 'src/components/models';
 import { Platform } from 'quasar'
 import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
@@ -183,6 +183,10 @@ export default {
     },
     async onLogout() {
       await this.userStore.logout()
+    },
+    changeStatusAndEmit(status: StatusType) {
+      this.userStore.changeStatus(status);
+      this.$socket.emit('updateStatus', { status });
     }
   },
   components: {
@@ -199,7 +203,7 @@ export default {
           return { icon: 'check_circle', color: 'positive' }
         case 'offline':
           return { icon: 'cancel', color: 'negative' }
-        case 'dnd':
+        case 'DND':
           return { icon: 'do_not_disturb', color: 'orange' }
         default:
           return { icon: '', color: '' }
