@@ -13,6 +13,7 @@ export default class extends BaseSchema {
       table.string('password', 255).notNullable()
       table.text('description').nullable()
       table.boolean('mentions_only').notNullable().defaultTo(false)
+      table.enum('status', [ 'online', 'DND', 'offline' ]).notNullable().defaultTo('offline')
 
       table.timestamp('created_at', { useTz: true }).notNullable()
       table.timestamp('updated_at', { useTz: true }).nullable()

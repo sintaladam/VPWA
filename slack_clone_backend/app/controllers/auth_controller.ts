@@ -41,4 +41,15 @@ export default class AuthController {
 
     return { ok: true };
   }
+
+  async updateStatus({ request, auth }: HttpContext) {
+    console.log('update status');
+    const user = auth.getUserOrFail();
+    const { status } = request.only(['status']) as { status: 'online' | 'DND' | 'offline' };
+    
+    user.status = status;
+    await user.save();
+
+    return { ok: true };
+  }
 }

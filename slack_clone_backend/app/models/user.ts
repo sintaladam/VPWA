@@ -40,6 +40,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare description: string | null
 
+  @column()
+  declare status: 'online' | 'DND' | 'offline'
+
   @manyToMany(() => Channel, {
     pivotTable: 'user_channels',
     pivotForeignKey: 'user_id',
