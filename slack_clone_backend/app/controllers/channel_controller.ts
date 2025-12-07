@@ -130,7 +130,8 @@ export default class ChannelController {
         'name',
         'surname',
         'description',
-        'email'
+        'email',
+        'status'
       ]);
   }
 

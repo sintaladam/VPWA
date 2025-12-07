@@ -19,6 +19,7 @@ class SocketService {
     else if (event === 'leaveChannel') this.leaveChannel(listener, data.channelId);
     else if (event === 'kickUser') this.kickUser(listener, data);
     else if (event === 'activity') this.handleActivity(data.body as messageBody, listener)
+    else if (event === 'updateStatus') this.updateStatus(listener, data);
   }
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
     listener.broadcast(event, data);
@@ -316,6 +317,49 @@ class SocketService {
 
   private handleActivity(body: messageBody, listener: ChannelListener) {
     this.broadcast('newActivity', { content: body.message, sender: listener.getUser() }, listener);
+  }
+
+  private async updateStatus(listener: ChannelListener, data?: request) {
+    const user = listener.getUser();
+    const payload: any = data ?? {};
+    const newStatus = payload.status; // 'online' | 'DND' | 'offline'
+
+    if (!newStatus || !['online', 'DND', 'offline'].includes(newStatus)) {
+      this.send('error', { message: 'Invalid status. Must be: online, DND, or offline' }, listener);
+      return;
+    }
+
+    const txn = await db.transaction();
+    try {
+      // update user status in database
+      await User.query({ client: txn })
+        .where('id', user.id)
+        .update({ status: newStatus });
+
+      await txn.commit();
+
+      // get all channels this user is in
+      const userChannels = await db
+        .from('user_channels')
+        .where('user_id', user.id)
+        .select('channel_id');
+
+      // broadcast status change to all channels user is member of
+      for (const uc of userChannels) {
+        broadcastingChannels.broadcastToChannel(uc.channel_id, 'userStatusChanged', {
+          userId: user.id,
+          nickname: user.nickname,
+          status: newStatus
+        });
+      }
+
+      // acknowledge to requester
+      this.send('statusUpdated', { userId: user.id, status: newStatus }, listener);
+    } catch (err) {
+      await txn.rollback();
+      console.error('updateStatus error', err);
+      this.send('error', { message: 'Failed to update status' }, listener);
+    }
   }
 }
 
