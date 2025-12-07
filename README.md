@@ -11,7 +11,7 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [x]  v zozname môže cez používateľské rozhranie kanál vytvoriť, opustiť, a ak je správcom aj zrušiť
    - [x]  dva typy kanálov - [ ]  súkromný (private channel) a verejný kanál (public channel)
    - [x]  správcom kanála je používateľ, ktorý kanál vytvoril 
-   - [ ]  ak nie je kanál aktívny (nie je pridaná nová správa) viac ako 30 dní, kanál prestáva existovať (následne je možné použiť channelName kanála pre "nový" kanál)
+   - [x]  ak nie je kanál aktívny (nie je pridaná nová správa) viac ako 30 dní, kanál prestáva existovať (následne je možné použiť channelName kanála pre "nový" kanál)
 3. používateľ odosiela správy a príkazy cez "príkazový riadok", ktorý je "fixným" prvkom aplikácie. používateľ môže odoslať správu v kanáli, ktorého je členom
    - [x] uc3 
 4. vytvorenie komunikačného kanála (channel) cez príkazový riadok
@@ -40,5 +40,7 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [x] uc10
 11. ak má používateľ aktívny niektorý z kanálov (nachádza sa v okne správ pre daný kanál) vidí v stavovej lište informáciu o tom, kto aktuálne píše správu (napr. Ed is typing)
    - po kliknutí na nickName si môže pozrieť rozpísaný text v reálnom čase, predtým, ako ju odosielateľ odošle (každá zmena je viditeľná))
-   - [ ] uc11
+   - [x] uc11
 
+- [ ] error handling and system notis
+- [x] dont login directly on register

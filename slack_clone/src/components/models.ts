@@ -1,3 +1,5 @@
+import type { Activity } from "src/contracts";
+
 export enum ChannelType {
   Public = 'public',
   Private = 'private',
@@ -42,6 +44,11 @@ export interface InviteType {
   channelId: number;
   senderId: number;
   recipientId: number;
+}
+
+export interface TypingActivity {
+  destroySelfFn: NodeJS.Timeout | null
+  activity: Activity
 }
 
 //type inviteStatusType = 'accepted' | 'pending' | 'rejected';

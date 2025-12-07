@@ -18,6 +18,7 @@ class SocketService {
     else if (event === 'deleteChannel') this.deleteChannel(listener, data.channelId);
     else if (event === 'leaveChannel') this.leaveChannel(listener, data.channelId);
     else if (event === 'kickUser') this.kickUser(listener, data);
+    else if (event === 'activity') this.handleActivity(data.body as messageBody, listener)
   }
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
     listener.broadcast(event, data);
@@ -311,6 +312,10 @@ class SocketService {
       console.error('kickUser error', err);
       this.send('error', { message: 'Failed to kick user' }, listener);
     }
+  }
+
+  private handleActivity(body: messageBody, listener: ChannelListener) {
+    this.broadcast('newActivity', { content: body.message, sender: listener.getUser() }, listener);
   }
 }
 

@@ -1,7 +1,7 @@
 import { defineBoot } from '#q-app/wrappers';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
-import type { Message } from 'src/contracts';
+import type { Activity, Message } from 'src/contracts';
 import { AuthManager } from 'src/services';
 import { useActivePage } from 'src/stores/threadStore';
 import { useNotifications } from 'src/composables/useNotifications'
@@ -24,6 +24,7 @@ const socket = io(process.env.API_URL, {
 socket.on('connect', () => console.log('[WS] connected', socket.id))
 socket.on('disconnect', (r) => console.log('[WS] disconnected', r))
 socket.on('connect_error', (e) => console.error('[WS] error', e.message))
+socket.on('newActivity', (data: Activity) => activePage.addActivity(data))
 
 socket.on('message', (data: { messages: Message[] }) => {
     try {
@@ -77,7 +78,7 @@ socket.on('kickVoteAdded', (data: { channelId: number; targetUserId: number; nic
   }
 });
 
-AuthManager.onChange((newToken) => {
+AuthManager.onChange((newToken) => { //reset socket when token is changed
   if (newToken !== null) {
     if (socket.connected) socket.disconnect();
     socket.auth = { token: newToken };
@@ -85,7 +86,7 @@ AuthManager.onChange((newToken) => {
   }
 })
 
-AuthManager.onLogout(() => {
+AuthManager.onLogout(() => { //disconnect socket when user logs out
   if (socket.connected) {
     socket.disconnect();
     socket.auth = {};

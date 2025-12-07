@@ -62,10 +62,12 @@ export const useAuthStore = defineStore('auth', {
     async register(form: RegisterData) {
       try {
         this._start();
-        const apiToken = await AuthService.register(form);
+        const res = await AuthService.register(form);
         this._success(null);
-        AuthManager.setToken(apiToken.token);
-        return apiToken;
+        if (res?.ok) {
+          return true;
+        }
+        return false;
       } catch (err) {
         this._error(err);
         throw err;

@@ -8,7 +8,6 @@ export default class AuthController {
     const data = await request.validateUsing(registerValidator);
     const user = await User.create(data);
     const token = await auth.use('api').createToken(user);
-    console.log(user, token);
     return token;
   }
 
@@ -17,7 +16,6 @@ export default class AuthController {
     const { email, password } = await request.validateUsing(loginValidator);
     const user = await User.verifyCredentials(email, password);
     const token = await auth.use('api').createToken(user);
-    console.log(user, token);
     return token;
   }
 

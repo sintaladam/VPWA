@@ -19,9 +19,16 @@ class AuthService {
       })
   }
 
-  async register (data: RegisterData): Promise<ApiToken> {
-    const response = await api.post<ApiToken>('auth/register', data)
-    return response.data
+  async register (data: RegisterData): Promise<{ ok: boolean; } | null> {
+    try {
+      const response = await api.post('auth/register', data);
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
   }
 
   async login (credentials: LoginCredentials): Promise<ApiToken> {

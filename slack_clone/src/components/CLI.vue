@@ -9,6 +9,7 @@
 <script lang="ts">
 import { CommandHandler } from 'src/utils/CommandHandler';
 import type { messageType, UserAtr } from 'src/components/models';
+import { socketService } from 'src/services';
 
 export default {
   data() {
@@ -57,6 +58,16 @@ export default {
       void messageType;
       return true;
     },
+  },
+  watch: {
+    messageInput: {
+      handler(newVal) {
+        const message: string = newVal.trim();
+        if (message) {
+          socketService.send('activity', { message });
+        }
+      }
+    }
   }
 }
 </script>

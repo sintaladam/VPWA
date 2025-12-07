@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
-import type { ChannelAtr, handleInviteType, KickVote } from 'src/components/models';
+import type { ChannelAtr, handleInviteType, KickVote, TypingActivity } from 'src/components/models';
 import { socket } from 'src/boot/socket';
-import type { Channel, Invite, Member, Message } from 'src/contracts';
+import type { Activity, Channel, Invite, Member, Message } from 'src/contracts';
 import HomeService from "src/services/HomeService";
 import { Notify } from 'quasar';
 import { useAuthStore } from 'src/stores/authStore';
@@ -16,6 +16,7 @@ export const useActivePage = defineStore('channelPage', {
     invites: [] as Invite[],
     members: [] as Member[],
     messages: [] as Message[],
+    typingActivity: [] as TypingActivity[],
   }),
   actions: {
     isAdmin(channel_id: number, userId: number) {
@@ -128,6 +129,23 @@ export const useActivePage = defineStore('channelPage', {
         }
       }
     },
+    addActivity(activity: Activity) {
+      let item = this.typingActivity.find(item => item.activity.sender.id === activity.sender.id);
+      if (item) {
+        item.activity.content = activity.content;
+        clearTimeout(item.destroySelfFn!); //reset delete timeout
+      }
+      else {
+        item = {
+          activity, destroySelfFn: null
+        };
+        this.typingActivity.push(item);
+      }
+      item.destroySelfFn = setTimeout(() => {
+        const id = this.typingActivity.indexOf(item);
+        if (id >= 0) this.typingActivity.splice(id, 1);
+      }, 2000);
+    }
   },
   getters: {
     getThreadDetails: (state) => (id: number) => {
