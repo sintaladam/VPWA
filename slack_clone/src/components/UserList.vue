@@ -43,7 +43,6 @@
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import type { Member } from 'src/contracts';
 import { useAuthStore } from 'src/stores/authStore';
 import { HomeService } from 'src/services';
@@ -51,16 +50,6 @@ import { useActivePage } from '../stores/threadStore';
 import type { Channel } from '../contracts/Home';
 
 export default {
-    props: {
-        users: {
-            type: Array as PropType<Member[]>,
-            required: true
-        },
-        channelId: {
-            type: Number,
-            required: true
-        },
-    },
     data() {
         return {
             userStore: useAuthStore(),
@@ -68,13 +57,22 @@ export default {
             details: null as Channel | null,
         }
     },
-    created() {
-        this.details = this.activePage.getThreadDetails(this.channelId);
-    },
     computed: {
-        creatorId() {
+        channelId(): number {
+          return this.details?.id as number;
+        },
+        creatorId(): number | null {
             return this.details?.creatorId || null;
         },
+        users(): Member[] {
+            return this.activePage.members || [];
+        },        
+    },
+    async mounted() {
+        if (this.channelId) {
+        await this.activePage.getMembers(this.channelId);
+        this.details = this.activePage.getThreadDetails(this.channelId);
+        }
     },
     methods: {
         async kickMember(userId: number) {

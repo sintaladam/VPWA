@@ -1,10 +1,11 @@
 import { Notify } from 'quasar';
-import type { NotificationType, StatusType } from '../components/models';
+import type { NotificationType, StatusType, Position } from '../components/models';
 
-export function notify(message: string, type: NotificationType): void {
+export function notify(message: string, type: NotificationType, position: Position = 'bottom'): void {
     Notify.create({
         type,
         message,
+        position,
     });
 }
 

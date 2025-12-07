@@ -39,9 +39,7 @@
 <script lang="ts">
 import type { QForm } from 'quasar'
 import { useAuthStore } from 'src/stores/authStore';
-//import { useCookies } from 'vue3-cookies';
-
-// import CryptoJS from 'crypto-js'
+import { notify } from 'src/utils/helperFunctions';
 import { type RouteLocationRaw } from 'vue-router';
 
 export default {
@@ -75,35 +73,14 @@ export default {
     }
   },
   methods: {
-    // async login() {
-    //   //const { cookies } = useCookies();
-
-    //   const form = this.$refs.formRef as QForm
-
-    //   const isValid = await form.validate()
-    //   if (!isValid) {
-    //     this.$q.notify({ type: 'negative', message: 'Please fill in all fields correctly' })
-    //     return
-    //   }
-
-    //   //const hashedPassword = CryptoJS.SHA256(this.password).toString()
-
-    //   // Replace with real backend check
-    //   // Create JWT token here 
-    //   const loginSuccess = false;
-    //   //const userToken = ''
-
-    //   if (loginSuccess) {
-    //     this.$q.notify({ type: 'positive', message: 'Login successful!' })
-    //     //cookies.set('token', userToken, '1h', '/', '', true, 'Strict');
-    //     void this.$router.push('/')
-    //   } else {
-    //     this.$q.notify({ type: 'negative', message: 'Invalid email or password' })
-    //   }
-    // }
-
     login() {
-      this.userStore.login(this.credentials).then(() => this.$router.push(this.redirectTo))
+      this.userStore.login(this.credentials)
+      .then(() => this.$router.push(this.redirectTo))
+      .then(() => notify(`Welcome to the app ${this.userStore.user?.nickname}`, 'positive', 'top'))
+      .catch((err) => {
+        void err;
+        notify('Login failed', 'negative', 'top');
+      })
     }
   }
 }

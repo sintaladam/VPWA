@@ -13,9 +13,7 @@
       </div>
     </div>
 
-    <UserList :users="activeUsers" :channelId="activeStore.activePageId" v-model="editorOpen" />
-
-
+    <UserList v-model="editorOpen" />
   </q-page>
 </template>
 
@@ -38,12 +36,6 @@ export default {
   },
   methods: {
     addMessage(value: string, type: messageType) {
-      // (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addMessage({
-      //   timestamp: Date.now(),
-      //   senderId: this.userStore.user?.id as number,
-      //   content: value,
-      //   type: type
-      // });
       if (type === 'message') {
         console.log('sending', type, value);
         SocketService.send('message', { message: value })

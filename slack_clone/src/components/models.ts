@@ -64,3 +64,5 @@ export type DeviceType = 'mobile' | 'desktop';
 export type messageType = 'command' | 'message' | 'component';
 
 export type handleInviteType = 'accept' | 'reject';
+
+export type Position =  'top-left' | 'top' | 'top-right' | 'left' | 'right' | 'center' | 'bottom-left' | 'bottom' | 'bottom-right';
