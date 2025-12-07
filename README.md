@@ -33,8 +33,8 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
    - [x]  notifikácia obsahuje časť zo správy a odosielateľa
    - [x]  používateľ si môže nastaviť, aby mu chodili notifikácie iba pre správy, ktoré sú mu adresované
 9. používateľ si môže nastaviť stav (online, DND, offline)
-   - [ ]  stav sa zobrazuje používateľom
-   - [ ]  ak je nastavený DND stav, neprichádzajú notifikácie
+   - [x]  stav sa zobrazuje používateľom
+   - [x]  ak je nastavený DND stav, neprichádzajú notifikácie
    - [ ]  ak je nastavený offline stav, neprichádzajú používateľovi správy, po prepnutí do online sú kanály automaticky aktualizované
 10. používateľ si môže pozrieť zoznam členov kanála (ak je tiež členom kanála) príkazom /list
    - [x] uc10
