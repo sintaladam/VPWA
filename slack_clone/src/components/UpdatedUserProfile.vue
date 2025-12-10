@@ -28,6 +28,9 @@
           <q-btn label="Confirm" @click="updateProfile" class="col" text-color="positive" />
           <q-btn label="Cancel" @click="restore" class="col" />
         </div>
+        <q-btn unelevated rounded color="negative" @click="onLogout" class="p-0">
+          Log out
+        </q-btn>
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -46,7 +49,7 @@ export default {
       localProfile: { ...(this.profile as User) } as User,
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
       editing: false,
-      activePage: useAuthStore(),
+      authStore: useAuthStore(),
       mentionsToggle: Boolean((this.profile)?.mentionsOnly)
     }
   },
@@ -75,7 +78,11 @@ export default {
       immediate: true
     },
   },
+  
   methods: {
+    async onLogout() {
+      await this.authStore.logout()
+    },
     async updateProfile() {
       const payload = { 
         ...this.extractAtr(this.localProfile), 
@@ -83,11 +90,11 @@ export default {
       } as ProfileAtr & { mentionsOnly?: boolean }
       
       console.log('Updating profile with mentionsOnly:', this.mentionsToggle);
-      const res = await this.activePage.updateProfile(payload);
+      const res = await this.authStore.updateProfile(payload);
       if (res) {
         this.editing = false;
-        this.localProfile = { ...this.activePage.user } as User;
-        this.mentionsToggle = Boolean((this.activePage.user)?.mentionsOnly);
+        this.localProfile = { ...this.authStore.user } as User;
+        this.mentionsToggle = Boolean((this.authStore.user)?.mentionsOnly);
         this.$q.notify({ type: 'positive', message: `updated successfuly` });
       }
       else {

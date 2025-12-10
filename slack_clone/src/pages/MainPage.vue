@@ -4,7 +4,7 @@
       <div class="bg-primary text-white q-pa-md rounded-borders rounded-t" style="height: 50px; flex: 0 0 auto;">
         {{ channelName }}
       </div>
-      <div class="col q-pa-md">
+      <div class="col q-py-xs">
         <MessageBoard ref="msgBoard" />
       </div>
       <div class="bg-white-1" style="height: 75px; flex: 0 0 auto;">

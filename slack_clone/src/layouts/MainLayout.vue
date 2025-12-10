@@ -1,29 +1,12 @@
 <template>
   <q-layout view="hHh LpR fFf">
-
     <q-header elevated class="bg-secondary text-white" height-hint="98">
       <q-toolbar>
         <q-btn v-if="drawerBehavior === 'mobile' && $q.platform.is.desktop" flat @click="toggleLeftDrawer" round dense
           icon="menu" class="q-mr-sm" />
-        <q-toolbar-title class="text-center flex justify-between items-center">
-          <!-- <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
-          </q-avatar> -->
-          slack clone
+        <q-toolbar-title class="text-center flex items-center" :class="$q.platform.is.mobile ? 'justify-end' : 'justify-between'">
+          <span v-if="$q.platform.is.desktop" class="">slack clone</span>
           <div class="row q-gutter-xs">
-            <div class="row flex-end">
-              <q-btn round flat @click="profileEditorOpen = true" class="p-0">
-                <q-avatar>
-                  <img src="https://cdn.quasar.dev/img/avatar.png">
-                </q-avatar>
-              </q-btn>
-              <q-btn unelevated rounded color="negative" @click="onLogout" class="p-0">
-                Log out
-              </q-btn>
-
-            </div>
-
-            <updated-user-profile v-model="profileEditorOpen" :profile="profile" />
 
             <q-btn-dropdown unelevated rounded :color="statusIcon.color">
               <template #label>
@@ -49,6 +32,16 @@
                 </q-item>
               </q-list>
             </q-btn-dropdown>
+            <div class="row flex-end">
+              <q-btn round flat @click="profileEditorOpen = true" class="p-0">
+                <q-avatar>
+                  <img src="https://cdn.quasar.dev/img/avatar.png">
+                </q-avatar>
+              </q-btn>
+            </div>
+
+            <updated-user-profile v-model="profileEditorOpen" :profile="profile" />
+
             <q-btn v-if="activeDevice === 'mobile'" flat @click="toggleLeftDrawer" round dense icon="menu"
               class="flex justify-end" />
           </div>
@@ -181,9 +174,6 @@ export default {
       if (this.activePage.activePageId == id) {
         this.$router.push('/' + 'channel');
       }
-    },
-    async onLogout() {
-      await this.userStore.logout()
     },
     changeStatusAndEmit(status: StatusType) {
       this.userStore.changeStatus(status);
