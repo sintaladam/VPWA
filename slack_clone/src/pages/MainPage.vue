@@ -13,7 +13,7 @@
     </div>
 
     <UserList 
-      v-model="editorOpen"  
+      v-model="editorOpen" v-if="activeStore.activePageId!=-1"
     />
   </q-page>
 </template>
@@ -66,7 +66,8 @@ export default {
     }
   },
   created() {
-    this.activeStore.setActivePage(Number(this.$route.params.id))
+    console.log('id:',this.$route.params.id)
+    this.activeStore.setActivePage(this.$route.params.id ? Number(this.$route.params.id) : null)
   },
   computed: {
     channelName() {

@@ -104,7 +104,7 @@
       </div>
     </q-drawer>
     <q-page-container>
-       <q-page class="flex flex-center" v-show="!activePage.getThreadDetails(activePage.activePageId)">
+       <q-page class="flex flex-center" v-if="!activePage.getThreadDetails(activePage.activePageId)">
         <div class="text-center">
           <q-icon name="sentiment_very_satisfied" size="64px" color="secondary" />
           <div class="text-h5 q-mt-md text-primary">Welcome back</div>
@@ -113,7 +113,7 @@
           </div>
         </div>
       </q-page>
-      <router-view :key="$route.fullPath" v-show="activePage.getThreadDetails(activePage.activePageId)" />
+      <router-view :key="$route.fullPath" v-show="activePage.activePageId!=-1" />
     </q-page-container>
 
   </q-layout>
@@ -189,7 +189,7 @@ export default {
       return this.$q.screen.width >= 600 ? 'desktop' : 'mobile';
     },
     statusIcon() {
-      switch (this.userStore.status) {
+      switch (this.userStore.user?.status) {
         case 'online':
           return { icon: 'check_circle', color: 'positive' }
         case 'offline':

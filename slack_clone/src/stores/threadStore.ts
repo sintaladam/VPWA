@@ -8,7 +8,7 @@ import { useAuthStore } from 'src/stores/authStore';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
-    activePageId: 0 as number,
+    activePageId: -1 as number,
     perPage: 25 as number, // how many chats are going to be loader per request
     kickvotes: [] as KickVote[],
 
@@ -26,14 +26,16 @@ export const useActivePage = defineStore('channelPage', {
       }
       return false;
     },
-    setActivePage(id: number) {
+    setActivePage(id: number | null) {
+      console.log('got', id)
+      if (id == null) return;
       this.activePageId = id;
       this.messages = [];
-      const userStore = useAuthStore();
-      if (userStore.user?.status === 'offline') {
-        return;
-      }
-      socket.emit('subscribe', { channelId: id});//maybe not a good idea :/
+      //const userStore = useAuthStore();
+      // if (userStore.user?.status === 'offline') {
+      //   return;
+      // }
+      socket.emit('subscribe', { channelId: id});
     },
     loadMessages(messages: Message[]) {
       this.messages = this.messages.concat(messages);

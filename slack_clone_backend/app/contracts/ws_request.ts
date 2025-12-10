@@ -3,7 +3,7 @@ export type eventType = 'message' | 'error'| 'subscribe' | 'loadMessages' | 'cha
 export interface request {
   channelId?: number
   slug?: string
-  body: messageBody | subscribeBody
+  body: messageBody | subscribeBody | statusBody
   perPage?: number
   createdAt?: Date
 }
@@ -14,4 +14,8 @@ export interface messageBody {
 
 export interface subscribeBody {
   channelId: number
+}
+
+export interface statusBody {
+  status: 'online' | 'offline' | 'DND'
 }

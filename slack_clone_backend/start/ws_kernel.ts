@@ -42,24 +42,32 @@ app.ready(() => {
 
         // set user status to online on connect
         try {
-            await User.query()
-                .where('id', user.id)
-                .update({ status: 'online' });
+            // await User.query()
+            //     .where('id', user.id)
+            //     .update({ status: 'online' });
             
-            // get all channels this user is in
-            const userChannels = await db
-                .from('user_channels')
-                .where('user_id', user.id)
-                .select('channel_id');
+            // // get all channels this user is in
+            // const userChannels = await db
+            //     .from('user_channels')
+            //     .where('user_id', user.id)
+            //     .select('channel_id');
 
-            // broadcast status change to all channels user is member of
-            for (const uc of userChannels) {
-                broadcasts.broadcastToChannel(uc.channel_id, 'userStatusChanged', {
-                    userId: user.id,
-                    nickname: user.nickname,
-                    status: 'online'
-                });
-            }
+            // // broadcast status change to all channels user is member of
+            // for (const uc of userChannels) {
+            //     broadcasts.broadcastToChannel(uc.channel_id, 'userStatusChanged', {
+            //         userId: user.id,
+            //         nickname: user.nickname,
+            //         status: 'online'
+            //     });
+            // }
+
+            // if (listener.getChannelId == null) listener.send('userStatusChanged', {
+            //     userId: user.id,
+            //     nickname: user.nickname,
+            //     status: 'online'
+            // });
+            socket_service.handle('updateStatus', { status: 'online'} as any, listener);
+
         } catch (err) {
             console.error('Failed to set online status', err);
         }

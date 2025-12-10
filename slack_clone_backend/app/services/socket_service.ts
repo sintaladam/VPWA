@@ -341,6 +341,8 @@ class SocketService {
 
       await txn.commit();
 
+      
+
       // get all channels this user is in
       const userChannels = await db
         .from('user_channels')
@@ -357,7 +359,12 @@ class SocketService {
       }
 
       // acknowledge to requester
-      this.send('statusUpdated', { userId: user.id, status: newStatus }, listener);
+      console.log('id:', listener.getChannelId())
+      if (listener.getChannelId() == null) this.send('userStatusChanged', {
+        userId: user.id,
+        nickname: user.nickname,
+        status: newStatus
+      }, listener);
     } catch (err) {
       await txn.rollback();
       console.error('updateStatus error', err);
