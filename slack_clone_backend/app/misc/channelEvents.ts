@@ -12,6 +12,10 @@ class BroadcastingChannels {
     this.channels = [];
   }
 
+  public getChannels() {
+    return this.channels;
+  }
+  //there could be a function to get a users socket by userId if needed
   subscribe(channelId: number, client: Socket) {
     let channel = this.channels.find(ch => ch.channelId === channelId);
 
@@ -64,7 +68,7 @@ export class ChannelListener {
     this.client = client;
     this.channels = channels;
   }
-
+  
   subscribe(channelId: number) {
     if (this.unsubscribeFn) this.unsubscribeFn();
     this.unsubscribeFn = this.channels.subscribe(channelId, this.client);

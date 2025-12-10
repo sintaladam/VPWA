@@ -1,7 +1,8 @@
-export type eventType = 'message' | 'error'| 'subscribe' | 'loadMessages' | 'channelDeleted' | 'leaveChannel' | 'userKicked' | 'kickVoteAdded' | 'newActivity' | 'userStatusChanged' | 'statusUpdated' |'';
+export type eventType = 'message' | 'error'| 'subscribe' | 'loadMessages' | 'channelDeleted' | 'leaveChannel' | 'userKicked' | 'kickVoteAdded' | 'newActivity' | 'userStatusChanged' | 'statusUpdated' | 'inviteSent' | '';
 
 export interface request {
   channelId?: number
+  slug?: string
   body: messageBody | subscribeBody
   perPage?: number
   createdAt?: Date

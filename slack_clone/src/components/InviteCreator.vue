@@ -22,13 +22,15 @@ import { Platform } from 'quasar';
 import { type DeviceType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
 import { HomeService } from 'src/services';
+import { socket } from 'src/boot/socket';
 
 export default {
   data() {
     return {
       activeStore: useActivePage(),
       userStore: useAuthStore(),
-      slug:'',
+      slug: '',
+      targetUserId: null, 
       activeDevice: Platform.is.desktop ? 'desktop' : 'mobile' as DeviceType,
     }
   },
@@ -50,6 +52,10 @@ export default {
   },
   methods: {
     async createInvite() {
+      socket.emit('inviteUser', {
+        channelId: this.channelId,
+        slug: this.slug,
+      });
       const res = await HomeService.createInvite(this.channelId, this.slug);
       if (res) {
         this.$q.notify({ type: 'positive', message: `invitation to ${this.channelId} was successful` });

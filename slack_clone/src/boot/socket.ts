@@ -1,7 +1,7 @@
 import { defineBoot } from '#q-app/wrappers';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
-import type { Activity, Member, Message } from 'src/contracts';
+import type { Activity, Member, Message, Invite } from 'src/contracts';
 import type { StatusType } from 'src/components/models'
 
 import { AuthManager } from 'src/services';
@@ -113,6 +113,33 @@ AuthManager.onChange((newToken) => { //reset socket when token is changed
     socket.connect();
   }
 })
+socket.on('inviteSent', (data: { success: boolean; message: string }) => {
+  if (data.success) {
+    Notify.create({
+      type: 'positive',
+      message: data.message,
+      position: 'top',
+    });
+  } else {
+    Notify.create({
+      type: 'negative',
+      message: data.message,
+      position: 'top',
+    });
+  }
+});
+
+socket.on('inviteReceived', (data: Invite) => {
+  console.log('Invite received:', data);
+
+  useActivePage().invites.push(data);
+
+  Notify.create({
+    type: 'info',
+    message: `You have been invited to join ${data.channel.name} by user ID ${data.senderId}.`,
+    position: 'top',
+  });
+});
 
 AuthManager.onLogout(() => { //disconnect socket when user logs out
   if (socket.connected) {

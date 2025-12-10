@@ -5,6 +5,8 @@ import Channel from "#models/channel";
 import User from "#models/user";
 import KickVote from "#models/kick_vote";
 import ChannelBan from "#models/channel_ban";
+import Invite from "#models/invite";
+import { Socket } from "socket.io"; // Import Socket type
 
 class SocketService {
   async handle(event: string, data: request, listener: ChannelListener) {
@@ -20,6 +22,7 @@ class SocketService {
     else if (event === 'kickUser') this.kickUser(listener, data);
     else if (event === 'activity') this.handleActivity(data.body as messageBody, listener)
     else if (event === 'updateStatus') this.updateStatus(listener, data);
+    else if (event === 'inviteUser') this.inviteUser(listener, data);
   }
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
     listener.broadcast(event, data);
@@ -360,6 +363,73 @@ class SocketService {
       console.error('updateStatus error', err);
       this.send('error', { message: 'Failed to update status' }, listener);
     }
+  }
+  private async inviteUser(listener: ChannelListener, data?: request) {
+    const inviter = listener.getUser();
+    const { channelId, slug } = data ?? {}; //slug is either nickname or email
+    console.log(`User ${inviter.nickname} is inviting user with slug "${slug}" to channel ID ${channelId}.`);
+
+    if (!channelId || !slug) {
+      this.send('error', { message: 'channelId and slug (nickname or email) are required' }, listener);
+      return;
+    }
+
+    // Find the recipient user by nickname or email
+    const targetUser = await User.query()
+      .where('nickname', slug)
+      .orWhere('email', slug)
+      .first();
+
+    if (!targetUser) {
+      this.send('error', { message: `User with slug "${slug}" not found` }, listener);
+      return;
+    }
+
+    // This could be optimized with a global user-socket map
+    // Find the target user's socket globally
+    let targetSocket: Socket | null = null;
+    for (const channel of broadcastingChannels.getChannels()) {
+      targetSocket = channel.listeners.find(client => client.data.user.id === targetUser.id) || null;
+      if (targetSocket) break; // Stop searching once the socket is found
+    }
+
+    if (!targetSocket) {
+      console.log(`Target user with ID ${targetUser.id} is not currently connected.`);
+      this.send('error', { message: `User with slug "${slug}" is not currently connected` }, listener);
+      return;
+    }
+
+    // Find the channel details
+    const channel = await Channel.query().where('id', channelId).first();
+    if (!channel) {
+      this.send('error', { message: `Channel with ID ${channelId} not found` }, listener);
+      return;
+    }
+
+    // Create the Invite record in the database
+    const invite = await Invite.create({
+      channel_id: channel.id,
+      sender_id: inviter.id,
+      recipient_id: targetUser.id,
+    });
+
+    // Preload the channel and sender for the invite
+    await invite.load('channel');
+    await invite.load('sender');
+
+    // Notify the invited user
+    targetSocket.emit('inviteReceived', {
+      id: invite.id,
+      channelId: invite.channel_id,
+      senderId: invite.sender_id,
+      recipientId: invite.recipient_id,
+      channel: {
+        id: invite.channel.id,
+        name: invite.channel.name,
+      },
+    });
+
+    this.send('inviteSent', { channelId, slug }, listener);
   }
 }
 
