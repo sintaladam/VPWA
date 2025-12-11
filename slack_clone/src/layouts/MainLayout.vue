@@ -176,7 +176,7 @@ export default {
       }
     },
     changeStatusAndEmit(status: StatusType) {
-      this.userStore.changeStatus(status);
+      //this.userStore.changeStatus(status);
       socket.emit('updateStatus', { status });
     }
   },

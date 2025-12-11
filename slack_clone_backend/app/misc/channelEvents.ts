@@ -1,98 +1,100 @@
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import type { eventType } from "../contracts/ws_request.js";
 import User from "#models/user";
 
-class BroadcastingChannels {
-  private channels: {
-    channelId: number,
-    listeners: Socket[];
-  }[];
+export class BroadcastingChannels {
+  private io: Server;
 
-  constructor() {
-    this.channels = [];
+  constructor(io: Server) {
+    this.io = io;
   }
 
   public getChannels() {
-    return this.channels;
-  }
-  //there could be a function to get a users socket by userId if needed
-  subscribe(channelId: number, client: Socket) {
-    let channel = this.channels.find(ch => ch.channelId === channelId);
-
-    if (channel) channel.listeners.push(client);
-    else {
-      channel = {
-        channelId,
-        listeners: [client]
-      }
-      this.channels.push(channel);
-    }
-
-    return () => { //unsub function
-      const id = channel.listeners.indexOf(client);
-      if (id >= 0) channel.listeners.splice(id, 1);
-    }
+    return this.io.of('/').adapter.rooms;
   }
 
-  broadcast(event: eventType, body: object, client: Socket) {
-    const channel = this.channels.find(ch => ch.listeners.includes(client));
-    if (channel) {
-      channel.listeners.forEach(client => {
-        client.emit(event, body);
-      });
-    }
+  public getSockets() {
+    return this.io.fetchSockets();
+  }
+  
+  public getSocketsByUserId(userId: number) {
+    return this.getSockets().then(arr => arr.filter(el => el.data.user.id === userId));
+  }
+
+  public getInactiveSockets() {
+    return this.getSockets().then(arr => arr.filter(el => el.rooms.size === 1));
+  }
+
+  broadcast(event: eventType, body: object, listener: ChannelListener) {
+    const channel = listener.getCurrentChannel();
+    if (channel) this.io.to(channel).emit(event, body);
   }
 
   broadcastToChannel(channelId: number, event: eventType, body: object) {
-    const channel = this.channels.find(ch => ch.channelId === channelId);
-    if (!channel) return;
-    channel.listeners.forEach(client => client.emit(event, body));
+    this.io.to(channelId.toString()).emit(event, body);
   }
 
-  getChannelOfListener(client: Socket) {
-    const channel = this.channels.find(ch => ch.listeners.includes(client));
-    return channel?.channelId ?? null;
+  async broadcastToActive(event: eventType, body: object, listener: ChannelListener) {
+    const channel = listener.getCurrentChannel();
+    let targets;
+    if (channel) targets = await this.io.in(channel).fetchSockets();
+    targets?.forEach(async el =>{
+      let user = await User.query().where('id', el.data.user.id).first();
+      if (user && user.status !== 'offline') {
+        el.emit(event, body);
+      }
+    });
   }
+
+  // getChannelOfListener(client: Socket) {
+  //   const channel = this.channels.find(ch => ch.listeners.includes(client));
+  //   return channel?.channelId ?? null;
+  // }
 }
 
-// export a singleton for app-wide use
-export const broadcastingChannels = new BroadcastingChannels();
-
 export class ChannelListener {
-  private unsubscribeFn: (() => void) | null;
+  private currentChannel: string | null;
   private client: Socket;
   private channels: BroadcastingChannels;
 
   constructor(client: Socket, channels: BroadcastingChannels) {
-    this.unsubscribeFn = null;
+    this.currentChannel = null;
     this.client = client;
     this.channels = channels;
   }
+
+  getCurrentChannel() {
+    return this.currentChannel;
+  }
   
   subscribe(channelId: number) {
-    if (this.unsubscribeFn) this.unsubscribeFn();
-    this.unsubscribeFn = this.channels.subscribe(channelId, this.client);
+    if (this.currentChannel) this.unsubscribe();
+    this.currentChannel = channelId.toString();
+    this.client.join(this.currentChannel);
   }
 
   unsubscribe() {
-    if (this.unsubscribeFn) this.unsubscribeFn();
-    this.unsubscribeFn = null;
+    if (this.currentChannel) this.client.leave(this.currentChannel);
   }
 
   broadcast(event: eventType, body: object) {
-    this.channels.broadcast(event, body, this.client);
+    this.channels.broadcast(event, body, this);
+  }
+
+  broadcastToOthers(event: eventType, body: object) {
+    if (this.currentChannel) this.client.to(this.currentChannel).emit(event, body)
   }
 
   send(event: eventType, body: object) {
     this.client.emit(event, body);
   }
 
-  getUser: () => User = () => {
+  getUser(): User {
     return this.client.data.user;
   }
 
   getChannelId() {
-    return this.channels.getChannelOfListener(this.client);
+    return this.currentChannel ? parseInt(this.currentChannel) : null;
   }
   
 }

@@ -1,15 +1,19 @@
 import { eventType, messageBody, request } from "../contracts/ws_request.js";
-import { ChannelListener, broadcastingChannels } from "../misc/channelEvents.js";
+import { ChannelListener, BroadcastingChannels } from "../misc/channelEvents.js";
 import db from "@adonisjs/lucid/services/db";
 import Channel from "#models/channel";
 import User from "#models/user";
 import KickVote from "#models/kick_vote";
 import ChannelBan from "#models/channel_ban";
 import Invite from "#models/invite";
-import { Socket } from "socket.io"; // Import Socket type
+import { getBroadcastingChannels } from "#start/ws_kernel";
+
+let broadcastingChannels: BroadcastingChannels;
 
 class SocketService {
+  private offlineUsers = [] as {userId: number, since: string}[];
   async handle(event: string, data: request, listener: ChannelListener) {
+    if (!broadcastingChannels) broadcastingChannels = getBroadcastingChannels();
     console.log(event, data);
     if (event === 'message') {
       const body = data.body as messageBody;
@@ -54,7 +58,8 @@ class SocketService {
 
       await message.load('sender');
 
-      this.broadcast('message', { messages: [message] }, listener);
+      //this.broadcast('message', { messages: [message] }, listener);
+      broadcastingChannels.broadcastToActive('message', { messages: [message] }, listener);
     } catch (error) {
       await txn.rollback();
 
@@ -89,6 +94,14 @@ class SocketService {
     
     const cutoff = (() => {
       if (!data?.createdAt) {
+    
+
+        let offUser = this.offlineUsers.find(el => el.userId === listener.getUser().id);
+        if (offUser) {
+          return offUser.since;
+        }
+
+
         // first page
         return new Date().toISOString();
       }
@@ -102,6 +115,7 @@ class SocketService {
 
       return parsed.toISOString();
     })();
+    console.log(cutoff);
 
     const messages = await channel
       .related('messages')
@@ -319,7 +333,8 @@ class SocketService {
   }
 
   private handleActivity(body: messageBody, listener: ChannelListener) {
-    this.broadcast('newActivity', { content: body.message, sender: listener.getUser() }, listener);
+    broadcastingChannels.broadcastToActive('newActivity', { content: body.message, sender: listener.getUser() }, listener);
+    //this.broadcast('newActivity', { content: body.message, sender: listener.getUser() }, listener);
   }
 
   private async updateStatus(listener: ChannelListener, data?: request) {
@@ -341,6 +356,34 @@ class SocketService {
 
       await txn.commit();
 
+      if (newStatus === 'offline') {
+        let offUser = this.offlineUsers.find(el => el.userId === user.id);
+        if (!offUser) {
+          offUser = { userId: user.id, since: '' }
+          this.offlineUsers.push(offUser);
+        }
+        offUser.since = new Date().toISOString();
+      }
+
+      else {
+        let offUser = this.offlineUsers.find(el => el.userId === user.id);
+        if (offUser) {
+          console.log(offUser);
+          this.offlineUsers = this.offlineUsers.filter(el => el.userId !== user.id);
+          const targets = await broadcastingChannels.getSocketsByUserId(user.id);
+          targets.forEach(async el => {
+            if ([...el.rooms].length > 1) {
+              const channel = await Channel.query().where('id', parseInt([...el.rooms][1])).firstOrFail();
+              const messages = await channel
+                .related('messages')
+                .query()
+                .preload('sender')
+                .where('created_at', '>', offUser.since);
+              el.emit('message', { messages });
+            }
+          });
+        }
+      }
       
 
       // get all channels this user is in
@@ -358,13 +401,13 @@ class SocketService {
         });
       }
 
-      // acknowledge to requester
-      console.log('id:', listener.getChannelId())
-      if (listener.getChannelId() == null) this.send('userStatusChanged', {
+      // also notify users inactive sockets
+      const targets = await broadcastingChannels.getInactiveSockets();
+      targets.filter(el => el.data.user.id === user.id).forEach(el => el.emit('userStatusChanged', {
         userId: user.id,
         nickname: user.nickname,
         status: newStatus
-      }, listener);
+      }));
     } catch (err) {
       await txn.rollback();
       console.error('updateStatus error', err);
@@ -394,13 +437,9 @@ class SocketService {
 
     // This could be optimized with a global user-socket map
     // Find the target user's socket globally
-    let targetSocket: Socket | null = null;
-    for (const channel of broadcastingChannels.getChannels()) {
-      targetSocket = channel.listeners.find(client => client.data.user.id === targetUser.id) || null;
-      if (targetSocket) break; // Stop searching once the socket is found
-    }
+    const targetSockets = await broadcastingChannels.getSocketsByUserId(targetUser.id);
 
-    if (!targetSocket) {
+    if (!targetSockets) {
       console.log(`Target user with ID ${targetUser.id} is not currently connected.`);
       this.send('error', { message: `User with slug "${slug}" is not currently connected` }, listener);
       return;
@@ -425,7 +464,7 @@ class SocketService {
     await invite.load('sender');
 
     // Notify the invited user
-    targetSocket.emit('inviteReceived', {
+    targetSockets.forEach(sock => sock.emit('inviteReceived', {
       id: invite.id,
       channelId: invite.channel_id,
       senderId: invite.sender_id,
@@ -434,7 +473,7 @@ class SocketService {
         id: invite.channel.id,
         name: invite.channel.name,
       },
-    });
+    }));
 
     this.send('inviteSent', { channelId, slug }, listener);
   }

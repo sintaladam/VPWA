@@ -36,6 +36,7 @@ socket.on('connect_error', (e) => console.error('[WS] error', e.message))
 socket.on('newActivity', (data: Activity) => activePage.addActivity(data))
 
 socket.on('message', (data: { messages: Message[] }) => {
+    console.log('got messages', data.messages)
     try {
       activePage.loadMessages(data.messages)
       data.messages?.forEach(m => {

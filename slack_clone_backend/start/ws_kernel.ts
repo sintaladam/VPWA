@@ -1,11 +1,13 @@
 import app from '@adonisjs/core/services/app'
 import server from '@adonisjs/core/services/server'
 import { Server } from 'socket.io'
-import { broadcastingChannels, ChannelListener } from '../app/misc/channelEvents.js';
+import { BroadcastingChannels, ChannelListener } from '../app/misc/channelEvents.js';
 import socket_service from '#services/socket_service';
 import auth_service from '#services/auth_service';
 import User from '#models/user';
 import db from '@adonisjs/lucid/services/db';
+
+let broadcasts: BroadcastingChannels;
 
 app.ready(() => {
     const io = new Server(server.getNodeServer(), {
@@ -13,6 +15,8 @@ app.ready(() => {
             origin: '*',
         },
     });
+
+    broadcasts = new BroadcastingChannels(io);
 
     io.use(async (socket, next) => {
         try {
@@ -32,8 +36,6 @@ app.ready(() => {
             next(new Error('Authentication failed'));
         }
     });
-
-    const broadcasts = broadcastingChannels;
 
     io.on('connection', async (socket) => {
         const listener = new ChannelListener(socket, broadcasts);
@@ -108,3 +110,8 @@ app.ready(() => {
 
     console.log('socket started');
 });
+
+export function getBroadcastingChannels(): BroadcastingChannels {
+    if (!broadcasts) throw new Error("Broadcasts not ready yet");
+    return broadcasts;
+}
