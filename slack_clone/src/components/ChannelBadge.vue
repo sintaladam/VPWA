@@ -1,14 +1,19 @@
 <template>
-  <q-expansion-item expand-icon-toggle class="q-pa-none custom-class">
+  <q-expansion-item expand-icon-toggle class="q-pa-none custom-class"
+  v-model="isOpen" 
+  @input="onExpansionChange"
+  >
     <template #header>
-      <q-item class="full-width column q-pa-xs rounded-borders" :to="`/channel/${channelId}`">
-        <div class="text-weight-medium">{{ channel.name }}</div>
+      <q-item class="full-width column q-pa-xs rounded-borders" :to="`/channel/${channelId}`"
+      style="max-width: 200px;">
+        <div class="text-weight-medium" style="overflow-wrap: break-word;">
+          {{ isOpen ? channel.name : nameTooLong(channel.name) }}</div>
         <div class="text-caption text-grey">{{ channel.type }}</div>
       </q-item>
     </template>
     <q-card>
       <q-card-section>
-        {{ channel.description }}
+        <div class="ellipsis">{{ channel.description }}</div>
         <div class="column q-pt-md q-gutter-md">
           <q-btn color="white" text-color="black" label="Details" @click="editorOpen = true" />
           <q-btn color="white" text-color="black" label="User list" @click="openUserList" />
@@ -62,6 +67,9 @@ export default {
     InviteCreator
   },
   methods: {
+    nameTooLong(name: string) {
+      return name.length > 20 ? name.slice(0, 25) + '...' : name;
+    },  
     async getUsers() {
       //this.activeUsers = this.activeStore.getThreadUsers(this.activeStore.activePageId);
       this.activeUsers = await HomeService.getMembers(this.channel.id) ?? [];
@@ -71,7 +79,10 @@ export default {
     },
     forwardDelete() {
       this.$emit('deleteChannelEvent');
-    }
+    },
+    onExpansionChange(isExpanded: boolean) {
+      this.isOpen = isExpanded;
+    },
   },
   computed: {
     channel() {
