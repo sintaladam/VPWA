@@ -22,8 +22,7 @@ import { Platform } from 'quasar';
 import { type DeviceType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
 import { HomeService } from 'src/services';
-import { socket } from 'src/boot/socket';
-
+import SocketService from 'src/services/SocketService';
 export default {
   data() {
     return {
@@ -52,10 +51,7 @@ export default {
   },
   methods: {
     async createInvite() {
-      socket.emit('inviteUser', {
-        channelId: this.channelId,
-        slug: this.slug,
-      });
+      SocketService.inviteUser(this.channelId, this.slug);
       const res = await HomeService.createInvite(this.channelId, this.slug);
       if (res) {
         this.$q.notify({ type: 'positive', message: `invitation to ${this.channelId} was successful` });

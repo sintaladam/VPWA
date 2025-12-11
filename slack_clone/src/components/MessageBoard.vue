@@ -71,9 +71,9 @@ import type { messageType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
 import type { Message } from 'src/contracts';
-import { socket } from 'src/boot/socket';
 import { nextTick } from 'vue';
 import { colors } from 'quasar'
+import SocketService from 'src/services/SocketService';
 
 export default {
   data() {
@@ -132,17 +132,18 @@ export default {
           if (settled) return;
           settled = true;
           clearTimeout(timeoutId);
-          socket.off('message', handler);
+          SocketService.turnOff('message', handler); 
           resolve(data.messages || []);
         };
 
-        socket.on('message', handler);
-        socket.emit('loadMessages', { perPage, createdAt: this.messages[0]?.createdAt });
-
+        SocketService.turnOn('message', handler);
+  
+        SocketService.loadMessages({ perPage, ...(this.messages[0]?.createdAt ? { createdAt: this.messages[0].createdAt } : {}) });
+        
         const timeoutId = setTimeout(() => {
           if (settled) return;
           settled = true;
-          socket.off('message', handler);
+          SocketService.turnOff('message', handler); 
           resolve([]);
         }, 5000);
       });
@@ -160,7 +161,7 @@ export default {
     async fetchOlderMessages() {
       return new Promise<(Message & { type: messageType })[]>(resolve => {
         const perPage = (this.activePage && this.activePage.perPage) ?? 25;
-        socket.emit('loadMessages', { perPage: perPage });
+        SocketService.loadMessages({ perPage: perPage });
         setTimeout(() => resolve([]), 500);
       });
     },

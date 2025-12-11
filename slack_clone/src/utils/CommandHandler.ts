@@ -9,12 +9,9 @@ import {
   type UserAtr,
 } from '../components/models';
 import { notify, isStatusType, print } from './helperFunctions';
-
-import { socket } from 'src/boot/socket';
-//import { Notify } from 'quasar'
-
 import type { Channel } from 'src/contracts';
 import { HomeService } from 'src/services';
+import SocketService from 'src/services/SocketService';
 
 export class CommandHandler {
   commandList = ['list', 'help', 'join', 'kick', 'invite', 'cancel', 'status'];
@@ -49,13 +46,9 @@ export class CommandHandler {
             this.activePage.activePageId,
             this.userStore.user?.id as number
           );
-
+          const channelId = this.activePage.activePageId;
           // emit kick event cez socket (backend rozhodne či je to admin-kick alebo vote-kick)
-          socket.emit('kickUser', {
-            channelId: this.activePage.activePageId,
-            targetNickname,
-            isAdmin
-          });
+          SocketService.kickUser(channelId, targetNickname ? targetNickname : '', isAdmin);
 
           if (isAdmin) {
             print(`Kicked user ${targetNickname} from channel.`, this.output);
@@ -97,13 +90,11 @@ export class CommandHandler {
         break;
       case 'cancel':
         if (this.activePage.isAdmin(this.activePage.activePageId, this.userStore.user?.id as number)) {
-          socket.emit('deleteChannel', { channelId: this.activePage.activePageId });
-          notify(`You successfully deleted the channel!`, 'positive');
+          SocketService.deleteChannel(this.activePage.activePageId);
         } else {
           console.log('leaving channel...')
           if (this.userStore.user) {
-            socket.emit('leaveChannel', { channelId: this.activePage.activePageId, userId: this.userStore.user.id });
-            notify(`You successfully left the channel!`, 'positive');
+            SocketService.leaveChannel(this.activePage.activePageId, this.userStore.user.id);
           } else {
             console.error('User is not logged in.');
           }
@@ -159,7 +150,7 @@ export class CommandHandler {
               this.output.push(`changing status to ${argument[0]}`);
               
               // emit socket event to broadcast status change
-              socket.emit('updateStatus', { status: argument[0] as StatusType });
+              SocketService.updateStatus(argument[0] as StatusType);
             } else this.output.push('Wrong status type: online, offline, DND');
           } else {
             this.output.push(`You provided ${argument.length} arguments but only 1 is needed`);

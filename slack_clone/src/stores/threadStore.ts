@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import type { ChannelAtr, handleInviteType, KickVote, TypingActivity } from 'src/components/models';
-import { socket } from 'src/boot/socket';
 import type { Activity, Channel, Invite, Member, Message } from 'src/contracts';
 import HomeService from "src/services/HomeService";
 import { Notify } from 'quasar';
 import { useAuthStore } from 'src/stores/authStore';
+import SocketService from 'src/services/SocketService';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
@@ -35,7 +35,7 @@ export const useActivePage = defineStore('channelPage', {
       // if (userStore.user?.status === 'offline') {
       //   return;
       // }
-      socket.emit('subscribe', { channelId: id});
+      SocketService.subscribeToChannel(id);
     },
     loadMessages(messages: Message[], isNew: boolean) {
       if (isNew) {

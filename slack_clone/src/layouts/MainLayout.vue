@@ -130,7 +130,7 @@ import { useAuthStore } from 'src/stores/authStore';
 import { useActivePage } from 'src/stores/threadStore';
 import type { User, Channel } from 'src/contracts';
 import ChannelSearch from 'src/components/ChannelSearch.vue';
-import { socket } from 'src/boot/socket';
+import SocketService from 'src/services/SocketService';
 
 export default {
   data() {
@@ -177,7 +177,7 @@ export default {
     },
     changeStatusAndEmit(status: StatusType) {
       //this.userStore.changeStatus(status);
-      socket.emit('updateStatus', { status });
+      SocketService.updateStatus(status);
     }
   },
   components: {
