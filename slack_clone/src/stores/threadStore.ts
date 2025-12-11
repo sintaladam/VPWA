@@ -37,7 +37,10 @@ export const useActivePage = defineStore('channelPage', {
       // }
       socket.emit('subscribe', { channelId: id});
     },
-    loadMessages(messages: Message[]) {
+    loadMessages(messages: Message[], isNew: boolean) {
+      if (isNew) {
+        this.typingActivity = this.typingActivity.filter(el => el.activity.sender.id !== messages[0]?.sender.id);
+      }
       this.messages = this.messages.concat(messages);
     },
     async getChannels() {
@@ -150,7 +153,7 @@ export const useActivePage = defineStore('channelPage', {
       item.destroySelfFn = setTimeout(() => {
         const id = this.typingActivity.indexOf(item);
         if (id >= 0) this.typingActivity.splice(id, 1);
-      }, 2000);
+      }, 3500);
     }
   },
   getters: {

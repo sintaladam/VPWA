@@ -35,10 +35,10 @@ socket.on('disconnect', (r) => {
 socket.on('connect_error', (e) => console.error('[WS] error', e.message))
 socket.on('newActivity', (data: Activity) => activePage.addActivity(data))
 
-socket.on('message', (data: { messages: Message[] }) => {
+socket.on('message', (data: { messages: Message[], isNew?: boolean }) => {
     console.log('got messages', data.messages)
     try {
-      activePage.loadMessages(data.messages)
+      activePage.loadMessages(data.messages, data.isNew ?? false)
       data.messages?.forEach(m => {
         void notifyForMessage(m)
       })

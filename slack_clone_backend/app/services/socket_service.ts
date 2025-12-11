@@ -59,7 +59,7 @@ class SocketService {
       await message.load('sender');
 
       //this.broadcast('message', { messages: [message] }, listener);
-      broadcastingChannels.broadcastToActive('message', { messages: [message] }, listener);
+      broadcastingChannels.broadcastToActive('message', { messages: [message], isNew: true }, listener);
     } catch (error) {
       await txn.rollback();
 
