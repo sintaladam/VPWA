@@ -68,7 +68,7 @@ class SocketService {
         activePage.removeMember(data.channelId, data.userId);
         const reason = data.voteKick ? '(vote-kick threshold reached)' : data.permanent ? '(admin kick)' : '';
         Notify.create({
-          type: 'negative',
+          type: 'positive',
           message: `User ${data.nickname} was kicked from channel ${reason}`,
           position: 'top',
         });
@@ -109,17 +109,17 @@ class SocketService {
       }
     });
 
-    this.socket.on('inviteSent', (data: { success: boolean; message: string }) => {
-      if (data.success) {
+    this.socket.on('inviteSent', (data: { channelId: number; slug: string }) => {
+      if (data) {
         Notify.create({
           type: 'positive',
-          message: data.message,
+          message: `Invitation sent successfully to user: ${data.slug}!`,
           position: 'top',
         });
       } else {
         Notify.create({
           type: 'negative',
-          message: data.message,
+          message: "Invitation failed :(",
           position: 'top',
         });
       }

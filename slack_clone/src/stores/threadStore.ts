@@ -128,10 +128,10 @@ export const useActivePage = defineStore('channelPage', {
         }
       }
       this.members = this.members.filter(m => m.id !== userId);
-
+      console.log('currentUserId', currentUserId, 'userId', userId);
       if (currentUserId === userId) {
         this.channels = this.channels.filter(c => c.id !== channelId);
-        
+        console.log('activePageId', this.activePageId, 'channelId', channelId);
         if (this.activePageId === channelId) {
           this.activePageId = 0;
           this.messages = [];

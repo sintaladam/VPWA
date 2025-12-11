@@ -52,6 +52,7 @@
 import type { Invite, Channel } from 'src/contracts';
 //import type { InviteType } from '../components/models';
 import { useActivePage } from 'src/stores/threadStore';
+import { notify } from 'src/utils/helperFunctions';
 
 export default {
     data() {
@@ -69,9 +70,6 @@ export default {
             required: true
         }
     },
-    // mounted() {
-    //     this.getChannelDetails()
-    // },
     created() {
         this.channel= this.invite.channel
     },
@@ -84,10 +82,10 @@ export default {
                 setTimeout(() => {
                     this.visible = false;
                 }, 300);
-                this.$q.notify({ type: 'positive', message: `${this.channel?.name} was added to your channels` });
+                notify(`${this.channel?.name} was added to your channels`, 'positive');
             }
             else {
-                this.$q.notify({ type: 'negative', message: `accept invitation to ${this.channel?.name} failed` })
+                notify(`accept invitation to ${this.channel?.name} failed`, 'negative');
             }
         },
         async handleReject() {
@@ -98,10 +96,10 @@ export default {
                 setTimeout(() => {
                     this.visible = false;
                 }, 300);
-                this.$q.notify({ type: 'negative', message: `invitation to ${this.channel?.name} was rejected` });
+                notify(`invitation to ${this.channel?.name} was rejected`, 'positive');
             }
             else {
-                this.$q.notify({ type: 'negative', message: `reject invitation to ${this.channel?.name} failed` })
+                notify(`reject invitation to ${this.channel?.name} failed`, 'negative');
             }
 
         },
@@ -117,9 +115,6 @@ export default {
             }, 10);
             setTimeout(done, 300);
         },
-        // getChannelDetails() {
-        //     this.channel = this.channelStore.getThreadDetails(this.invite.channel_id, 'channel') as Channel;
-        // }
     }
 }
 </script>

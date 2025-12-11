@@ -10,7 +10,7 @@ import {
 } from '../components/models';
 import { notify, isStatusType, print } from './helperFunctions';
 import type { Channel } from 'src/contracts';
-import { HomeService } from 'src/services';
+//import { HomeService } from 'src/services';
 import SocketService from 'src/services/SocketService';
 
 export class CommandHandler {
@@ -64,6 +64,7 @@ export class CommandHandler {
         break;
       case 'invite':
         if (argument && argument.length > 0) {
+          //works with nickname or email
           const invitedUser = argument.join(' ').trim();
           if (!invitedUser) {
             print('User nickname or email cannot be empty.', this.output);
@@ -75,15 +76,16 @@ export class CommandHandler {
             print('You must be in a channel to invite someone.', this.output);
             break;
           }
+          SocketService.inviteUser(currentChannelId, invitedUser);
           // send invite
-          const res = await HomeService.createInvite(currentChannelId, invitedUser);
-          if (res) {
-            notify(`Invitation sent to ${invitedUser}`, 'positive');
-            print(`Invitation sent to ${invitedUser}`, this.output);
-          } else {
-            notify(`Failed to invite ${invitedUser}`, 'negative');
-            print(`Failed to invite ${invitedUser}`, this.output);
-          }
+          // const res = await HomeService.createInvite(currentChannelId, invitedUser);
+          // if (res) {
+          //   notify(`Invitation sent to ${invitedUser}`, 'positive');
+          //   print(`Invitation sent to ${invitedUser}`, this.output);
+          // } else {
+          //   notify(`Failed to invite ${invitedUser}`, 'negative');
+          //   print(`Failed to invite ${invitedUser}`, this.output);
+          // }
         } else {
           this.output.push('Usage: /invite <nickname or email>');
         }
