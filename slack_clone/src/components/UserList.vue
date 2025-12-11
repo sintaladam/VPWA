@@ -33,7 +33,12 @@
                         </q-item-section>
 
                         <!-- Activity Bubble -->
-                        <q-item-section side>
+
+                        <q-item-section side v-if="userStore.user!.id === creatorId && user.id !== creatorId">
+                            <q-btn round flat color="negative" icon="cancel" size="sm"
+                                @click.stop="kickMember(user.nickname)" />
+                        </q-item-section>
+                                                <q-item-section side>
                             <div 
                                 class="activity-bubble q-mr-sm"
                                 :style="{ backgroundColor: getStatusColor(user) }"
@@ -44,10 +49,6 @@
                             </div>
                         </q-item-section>
 
-                        <q-item-section side v-if="userStore.user!.id === creatorId && user.id !== creatorId">
-                            <q-btn round flat color="negative" icon="cancel" size="sm"
-                                @click.stop="kickMember(user.nickname)" />
-                        </q-item-section>
                     </q-item>
                 </q-list>
 
