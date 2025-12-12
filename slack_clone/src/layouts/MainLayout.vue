@@ -104,18 +104,8 @@
       </div>
     </q-drawer>
     <q-page-container>
-       <q-page class="flex flex-center" v-if="!activePage.getThreadDetails(activePage.activePageId)">
-        <div class="text-center">
-          <q-icon name="sentiment_very_satisfied" size="64px" color="secondary" />
-          <div class="text-h5 q-mt-md text-primary">Welcome back</div>
-          <div class="text-subtitle2 q-mt-sm text-secondary">
-            Select a channel to get started
-          </div>
-        </div>
-      </q-page>
-      <router-view :key="$route.fullPath" v-show="activePage.activePageId!=-1" />
+      <router-view :key="$route.fullPath" />
     </q-page-container>
-
   </q-layout>
 </template>
 
