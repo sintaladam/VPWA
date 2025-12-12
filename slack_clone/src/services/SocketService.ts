@@ -39,12 +39,16 @@ class SocketService {
       console.log('got messages', data.messages);
       try {
         activePage.loadMessages(data.messages, data.isNew ?? false);
-        data.messages?.forEach((message) => {
-          void notifyForMessage(message);
-        });
+        // data.messages?.forEach((message) => {
+        //   void notifyForMessage(message);
+        // });
       } catch (error) {
         console.error('message handler error', error);
       }
+    });
+
+    this.socket.on('notification', (data: { message: Message, channel: string }) => {
+      void notifyForMessage(data.message, data.channel);
     });
 
     this.socket.on('channelDeleted', (data: { channelId: number }) => {

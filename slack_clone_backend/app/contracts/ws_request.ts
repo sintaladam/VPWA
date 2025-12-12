@@ -1,4 +1,4 @@
-export type eventType = 'message' | 'error'| 'subscribe' | 'loadMessages' | 'channelDeleted' | 'leaveChannel' | 'userKicked' | 'kickVoteAdded' | 'newActivity' | 'userStatusChanged' | 'statusUpdated' | 'inviteSent' | '';
+export type eventType = 'notification' | 'message' | 'error'| 'subscribe' | 'loadMessages' | 'channelDeleted' | 'leaveChannel' | 'userKicked' | 'kickVoteAdded' | 'newActivity' | 'userStatusChanged' | 'statusUpdated' | 'inviteSent' | '';
 
 export interface request {
   channelId?: number

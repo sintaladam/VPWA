@@ -60,6 +60,15 @@ class SocketService {
 
       //this.broadcast('message', { messages: [message] }, listener);
       broadcastingChannels.broadcastToActive('message', { messages: [message], isNew: true }, listener);
+
+      const channel = await Channel
+        .query()
+        .where('id', channel_id)
+        .first();
+      
+      const channelUsers = await channel?.related('users').query();
+      channelUsers?.forEach(el => broadcastingChannels.sendToUser('notification', { message: message, channel: channel!.name }, el.id))
+  
     } catch (error) {
       await txn.rollback();
 

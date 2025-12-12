@@ -11,7 +11,7 @@ export function useNotifications() {
     return res === 'granted'
   }
 
-  async function notifyForMessage(message: Message) {
+  async function notifyForMessage(message: Message, channel: string) {
     const user = auth.user
     if (!user) return
 
@@ -22,11 +22,12 @@ export function useNotifications() {
 
     if (message.sender?.id === user.id) return
 
-    if (AppVisibility.appVisible) return // Boolean
-
     const ok = await requestPermission()
     if (!ok) return
-    const title = message.sender?.nickname ?? 'New message'
+
+    if (AppVisibility.appVisible) return // Boolean
+
+    const title = (message.sender?.nickname ?? 'New message') + ' in ' + channel
     const body = (message.content ?? '').slice(0, 120)
 
     try {

@@ -46,6 +46,14 @@ export class BroadcastingChannels {
     });
   }
 
+  async sendToUser(event: eventType, body: object, userId:number) {
+    const user = await User.query().where('id', userId).first();
+    if (user && user.status !== 'offline') {
+      const targets = await this.getSocketsByUserId(userId);
+      targets.forEach(el => el.emit(event, body));
+    }
+  }
+
   // getChannelOfListener(client: Socket) {
   //   const channel = this.channels.find(ch => ch.listeners.includes(client));
   //   return channel?.channelId ?? null;
