@@ -30,6 +30,7 @@ router.group(() => {
 
 router.group(() => {
   router.get('channels', '#controllers/channel_controller.getChannels');
+  router.get('channels/public', '#controllers/channel_controller.getAllPublicChannels');
   router.post('channels/create', '#controllers/channel_controller.createChannel');
   router.post('channels/update', '#controllers/channel_controller.updateChannel');
   router.delete('channels/delete', '#controllers/channel_controller.deleteChannel');
