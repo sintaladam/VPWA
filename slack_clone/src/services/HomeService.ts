@@ -19,6 +19,18 @@ class HomeService {
     }
   }
 
+  async getAllPublicChannels(): Promise<Channel[] | null> {
+    try {
+      const response = await api.get<Channel[]>('home/channels/public ');
+      return response.data;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('Action failed:', error.response?.data);
+
+      return null;
+    }
+  }
+
   async searchChannels(slug: string): Promise<Channel[] | null> {
     try {
       const response = await api.post<Channel[]>('home/channels/search', { slug });

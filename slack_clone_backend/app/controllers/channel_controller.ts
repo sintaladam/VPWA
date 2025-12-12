@@ -17,6 +17,18 @@ export default class ChannelController {
     return channels;
   }
 
+  async getAllPublicChannels({ auth }: HttpContext) {
+  const user = auth.getUserOrFail()
+
+  const channels = await Channel
+    .query()
+    .where('type', 'public')
+    .whereDoesntHave('users', (query) => {
+      query.where('users.id', user.id)
+    })
+  return channels
+}
+
   async searchChannels({ auth, request }: HttpContext) {
     console.log('search channels');
     const user = auth.getUserOrFail();
@@ -33,7 +45,7 @@ export default class ChannelController {
     return channels;
   }
 
-  async createChannel({ auth, request }: HttpContext) {
+  async createChannel({ auth, request, response }: HttpContext) {
     console.log('get invites');
     const user = auth.getUserOrFail();
     const { name, type, description } = await request.validateUsing(createChannelValidator);
@@ -48,7 +60,9 @@ export default class ChannelController {
       return { ok: true };
     } catch (error) {
       await txn.rollback();
-
+      if (error.code === '23505') {
+        return response.conflict({ error: 'Channel with this name already exists' });
+      }
       throw error;
     }
   }

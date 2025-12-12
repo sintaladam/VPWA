@@ -12,6 +12,7 @@ import { notify, isStatusType, print } from './helperFunctions';
 import type { Channel } from 'src/contracts';
 //import { HomeService } from 'src/services';
 import SocketService from 'src/services/SocketService';
+import { HomeService } from 'src/services';
 
 export class CommandHandler {
   commandList = ['list', 'help', 'join', 'kick', 'invite', 'cancel', 'status'];
@@ -104,7 +105,16 @@ export class CommandHandler {
         break;
       case 'join':
         if (argument && argument.length > 0) {
-          const channelName = argument.join(' ').trim();
+          // detect optional "[private]" flag at end
+          const args = [...argument];
+          let isPrivate = false;
+          const lastArg = args[args.length - 1];
+          if (lastArg && /^\[private\]$/i.test(lastArg.trim())) {
+            isPrivate = true;
+            args.pop();
+          }
+
+          const channelName = args.join(' ').trim();
           if (!channelName) {
             print('Channel name cannot be empty.', this.output);
             break;
@@ -117,10 +127,29 @@ export class CommandHandler {
             await this.router.push(`/channel/${channel.id}`);
             print(`Joined channel ${channel.name}`, this.output);
           } else {
-            // create new channel
+            const channels = await HomeService.getAllPublicChannels(); // refresh channels
+            if (channels) {
+              const channel = channels.find((ch) => ch.name === channelName);
+              if (channel) {
+                // channel exists, join it
+                const res2 = await this.activePage.joinChannel(channel.id);
+                if (res2) {
+                  this.activePage.activePageId = channel.id;
+                  await this.router.push(`/channel/${channel.id}`);
+                  notify(`Joined channel '${channelName}' successfully`, 'positive');
+                  print(`Joined channel ${channel.name}`, this.output);
+                  break;
+                } else {
+                  notify(`Failed to join channel '${channelName}'`, 'negative');
+                  print('Failed to join channel.', this.output);
+                  break;
+                }
+              }
+            }
+            // create new channel (use private flag if specified)
             const newChannel = {
               name: channelName,
-              type: ChannelType.Public,
+              type: isPrivate ? ChannelType.Private : ChannelType.Public,
               description: '',
             } as Partial<Channel>;
 
@@ -142,7 +171,7 @@ export class CommandHandler {
             }
           }
         } else {
-          this.output.push('Usage: /join <channel name>');
+          this.output.push('Usage: /join <channel name> [private]');
         }
         break;
       case 'status':
