@@ -250,12 +250,12 @@ class SocketService {
         await txn.commit();
 
         // broadcast kick event
-        broadcastingChannels.broadcastToChannel('userKicked', channelId, { 
+        broadcastingChannels.sendToUser('userKicked', { 
           channelId, 
           userId: targetUser.id, 
           nickname: targetNickname, 
           permanent: true 
-        });
+        }, targetUser.id);
         //this.send('userKicked', { channelId, userId: targetUser.id, nickname: targetNickname, permanent: true }, listener);
       } else {
         // member vote-kick: register vote
