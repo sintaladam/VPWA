@@ -38,6 +38,7 @@ import UserList from './UserList.vue'
 import { HomeService } from 'src/services';
 import { useAuthStore } from 'src/stores/authStore';
 import InviteCreator from './InviteCreator.vue';
+import SocketService from 'src/services/SocketService';
 
 export default {
   data() {
@@ -78,8 +79,17 @@ export default {
       this.listOpen = true;
     },
     forwardDelete() {
-      this.$emit('deleteChannelEvent');
-    },
+      if (this.activeStore.isAdmin(this.activeStore.activePageId, this.userStore.user?.id as number)) {
+        SocketService.deleteChannel(this.activeStore.activePageId);
+        } else {
+          console.log('leaving channel...')
+          if (this.userStore.user) {
+            SocketService.leaveChannel(this.activeStore.activePageId, this.userStore.user.id);
+          } else {
+            console.error('User is not logged in.');
+          }
+        }    
+      },
     onExpansionChange(isExpanded: boolean) {
       this.isOpen = isExpanded;
     },
