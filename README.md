@@ -35,12 +35,9 @@ Akékoľvek iné vylepšenia sú vítané a potešia ma : )
 9. používateľ si môže nastaviť stav (online, DND, offline)
    - [x]  stav sa zobrazuje používateľom
    - [x]  ak je nastavený DND stav, neprichádzajú notifikácie
-   - [ ]  ak je nastavený offline stav, neprichádzajú používateľovi správy, po prepnutí do online sú kanály automaticky aktualizované
+   - [x]  ak je nastavený offline stav, neprichádzajú používateľovi správy, po prepnutí do online sú kanály automaticky aktualizované
 10. používateľ si môže pozrieť zoznam členov kanála (ak je tiež členom kanála) príkazom /list
    - [x] uc10
 11. ak má používateľ aktívny niektorý z kanálov (nachádza sa v okne správ pre daný kanál) vidí v stavovej lište informáciu o tom, kto aktuálne píše správu (napr. Ed is typing)
    - po kliknutí na nickName si môže pozrieť rozpísaný text v reálnom čase, predtým, ako ju odosielateľ odošle (každá zmena je viditeľná))
    - [x] uc11
-
-- [ ] error handling and system notis
-- [x] dont login directly on register
