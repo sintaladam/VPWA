@@ -25,14 +25,8 @@
                     <q-list dense>
                         <q-item>
                             <q-item-section>
-                                <q-item-label caption>Channel Type</q-item-label>
+                                <q-item-label caption>Type</q-item-label>
                                 <q-item-label>{{ channel.type }}</q-item-label>
-                            </q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>
-                                <q-item-label caption>Members</q-item-label>
-                                <!-- <q-item-label>{{ channel.users.length }} members</q-item-label> -->
                             </q-item-section>
                         </q-item>
                         <q-item>
