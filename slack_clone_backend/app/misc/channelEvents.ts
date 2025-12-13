@@ -34,17 +34,16 @@ export class BroadcastingChannels {
     this.io.to(channelId.toString()).emit(event, body);
   }
 
-  async broadcastToActive(event: eventType, body: object, channelId: number) {
-    // const channel = listener.getCurrentChannel();
-    // let targets;
-    this.io.to(channelId.toString()).emit(event, body);
-    // if (channelId) targets = await this.io.in(channelId.toString()).fetchSockets();
-    // targets?.forEach(async el =>{
-    //   let user = await User.query().where('id', el.data.user.id).first();
-    //   if (user && user.status !== 'offline') {
-    //     el.emit(event, body);
-    //   }
-    // });
+  async broadcastToActive(event: eventType, body: object, listener: ChannelListener) {
+    const channel = listener.getCurrentChannel();
+    let targets;
+    if (channel) targets = await this.io.in(channel).fetchSockets();
+    targets?.forEach(async el =>{
+      let user = await User.query().where('id', el.data.user.id).first();
+      if (user && user.status !== 'offline') {
+        el.emit(event, body);
+      }
+    });
   }
 
   async sendToUser(event: eventType, body: object, userId:number) {

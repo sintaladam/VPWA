@@ -67,8 +67,9 @@ class SocketService {
 
       await message.load('sender');
 
-      //this.broadcast('message', { messages: [message] }, listener);
-      broadcastingChannels.broadcastToChannel('message', channelId, { messages: [message], isNew: true });
+    
+      broadcastingChannels.broadcastToActive('message', { messages: [message], isNew: true }, listener);
+      // broadcastingChannels.broadcastToChannel('message', channelId, { messages: [message], isNew: true });
 
       const channel = await Channel
         .query()
@@ -359,11 +360,12 @@ class SocketService {
   }
 
   private handleActivity(message: string, channelId: number, listener: ChannelListener) {
-    broadcastingChannels.broadcastToChannel('newActivity', channelId, { content: message, sender: listener.getUser()});
+    void channelId;
+    broadcastingChannels.broadcastToActive('newActivity', { content: message, sender: listener.getUser() }, listener);
+    // broadcastingChannels.broadcastToChannel('newActivity', channelId, { content: message, sender: listener.getUser()});
   }
 
   private async updateStatus(listener: ChannelListener, data?: request) {
-    console.log(this.offlineUsers)
     const user = listener.getUser();
     const payload: any = data ?? {};
     const newStatus = payload.status; // 'online' | 'DND' | 'offline'
@@ -393,7 +395,6 @@ class SocketService {
 
       else {
         let offUser = this.offlineUsers.find(el => el.userId === user.id);
-        console.log("offUser", offUser);
         if (offUser) {
           console.log(offUser);
           this.offlineUsers = this.offlineUsers.filter(el => el.userId !== user.id);
@@ -411,6 +412,8 @@ class SocketService {
           });
         }
       }
+      
+
       // get all channels this user is in
       const userChannels = await db
         .from('user_channels')
@@ -433,7 +436,6 @@ class SocketService {
         nickname: user.nickname,
         status: newStatus
       }));
-    listener.unsubscribe();
     } catch (err) {
       await txn.rollback();
       console.error('updateStatus error', err);
