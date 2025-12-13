@@ -1,6 +1,7 @@
 import { Notify } from "quasar";
 import { socket } from "src/boot/socket";
-
+import { router } from 'src/router';
+ 
 import { useAuthStore } from "src/stores/authStore";
 import { AuthManager } from 'src/services';
 import { notify } from "src/utils/helperFunctions";
@@ -15,12 +16,20 @@ const { notifyForMessage } = useNotifications()
 
 class SocketService {
   private socket: typeof socket;
-  
-
-  constructor() {
+ 
+   constructor() {
     this.socket = socket;
 
-    //socket listeners
+    // debugging
+    // socket listeners
+    // this.socket.on('error', (data: { message: string }) => {
+    //   console.error('[WS] error received:', data.message);
+    //   Notify.create({
+    //     type: 'negative',
+    //     message: `WebSocket error: ${data.message}`,
+    //     position: 'top',
+    //   });
+    // }); 
     this.socket.on('connect', () => {
       console.log('[WS] connected', this.socket.id);
       // status is set to online automatically by the backend on connect
@@ -51,31 +60,51 @@ class SocketService {
       void notifyForMessage(data.message, data.channel);
     });
 
-    this.socket.on('channelDeleted', (data: { channelId: number }) => {
+    this.socket.on('channelDeleted', async (data: { channelId: number }) => {
       try {
-        activePage.removeChannel(data.channelId);
+        await activePage.removeChannel(data.channelId);
       } catch (e) {
         console.error('channelDeleted handler error', e);
       }
     });
 
-    this.socket.on('leaveChannel', (data: { channelId: number; userId: number }) => {
+    this.socket.on('joinedChannel', async (data: { channelId: number; userId: number; nickname: string }) => {
+      try {
+        await activePage.getMembers(data.channelId);
+        if (userStore.user && userStore.user.id === data.userId) {
+          //notify(`You have joined the channel successfully!`, 'positive', 'top');  
+        } else {
+          notify(`User ${data.nickname} has joined the channel!`, 'positive', 'top');
+        }
+      } catch (e) {
+        console.error('joinChannel handler error', e);
+      }
+    }); 
+
+    this.socket.on('leaveChannel', async (data: { channelId: number; userId: number }) => {
       try {
         activePage.removeMember(data.channelId, data.userId);
+        if (userStore.user && userStore.user.id === data.userId) {
+          await router?.push('/channel');
+          activePage.activePageId = -1;
+          notify(`You have left the channel.`, 'positive', 'top');  
+        }
       } catch (e) {
         console.error('leaveChannel handler error', e);
       }
     });
 
-    this.socket.on('userKicked', (data: { channelId: number; userId: number; nickname: string; permanent?: boolean; voteKick?: boolean }) => {
+    this.socket.on('userKicked', async (data: { channelId: number; userId: number; nickname: string; permanent?: boolean; voteKick?: boolean }) => {
       try {
         activePage.removeMember(data.channelId, data.userId);
         const reason = data.voteKick ? '(vote-kick threshold reached)' : data.permanent ? '(admin kick)' : '';
-        Notify.create({
-          type: 'positive',
-          message: `User ${data.nickname} was kicked from channel ${reason}`,
-          position: 'top',
-        });
+        if (userStore.user && userStore.user.id === data.userId) {
+          notify(`You were kicked from channel ${reason}`, 'negative', 'top');
+          await router?.push('/channel');
+          
+        }else {
+          notify(`User ${data.nickname} was kicked from channel ${reason}`, 'positive', 'top');
+        }
       } catch (e) {
         console.error('userKicked handler error', e);
       }
@@ -100,6 +129,12 @@ class SocketService {
         // update authStore if this is the current user
         if (auth.user && auth.user.id === data.userId) {
           auth.changeStatus(data.status);
+          console.log(`Your status changed to ${data.status}`);
+          if (data.status === 'online') {
+            this.subscribeToChannel(activePage.activePageId);
+            console.log('Refreshing channels on status online');
+            //await activePage.loadMessages();
+          }
         }
         // update in members list for display in UI
         const member = activePage.members.find(m => m.id === data.userId);
@@ -131,7 +166,7 @@ class SocketService {
 
     this.socket.on('inviteReceived', (data: Invite) => {
       console.log('Invite received:', data);
-
+      console.log('current active page: ', useActivePage().activePageId);
       useActivePage().invites.push(data);
 
       Notify.create({
@@ -140,6 +175,10 @@ class SocketService {
         position: 'top',
       });
     });
+
+    this.socket.on('invite_error', (data: { message: string }) => {
+      notify('Invite error: ' + data.message, 'negative', 'top');
+    }); 
 
     //auth logic
     AuthManager.onChange((newToken) => {
@@ -177,13 +216,12 @@ class SocketService {
   //socket emiters
 
   send(event: string, body: object) {
-    if (['message', 'activity'].includes(event) && userStore.user?.status === 'offline') {
+    if (['message', 'activity'].includes(event) && userStore.user?.status === 'offline')  {
       notify('Action not possible while offline', 'negative');
       return;
     }
     this.socket.emit(event, { body });
   }
-
   inviteUser(channelId: number, slug: string) {
       this.socket.emit('inviteUser', {
       channelId: channelId,
@@ -214,6 +252,9 @@ class SocketService {
   loadMessages(params: { perPage: number; createdAt?: string }) {
     this.socket.emit('loadMessages', params);
   }
+  joinChannel(channelId: number) {
+    this.socket.emit('joinChannel', { channelId });
+  } 
 }
 
 export default new SocketService();

@@ -16,17 +16,26 @@ class SocketService {
     if (!broadcastingChannels) broadcastingChannels = getBroadcastingChannels();
     console.log(event, data);
     if (event === 'message') {
-      const body = data.body as messageBody;
-      this.handleMessage(body, listener);
+      console.log("data", data)
+      const { body } = data as request;
+      const mb = body as messageBody;
+      this.handleMessage(mb, mb.channelId, listener);
     }
     else if (event === 'subscribe') listener.subscribe(data.channelId!);
     else if (event === 'loadMessages') this.loadMessages(listener, data);
     else if (event === 'deleteChannel') this.deleteChannel(listener, data.channelId);
-    else if (event === 'leaveChannel') this.leaveChannel(listener, data.channelId);
+    else if (event === 'leaveChannel') this.leaveChannel(listener, data);
     else if (event === 'kickUser') this.kickUser(listener, data);
-    else if (event === 'activity') this.handleActivity(data.body as messageBody, listener)
+    else if (event === 'activity') {
+      const b = data.body as messageBody;
+      const msg = b?.message;
+      const cid = Number(b.channelId);
+      if (!msg || !cid) return this.send('error', { message: 'Invalid activity payload' }, listener);
+      this.handleActivity(msg, cid, listener);
+    }
     else if (event === 'updateStatus') this.updateStatus(listener, data);
     else if (event === 'inviteUser') this.inviteUser(listener, data);
+    else if (event === 'joinChannel') this.joinChannel(listener, data);
   }
   private broadcast(event: eventType, data: object, listener: ChannelListener) {
     listener.broadcast(event, data);
@@ -36,11 +45,11 @@ class SocketService {
     listener.send(event, data)
   }
 
-  private async handleMessage(body: messageBody, listener: ChannelListener) {
+  private async handleMessage(body: messageBody, channelId: number, listener: ChannelListener) {
     const user = listener.getUser();
-    const channel_id = listener.getChannelId();
-
-    if (!channel_id) {
+    // const channel_id = listener.getChannelId();
+    console.log("handleMessage called for channel_id:", channelId, "user:", user?.nickname);
+    if (!channelId) {
       console.error('No subscription to channel');
       this.send('error', { message: 'No subscription to channel' }, listener);
       return;
@@ -52,18 +61,18 @@ class SocketService {
       const message = await user
         .useTransaction(txn)
         .related('messages')
-        .create({ content: body.message, channel_id });
+        .create({ content: body.message,  channel_id: channelId });
 
       await txn.commit();
 
       await message.load('sender');
 
       //this.broadcast('message', { messages: [message] }, listener);
-      broadcastingChannels.broadcastToActive('message', { messages: [message], isNew: true }, listener);
+      broadcastingChannels.broadcastToChannel('message', channelId, { messages: [message], isNew: true });
 
       const channel = await Channel
         .query()
-        .where('id', channel_id)
+        .where('id', channelId)
         .first();
       
       const channelUsers = await channel?.related('users').query();
@@ -100,7 +109,6 @@ class SocketService {
       return;
     }
 
-    
     const cutoff = (() => {
       if (!data?.createdAt) {
     
@@ -167,9 +175,11 @@ class SocketService {
     }
   }
 
-  private async leaveChannel(listener: ChannelListener, channelId?: number) {
+  private async leaveChannel(listener: ChannelListener, data?: request) {
+    const channelId = data?.channelId;
+    console.log(listener)
     if (!channelId) {
-      this.send('error', { message: 'No channelId provided' }, listener);
+      this.send('error', { message: 'No channelId provided or userId provided' }, listener);
       return;
     }
 
@@ -185,9 +195,9 @@ class SocketService {
         .where('channel_id', channelId)
         .andWhere('user_id', user.id)
         .delete();
-
-      broadcastingChannels.broadcastToChannel(channelId, 'leaveChannel', { channelId, userId: user.id });
-
+      
+      broadcastingChannels.broadcastToChannel('leaveChannel', channelId, { channelId, userId: user.id });
+      listener.unsubscribe();   
       this.send('leaveChannel', { channelId, userId: user.id }, listener);
     } catch (error) {
       console.error('leaveChannel error', error);
@@ -214,17 +224,6 @@ class SocketService {
       return;
     }
 
-    // check if target is banned
-    const existingBan = await ChannelBan.query()
-      .where('channel_id', channelId)
-      .where('user_id', targetUser.id)
-      .first();
-
-    if (existingBan) {
-      this.send('error', { message: 'User is already banned from this channel' }, listener);
-      return;
-    }
-
     const txn = await db.transaction();
     try {
       if (isAdmin) {
@@ -243,12 +242,6 @@ class SocketService {
           .andWhere('user_id', targetUser.id)
           .delete();
 
-        // create ban record
-        await ChannelBan.create({
-          channel_id: channelId,
-          user_id: targetUser.id,
-        }, { client: txn });
-
         // clear all kick votes for this user
         await KickVote.query({ client: txn })
           .where('channel_id', channelId)
@@ -258,7 +251,7 @@ class SocketService {
         await txn.commit();
 
         // broadcast kick event
-        broadcastingChannels.broadcastToChannel(channelId, 'userKicked', { 
+        broadcastingChannels.broadcastToChannel('userKicked', channelId, { 
           channelId, 
           userId: targetUser.id, 
           nickname: targetNickname, 
@@ -314,7 +307,7 @@ class SocketService {
 
           await txn.commit();
 
-          broadcastingChannels.broadcastToChannel(channelId, 'userKicked', { 
+          broadcastingChannels.broadcastToChannel('userKicked', channelId, { 
             channelId, 
             userId: targetUser.id, 
             nickname: targetNickname, 
@@ -325,7 +318,7 @@ class SocketService {
         } else {
           await txn.commit();
           // notify channel members about vote progress
-          broadcastingChannels.broadcastToChannel(channelId, 'kickVoteAdded', { 
+          broadcastingChannels.broadcastToChannel('kickVoteAdded', channelId, { 
             channelId, 
             targetUserId: targetUser.id, 
             nickname: targetNickname, 
@@ -341,12 +334,12 @@ class SocketService {
     }
   }
 
-  private handleActivity(body: messageBody, listener: ChannelListener) {
-    broadcastingChannels.broadcastToActive('newActivity', { content: body.message, sender: listener.getUser() }, listener);
-    //this.broadcast('newActivity', { content: body.message, sender: listener.getUser() }, listener);
+  private handleActivity(message: string, channelId: number, listener: ChannelListener) {
+    broadcastingChannels.broadcastToChannel('newActivity', channelId, { content: message, sender: listener.getUser()});
   }
 
   private async updateStatus(listener: ChannelListener, data?: request) {
+    console.log(this.offlineUsers)
     const user = listener.getUser();
     const payload: any = data ?? {};
     const newStatus = payload.status; // 'online' | 'DND' | 'offline'
@@ -376,6 +369,7 @@ class SocketService {
 
       else {
         let offUser = this.offlineUsers.find(el => el.userId === user.id);
+        console.log("offUser", offUser);
         if (offUser) {
           console.log(offUser);
           this.offlineUsers = this.offlineUsers.filter(el => el.userId !== user.id);
@@ -393,8 +387,6 @@ class SocketService {
           });
         }
       }
-      
-
       // get all channels this user is in
       const userChannels = await db
         .from('user_channels')
@@ -403,7 +395,7 @@ class SocketService {
 
       // broadcast status change to all channels user is member of
       for (const uc of userChannels) {
-        broadcastingChannels.broadcastToChannel(uc.channel_id, 'userStatusChanged', {
+        broadcastingChannels.broadcastToChannel('userStatusChanged', uc.channel_id, {
           userId: user.id,
           nickname: user.nickname,
           status: newStatus
@@ -417,6 +409,7 @@ class SocketService {
         nickname: user.nickname,
         status: newStatus
       }));
+      listener.unsubscribe();
     } catch (err) {
       await txn.rollback();
       console.error('updateStatus error', err);
@@ -429,10 +422,14 @@ class SocketService {
     console.log(`User ${inviter.nickname} is inviting user with slug "${slug}" to channel ID ${channelId}.`);
 
     if (!channelId || !slug) {
-      this.send('error', { message: 'channelId and slug (nickname or email) are required' }, listener);
+      this.send('invite_error', { message: 'channelId and slug (nickname or email) are required' }, listener);
       return;
     }
-
+    console.log(inviter.nickname, slug);
+    if (inviter.nickname === slug || inviter.email === slug) {
+      this.send('invite_error', { message: 'You cannot invite yourself' }, listener);
+      return;
+    }
     // Find the recipient user by nickname or email
     const targetUser = await User.query()
       .where('nickname', slug)
@@ -440,7 +437,7 @@ class SocketService {
       .first();
 
     if (!targetUser) {
-      this.send('error', { message: `User with slug "${slug}" not found` }, listener);
+      this.send('invite_error', { message: `User with slug "${slug}" not found` }, listener);
       return;
     }
 
@@ -448,16 +445,30 @@ class SocketService {
     // Find the target user's socket globally
     const targetSockets = await broadcastingChannels.getSocketsByUserId(targetUser.id);
 
-    if (!targetSockets) {
-      console.log(`Target user with ID ${targetUser.id} is not currently connected.`);
-      this.send('error', { message: `User with slug "${slug}" is not currently connected` }, listener);
+    // Check if an invite already exists
+    const existingInvite = await Invite.query()
+      .where('channel_id', channelId)
+      .where('recipient_id', targetUser.id)
+      .first();
+
+    if (existingInvite) {
+      this.send('invite_error', { message: `An invitation has already been sent to user: ${slug}` }, listener);
       return;
     }
-
+    // Check if the user is already a member of the channel
+    const existingMembership = await db
+      .from('user_channels')
+      .where('channel_id', channelId)
+      .where('user_id', targetUser.id)
+      .first();
+    if (existingMembership) {
+      this.send('invite_error', { message: `User: ${slug} is already a member of the channel` }, listener);
+      return;
+    }
     // Find the channel details
     const channel = await Channel.query().where('id', channelId).first();
     if (!channel) {
-      this.send('error', { message: `Channel with ID ${channelId} not found` }, listener);
+      this.send('invite_error', { message: `Channel with ID ${channelId} not found` }, listener);
       return;
     }
 
@@ -467,7 +478,11 @@ class SocketService {
       sender_id: inviter.id,
       recipient_id: targetUser.id,
     });
-
+    
+    if (!targetSockets) {
+      this.send('inviteSent', { channelId, slug }, listener);
+      return;
+    }
     // Preload the channel and sender for the invite
     await invite.load('channel');
     await invite.load('sender');
@@ -485,6 +500,24 @@ class SocketService {
     }));
 
     this.send('inviteSent', { channelId, slug }, listener);
+
+    
+  }
+  private async joinChannel(listener: ChannelListener, data?: request) { 
+    const user = listener.getUser();
+    const { channelId } = data ?? {};
+    if (!channelId) {
+      this.send('error', { message: 'channelId is required to join channel' }, listener);
+      return;
+    }
+    //check if channel exists
+    const channel = await Channel.query().where('id', channelId).first();
+    if (!channel) {
+      this.send('error', { message: 'Channel does not exist' }, listener);
+      return;
+    }
+    broadcastingChannels.broadcastToChannel('joinedChannel', channelId, { channelId, userId: user.id, nickname: user.nickname });
+    //this.send('joinChannel', { channelId, userId: user.id, nickname: user.nickname }, listener);
   }
 }
 

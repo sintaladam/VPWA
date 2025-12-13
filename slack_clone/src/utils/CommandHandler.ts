@@ -1,6 +1,6 @@
 import { useActivePage } from 'src/stores/threadStore';
 import { useAuthStore } from 'src/stores/authStore';
-import { useRouter } from 'vue-router';
+import { router } from 'src/router';
 import {
   ChannelType,
   type ChannelAtr,
@@ -16,7 +16,6 @@ import { HomeService } from 'src/services';
 
 export class CommandHandler {
   commandList = ['list', 'help', 'join', 'kick', 'invite', 'cancel', 'status'];
-  router = useRouter();
   activePage = useActivePage();
   userStore = useAuthStore();
   output = [''];  
@@ -124,7 +123,7 @@ export class CommandHandler {
           if (channel) {
             // channel exists, just join it
             this.activePage.activePageId = channel.id;
-            await this.router.push(`/channel/${channel.id}`);
+            await router?.push(`/channel/${channel.id}`);
             print(`Joined channel ${channel.name}`, this.output);
           } else {
             const channels = await HomeService.getAllPublicChannels(); // refresh channels
@@ -133,9 +132,10 @@ export class CommandHandler {
               if (channel) {
                 // channel exists, join it
                 const res2 = await this.activePage.joinChannel(channel.id);
+                SocketService.joinChannel(channel.id);
                 if (res2) {
                   this.activePage.activePageId = channel.id;
-                  await this.router.push(`/channel/${channel.id}`);
+                  await router?.push(`/channel/${channel.id}`);
                   notify(`Joined channel '${channelName}' successfully`, 'positive');
                   print(`Joined channel ${channel.name}`, this.output);
                   break;
@@ -159,7 +159,7 @@ export class CommandHandler {
               channel = this.activePage.getThreadId(channelName);
               if (channel) {
                 this.activePage.activePageId = channel.id;
-                await this.router.push(`/channel/${channel.id}`);
+                await router?.push(`/channel/${channel.id}`);
                 notify(`Channel '${channelName}' created successfully`, 'positive');
                 print(`Created and joined channel ${channel.name}`, this.output);
               } else {

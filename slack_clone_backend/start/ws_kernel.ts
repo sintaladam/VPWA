@@ -96,7 +96,7 @@ app.ready(() => {
 
                 // broadcast status change to all channels user is member of
                 for (const uc of userChannels) {
-                    broadcasts.broadcastToChannel(uc.channel_id, 'userStatusChanged', {
+                    broadcasts.broadcastToChannel('userStatusChanged', uc.channel_id, {
                         userId: user.id,
                         nickname: user.nickname,
                         status: 'offline'

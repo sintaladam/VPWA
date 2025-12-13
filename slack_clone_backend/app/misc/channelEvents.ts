@@ -30,20 +30,21 @@ export class BroadcastingChannels {
     if (channel) this.io.to(channel).emit(event, body);
   }
 
-  broadcastToChannel(channelId: number, event: eventType, body: object) {
+  broadcastToChannel(event: eventType ,channelId: number, body: object) {
     this.io.to(channelId.toString()).emit(event, body);
   }
 
-  async broadcastToActive(event: eventType, body: object, listener: ChannelListener) {
-    const channel = listener.getCurrentChannel();
-    let targets;
-    if (channel) targets = await this.io.in(channel).fetchSockets();
-    targets?.forEach(async el =>{
-      let user = await User.query().where('id', el.data.user.id).first();
-      if (user && user.status !== 'offline') {
-        el.emit(event, body);
-      }
-    });
+  async broadcastToActive(event: eventType, body: object, channelId: number) {
+    // const channel = listener.getCurrentChannel();
+    // let targets;
+    this.io.to(channelId.toString()).emit(event, body);
+    // if (channelId) targets = await this.io.in(channelId.toString()).fetchSockets();
+    // targets?.forEach(async el =>{
+    //   let user = await User.query().where('id', el.data.user.id).first();
+    //   if (user && user.status !== 'offline') {
+    //     el.emit(event, body);
+    //   }
+    // });
   }
 
   async sendToUser(event: eventType, body: object, userId:number) {
@@ -82,7 +83,10 @@ export class ChannelListener {
   }
 
   unsubscribe() {
-    if (this.currentChannel) this.client.leave(this.currentChannel);
+    if (this.currentChannel) {
+      this.client.leave(this.currentChannel.toString());
+      //this.currentChannel = null;
+    }
   }
 
   broadcast(event: eventType, body: object) {
@@ -99,6 +103,13 @@ export class ChannelListener {
 
   getUser(): User {
     return this.client.data.user;
+  }
+  unsubscribeUserFromChannel(channelId: number) {
+    console.log("before", this.client.rooms)
+    this.client.leave(channelId.toString());
+    this.currentChannel = null;
+    console.log("after", this.client.rooms)
+
   }
 
   getChannelId() {

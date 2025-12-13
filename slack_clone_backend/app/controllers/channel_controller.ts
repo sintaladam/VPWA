@@ -2,7 +2,7 @@ import Channel from '#models/channel';
 import type { HttpContext } from '@adonisjs/core/http'
 import { channelIdValidator, channelKickValidator, channelSearchValidator, createChannelValidator, updateChannelValidator } from '#validators/channel';
 import db from '@adonisjs/lucid/services/db';
-import { getBroadcastingChannels } from '#start/ws_kernel';
+// import { getBroadcastingChannels } from '#start/ws_kernel';
 
 export default class ChannelController {
 
@@ -180,13 +180,13 @@ export default class ChannelController {
         .andWhere('user_id', user.id)
         .delete();
 
-      // broadcast to channel listeners that a user left
-      try {
-        getBroadcastingChannels().broadcastToChannel(channelId, 'leaveChannel', { channelId, userId: user.id });
-      } catch (err) {
-        // don't fail the request if broadcasting fails
-        console.error('broadcast leaveChannel error', err);
-      }
+      // // broadcast to channel listeners that a user left
+      // try {
+      //   getBroadcastingChannels().broadcastToChannel( 'leaveChannel',channelId, { channelId, userId: user.id });
+      // } catch (err) {
+      //   // don't fail the request if broadcasting fails
+      //   console.error('broadcast leaveChannel error', err);
+      // }
 
       return { ok: true };
     } catch (err) {

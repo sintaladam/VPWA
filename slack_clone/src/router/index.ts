@@ -8,6 +8,8 @@ import {
 import routes from './routes';
 // import { useUserStore } from 'src/stores/userUserStore'; 
 
+let routerInstance: ReturnType<typeof createRouter> | null = null;
+
 export default defineRouter(function () {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
@@ -21,22 +23,25 @@ export default defineRouter(function () {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
+  routerInstance = Router;
   // Router.beforeEach((to, from, next) => {
   //   const userStore = useUserStore();
   //   const isAuthenticated = userStore.isAuthenticated;
-    
+  //   
   //   if (to.path.startsWith('/channel')) {
   //     if (!isAuthenticated) {
   //       return next('/login');
   //     }
   //   }
-
+  //
   //   if (to.path.startsWith('/login') && isAuthenticated) {
   //     return next('/channel/0');
   //   }
-
+  //
   //   next();
   // });
 
   return Router;
 });
+
+export { routerInstance as router };

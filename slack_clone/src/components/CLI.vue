@@ -10,13 +10,15 @@
 import { CommandHandler } from 'src/utils/CommandHandler';
 import type { messageType, UserAtr } from 'src/components/models';
 import { socketService } from 'src/services';
+import { useActivePage } from 'src/stores/threadStore';
 
 export default {
   data() {
     return {
       messageInput: '',
       messageType: '' as messageType,
-      command: new CommandHandler()
+      command: new CommandHandler(),
+      activePageId: useActivePage().activePageId,
     };
   },
   methods: {
@@ -64,7 +66,7 @@ export default {
       handler(newVal) {
         const message: string = newVal.trim();
         if (message) {
-          socketService.send('activity', { message });
+          socketService.send('activity', { message, channelId: this.activePageId });
         }
       }
     }

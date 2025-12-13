@@ -5,6 +5,7 @@ import HomeService from "src/services/HomeService";
 import { Notify } from 'quasar';
 import { useAuthStore } from 'src/stores/authStore';
 import SocketService from 'src/services/SocketService';
+import { router } from 'src/router';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
@@ -91,7 +92,7 @@ export const useActivePage = defineStore('channelPage', {
     async getMembers(channel_id: number) {
       this.members = await HomeService.getMembers(channel_id) ?? [];
     },
-    removeChannel(channelId: number) {
+    async removeChannel(channelId: number) {
       const auth = useAuthStore();
       const currentUserId = auth.user?.id ?? null;
 
@@ -105,7 +106,7 @@ export const useActivePage = defineStore('channelPage', {
         this.activePageId = 0;
         this.messages = [];
       }
-
+      await router?.push('/channel');
       // notify non-admin users that the channel was deleted by owner
       if (currentUserId !== null && !isCurrentUserAdmin) {
         Notify.create({
@@ -117,7 +118,6 @@ export const useActivePage = defineStore('channelPage', {
     removeMember(channelId: number, userId: number) {
       const auth = useAuthStore();
       const currentUserId = auth.user?.id ?? null;
-
       const chIndex = this.channels.findIndex(c => c.id === channelId);
       if (chIndex !== -1) {
         type ChannelWithUsers = Channel & { users?: number[] };

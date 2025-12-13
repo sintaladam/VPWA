@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-sm" v-if="!activeStore.getThreadDetails(activeStore.activePageId)" >
+  <q-page class="q-pa-sm" v-if="!activeStore.getThreadDetails(activeStore.activePageId)">    
     <div class="column full-height no-wrap">
       <div class="flex column flex-center"  style="height: calc(100vh - 140px)">
         <q-icon name="sentiment_very_satisfied" size="64px" color="secondary" />
@@ -63,7 +63,7 @@ export default {
     addMessage(value: string, type: messageType) {
       if (type === 'message') {
         console.log('sending', type, value);
-        SocketService.send('message', { message: value })
+        SocketService.send('message', { message: value, channelId: this.activeStore.activePageId } );
       }
       else {
         (this.$refs.msgBoard as InstanceType<typeof MessageBoard>).addLocalMessage({
