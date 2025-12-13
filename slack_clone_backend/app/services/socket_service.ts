@@ -37,9 +37,9 @@ class SocketService {
     else if (event === 'inviteUser') this.inviteUser(listener, data);
     else if (event === 'joinChannel') this.joinChannel(listener, data);
   }
-  private broadcast(event: eventType, data: object, listener: ChannelListener) {
-    listener.broadcast(event, data);
-  }
+  // private broadcast(event: eventType, data: object, listener: ChannelListener) {
+  //   listener.broadcast(event, data);
+  // }
 
   private send(event: eventType, data: object, listener: ChannelListener) {
     listener.send(event, data)
@@ -156,7 +156,15 @@ class SocketService {
       this.send('error', { message: 'Invalid channel' }, listener);
       return;
     }
-
+    //get all users
+    const channelUsers = await channel.related('users').query();
+    for (const user of channelUsers) {
+      //notify each user about channel deletion
+      const userSockets = await broadcastingChannels.getSocketsByUserId(user.id);
+      userSockets.forEach(sock => {
+        sock.emit('channelDeleted', { channelId });
+      });
+    }
     //permission check
     //for now frontend only allows admin to delete channel
     const txn = await db.transaction();
@@ -166,8 +174,6 @@ class SocketService {
       await txn.commit();
 
       // notify all listeners in the channel (and the requester)
-      this.broadcast('channelDeleted', { channelId }, listener);
-      this.send('channelDeleted', { channelId }, listener);
     } catch (error) {
       await txn.rollback();
       console.error('deleteChannel error', error);
@@ -177,7 +183,6 @@ class SocketService {
 
   private async leaveChannel(listener: ChannelListener, data?: request) {
     const channelId = data?.channelId;
-    console.log(listener)
     if (!channelId) {
       this.send('error', { message: 'No channelId provided or userId provided' }, listener);
       return;
@@ -195,8 +200,23 @@ class SocketService {
         .where('channel_id', channelId)
         .andWhere('user_id', user.id)
         .delete();
-      
-      broadcastingChannels.broadcastToChannel('leaveChannel', channelId, { channelId, userId: user.id });
+
+      const channel = await Channel.query().where('id', channelId).first();
+      if (!channel) {
+        this.send('error', { message: 'Invalid channel' }, listener);
+        return;
+      }
+      console.log("User", user.nickname, "left channel", channel.name);
+      const channelUsers = await channel.related('users').query();
+      for (const u of channelUsers) {
+        //notify each user in channel about someone leaving
+        const userSockets = await broadcastingChannels.getSocketsByUserId(u.id);
+        console.log(user.id);
+        userSockets.forEach(sock => {
+          sock.emit('leaveChannel', { channelId, userId: user.id });
+        });
+      }
+      this.send('leaveChannel', { channelId, userId: user.id }, listener);
       listener.unsubscribe();   
     } catch (error) {
       console.error('leaveChannel error', error);
@@ -213,6 +233,11 @@ class SocketService {
 
     if (!channelId || !targetNickname) {
       this.send('error', { message: 'channelId and targetNickname required' }, listener);
+      return;
+    }
+
+    if (requester.nickname === targetNickname) {
+      this.send('kick_error', { message: 'You cannot kick yourself' }, listener);
       return;
     }
 
@@ -313,7 +338,7 @@ class SocketService {
             permanent: true, 
             voteKick: true 
           });
-          this.send('userKicked', { channelId, userId: targetUser.id, nickname: targetNickname, permanent: true, voteKick: true }, listener);
+          //this.send('userKicked', { channelId, userId: targetUser.id, nickname: targetNickname, permanent: true, voteKick: true }, listener);
         } else {
           await txn.commit();
           // notify channel members about vote progress
@@ -323,7 +348,7 @@ class SocketService {
             nickname: targetNickname, 
             voteCount: total 
           });
-          this.send('kickVoteAdded', { channelId, targetUserId: targetUser.id, nickname: targetNickname, voteCount: total }, listener);
+          //this.send('kickVoteAdded', { channelId, targetUserId: targetUser.id, nickname: targetNickname, voteCount: total }, listener);
         }
       }
     } catch (err) {

@@ -9,6 +9,7 @@ import type { Activity, Message, Invite, Member } from "src/contracts";
 import { useActivePage } from "src/stores/threadStore";
 import type { StatusType } from "src/components/models";
 import { useNotifications } from 'src/composables/useNotifications'
+import { ChannelType } from "src/components/models";
 
 const userStore = useAuthStore();
 const activePage = useActivePage();
@@ -122,6 +123,10 @@ class SocketService {
       }
     });
 
+    this.socket.on('kick_error', (data: { message: string }) => {
+      notify('Kick error: ' + data.message, 'negative', 'top');
+    });
+
     this.socket.on('userStatusChanged', (data: { userId: number; nickname: string; status: StatusType }) => {
       try {
         const auth = useAuthStore();
@@ -171,7 +176,7 @@ class SocketService {
 
       Notify.create({
         type: 'info',
-        message: `You have been invited to join ${data.channel.name} by user ID ${data.senderId}.`,
+        message: `You have been invited to join server: ${data.channel.name}`,
         position: 'top',
       });
     });
@@ -223,7 +228,11 @@ class SocketService {
     this.socket.emit(event, { body });
   }
   inviteUser(channelId: number, slug: string) {
-      this.socket.emit('inviteUser', {
+    if (activePage.getThreadDetails(channelId)?.type === ChannelType.Private && !activePage.isAdmin(channelId, userStore.user?.id || -1)) {
+      notify('Only creators of the private channel can invite users to private channels.', 'warning', 'top');
+      return;
+    } 
+    this.socket.emit('inviteUser', {
       channelId: channelId,
       slug: slug,
     });

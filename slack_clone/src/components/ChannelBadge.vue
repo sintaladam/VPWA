@@ -83,15 +83,15 @@ export default {
     forwardDelete() {
       if (this.activeStore.isAdmin(this.activeStore.activePageId, this.userStore.user?.id as number)) {
         SocketService.deleteChannel(this.activeStore.activePageId);
+      } else {
+        console.log('leaving channel...')
+        if (this.userStore.user) {
+          SocketService.leaveChannel(this.activeStore.activePageId, this.userStore.user.id);
         } else {
-          console.log('leaving channel...')
-          if (this.userStore.user) {
-            SocketService.leaveChannel(this.activeStore.activePageId, this.userStore.user.id);
-          } else {
-            console.error('User is not logged in.');
-          }
-        }    
-      },
+          console.error('User is not logged in.');
+        }
+      }    
+    },
     onExpansionChange(isExpanded: boolean) {
       this.isOpen = isExpanded;
     },

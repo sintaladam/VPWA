@@ -51,6 +51,7 @@ import type { Invite, Channel } from 'src/contracts';
 //import type { InviteType } from '../components/models';
 import { useActivePage } from 'src/stores/threadStore';
 import { notify } from 'src/utils/helperFunctions';
+import SocketService from 'src/services/SocketService';
 
 export default {
     data() {
@@ -81,6 +82,7 @@ export default {
                 setTimeout(() => {
                     this.visible = false;
                 }, 300);
+                SocketService.joinChannel(this.channel?.id || -1);
                 notify(`${this.channel?.name} was added to your channels`, 'positive');
             }
             else {
