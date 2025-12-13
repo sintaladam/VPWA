@@ -29,8 +29,17 @@
         </template>
 
         <q-card-section class="q-pt-none">
-          <div class="text-subtitle2"><strong>Type:</strong> <span style="white-space:normal; word-break:break-word">{{ channel.type }}</span></div>
-          <div class="text-body2 q-mt-sm" style="white-space:normal; word-break:break-word">{{ channel.description || 'No description' }}</div>
+          <div class="text-subtitle2">
+            <strong>Type:</strong> 
+            <span style="white-space:normal; word-break:break-word">
+              {{ channel.type }}
+            </span>
+          </div>
+          <div class="text-body2 q-mt-sm" style="white-space:normal; word-break:break-word">
+                        <strong>Description:</strong> 
+
+            {{ channel.description || 'No description' }}
+          </div>
         </q-card-section>
       </q-expansion-item>
     </q-card>

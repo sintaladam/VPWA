@@ -408,7 +408,7 @@ class SocketService {
         nickname: user.nickname,
         status: newStatus
       }));
-      listener.unsubscribe();
+    listener.unsubscribe();
     } catch (err) {
       await txn.rollback();
       console.error('updateStatus error', err);
@@ -495,6 +495,9 @@ class SocketService {
       channel: {
         id: invite.channel.id,
         name: invite.channel.name,
+        description: invite.channel.description,
+        type: invite.channel.type,
+        creatorId: invite.channel.creator_id 
       },
     }));
 
