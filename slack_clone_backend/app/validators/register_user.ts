@@ -2,7 +2,7 @@ import vine from '@vinejs/vine';
 
 export const registerValidator = vine.compile(
   vine.object({
-    nickname: vine.string().trim().minLength(1).maxLength(127),
+    nickname: vine.string().trim().minLength(1).maxLength(127).unique({ table: 'users', column: 'nickname' }),
     name: vine.string().trim().minLength(1).maxLength(127),
     surname: vine.string().trim().minLength(1).maxLength(127),
     email: vine.string().trim().email(),

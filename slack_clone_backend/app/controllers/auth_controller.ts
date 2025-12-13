@@ -3,9 +3,16 @@ import { registerValidator, loginValidator, updateValidator } from '#validators/
 import User from '#models/user'
 
 export default class AuthController {
-  async register({ request, auth }: HttpContext) {
-    console.log('register');
+  async register({ request, auth, response }: HttpContext) {
     const data = await request.validateUsing(registerValidator);
+
+    if (data.nickname) {
+      const existing = await User.query().where('nickname', data.nickname).first();
+      if (existing) {
+        return response.status(409).send({ error: 'Nickname already taken', field: 'nickname' });
+      }
+    }
+
     const user = await User.create(data);
     const token = await auth.use('api').createToken(user);
     return token;
@@ -30,13 +37,17 @@ export default class AuthController {
     return auth.user;
   }
 
-  async update({ request, auth }: HttpContext) {
-    console.log('update user');
+  async update({ request, auth, response }: HttpContext) {
     const user = auth.getUserOrFail();
     const validated = await request.validateUsing(updateValidator);
+    if (validated.nickname && validated.nickname !== user.nickname) {
+      const existing = await User.query().where('nickname', validated.nickname).first();
+      if (existing) {
+        return response.status(409).send({ error: 'Nickname already taken', field: 'nickname' });
+      }
+    }
 
     await user.merge(validated).save();
-
     return { ok: true };
   }
 

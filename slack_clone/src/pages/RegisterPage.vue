@@ -101,35 +101,6 @@ export default {
       }
     },
   methods: {
-    // async register() {
-    //   const form = this.$refs.formRef as QForm
-    //   if (!form) {
-    //     this.$q.notify({ type: 'negative', message: 'Form reference not found!' })
-    //     return
-    //   }
-
-    //   const isValid = await form.validate()
-    //   if (!isValid) {
-    //     this.$q.notify({ type: 'negative', message: 'Please fill in all fields correctly' })
-    //     return
-    //   }
-
-    //   this.userStore.login({
-    //     id: 1,
-    //     name: this.form.firstname,
-    //     surname: this.form.lastname,
-    //     nickname: this.form.username,
-    //     email: this.form.email,
-    //     description: '',
-    //     status: 'online',
-    //     token: 'sometoken',
-    //     isAuthenticated: true
-    //   } as ProfileAtr)
-
-    //   this.$q.notify({ type: 'positive', message: 'Registration successful!' })
-    //   void this.$router.push('/')
-    // }
-    
     register() {
       this.userStore.register(this.form).then(() => this.$router.push(this.redirectTo))
     }
