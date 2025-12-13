@@ -1,45 +1,40 @@
 <template>
-    <transition @before-leave="beforeLeave" @leave="leave">
-        <q-card v-if="visible && channel" flat bordered
-            class="q-mb-sm full-width invite-card"
-            :style="{ transform: `translateX(${offset}px)`, transition: animating ? 'transform 0.3s ease-out' : 'none' }">
-            <q-expansion-item dense :label="channel.name" header-class="q-py-sm q-px-md">
-                <template v-slot:header>
-                    <q-item-section>
-                        <div class="text-weight-medium">{{ channel.name }}</div>
-                        <div class="text-caption text-orange-10 q-mt-xs row items-center q-gutter-xs">
-                            <q-icon name="schedule" size="14px" />
-                            <span>Pending invitation</span>
-                        </div>
-                    </q-item-section>
+  <transition @before-leave="beforeLeave" @leave="leave">
+    <q-card
+      v-if="visible && channel"
+      flat
+      bordered
+      class="q-mb-sm full-width invite-card"
+      :style="{ transform: `translateX(${offset}px)`, transition: animating ? 'transform 0.3s ease-out' : 'none' }"
+    >
+      <!-- hide default chevron with empty expand-icon and control expansion via opened -->
+      <q-expansion-item dense header-class="q-py-sm q-px-md" expand-icon="">
+        <template #header>
+          <div class="row items-center justify-between" style="width:100%">
+            <div style="min-width:0">
+              <div class="text-weight-medium" style="white-space:normal; word-break:break-word; overflow-wrap:anywhere;">
+                {{ channel.name }}
+              </div>
+              <div class="text-caption text-orange-10 q-mt-xs row items-center q-gutter-xs">
+                <q-icon name="schedule" size="14px" />
+                <span class="q-ml-xs">Pending invitation</span>
+              </div>
+            </div>
 
-                    <q-item-section side>
-                        <div class="row q-gutter-sm">
-                            <q-btn round flat color="negative" icon="close" size="sm" @click.stop="handleReject" />
-                            <q-btn round flat color="positive" icon="check" size="sm" @click.stop="handleAccept" />
-                        </div>
-                    </q-item-section>
-                </template>
+            <div class="row items-center no-wrap">
+              <q-btn round flat color="negative" icon="close" size="sm" @click.stop="handleReject" class="q-mr-sm no-outline" />
+              <q-btn round flat color="positive" icon="check" size="sm" @click.stop="handleAccept" class="q-mr-sm no-outline" />
+            </div>
+          </div>
+        </template>
 
-                <q-card-section class="q-pt-none">
-                    <q-list dense>
-                        <q-item>
-                            <q-item-section>
-                                <q-item-label caption>Type</q-item-label>
-                                <q-item-label>{{ channel.type }}</q-item-label>
-                            </q-item-section>
-                        </q-item>
-                        <q-item>
-                            <q-item-section>
-                                <q-item-label caption>Description</q-item-label>
-                                <q-item-label>{{ channel.description || 'No description' }}</q-item-label>
-                            </q-item-section>
-                        </q-item>
-                    </q-list>
-                </q-card-section>
-            </q-expansion-item>
-        </q-card>
-    </transition>
+        <q-card-section class="q-pt-none">
+          <div class="text-subtitle2"><strong>Type:</strong> <span style="white-space:normal; word-break:break-word">{{ channel.type }}</span></div>
+          <div class="text-body2 q-mt-sm" style="white-space:normal; word-break:break-word">{{ channel.description || 'No description' }}</div>
+        </q-card-section>
+      </q-expansion-item>
+    </q-card>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -55,7 +50,6 @@ export default {
             visible: true,
             offset: 0,
             animating: false,
-            channel: null as Channel | null | undefined
         }
     },
     props: {
@@ -64,8 +58,10 @@ export default {
             required: true
         }
     },
-    created() {
-        this.channel= this.invite.channel
+    computed: {
+        channel(): Channel | null {
+            return (this.invite && (this.invite as Invite).channel) ?? null;
+        }
     },
     methods: {
         async handleAccept() {
@@ -112,3 +108,23 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+/* remove focus/active/hover outline and shadow for our buttons */
+.no-outline,
+.no-outline:focus,
+.no-outline:active,
+.no-outline:hover,
+.no-outline:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ensure internal content doesn't show extra focus ring */
+.no-outline .q-btn__content,
+.no-outline .q-btn__wrapper {
+  outline: none !important;
+  box-shadow: none !important;
+}
+</style>

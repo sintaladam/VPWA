@@ -198,7 +198,6 @@ class SocketService {
       
       broadcastingChannels.broadcastToChannel('leaveChannel', channelId, { channelId, userId: user.id });
       listener.unsubscribe();   
-      this.send('leaveChannel', { channelId, userId: user.id }, listener);
     } catch (error) {
       console.error('leaveChannel error', error);
       this.send('error', { message: 'Failed to leave channel' }, listener);

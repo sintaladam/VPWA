@@ -247,7 +247,6 @@ class SocketService {
   }
   leaveChannel(channelId: number, userId: number) {
     this.socket.emit('leaveChannel', { channelId, userId });
-    notify(`You successfully left the channel!`, 'positive');
   }
   loadMessages(params: { perPage: number; createdAt?: string }) {
     this.socket.emit('loadMessages', params);
