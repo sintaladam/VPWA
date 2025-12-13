@@ -35,6 +35,7 @@ import { useActivePage } from 'src/stores/threadStore';
 import { Platform } from 'quasar';
 import type { ChannelAtr, DeviceType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
+import { notify } from 'src/utils/helperFunctions';
 
 export default {
   data() {
@@ -67,10 +68,10 @@ export default {
       if (res) {
         this.localDialogOpen = false;
         this.newChannel = { name: '', type: '', description: '' };
-        this.$q.notify({ type: 'positive', message: `Channel created successfully` });
+        notify('Channel created successfully', 'positive', 'top');
       }
       else {
-        this.$q.notify({ type: 'negative', message: `Channel creation failed` })
+        notify('Channel creation failed', 'negative', 'top');
       }
     }
   },

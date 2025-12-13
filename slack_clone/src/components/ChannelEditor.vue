@@ -42,6 +42,7 @@ import { type DeviceType } from './models';
 import { Platform } from 'quasar'
 import { useAuthStore } from 'src/stores/authStore';
 import type { Channel } from 'src/contracts';
+import { notify } from 'src/utils/helperFunctions';
 
 export default {
   data() {
@@ -83,10 +84,9 @@ export default {
       if (res) {
         this.editing = false;
         this.localChannel = this.channel
-        this.$q.notify({ type: 'positive', message: `updated successfuly` });
-      }
-      else {
-        this.$q.notify({ type: 'negative', message: `update failed` })
+        notify('updated successfuly', 'positive', 'top');
+      }else {
+        notify('update failed', 'negative', 'top');
       }
     },
     restore() {

@@ -77,15 +77,6 @@ export class CommandHandler {
             break;
           }
           SocketService.inviteUser(currentChannelId, invitedUser);
-          // send invite
-          // const res = await HomeService.createInvite(currentChannelId, invitedUser);
-          // if (res) {
-          //   notify(`Invitation sent to ${invitedUser}`, 'positive');
-          //   print(`Invitation sent to ${invitedUser}`, this.output);
-          // } else {
-          //   notify(`Failed to invite ${invitedUser}`, 'negative');
-          //   print(`Failed to invite ${invitedUser}`, this.output);
-          // }
         } else {
           this.output.push('Usage: /invite <nickname or email>');
         }
@@ -160,14 +151,12 @@ export class CommandHandler {
               if (channel) {
                 this.activePage.activePageId = channel.id;
                 await router?.push(`/channel/${channel.id}`);
-                notify(`Channel '${channelName}' created successfully`, 'positive');
-                print(`Created and joined channel ${channel.name}`, this.output);
+                notify(`Channel '${channelName}' created successfully`, 'positive', 'top');
               } else {
                 print('Channel created but failed to join.', this.output);
               }
             } else {
-              notify(`Failed to create channel '${channelName}'`, 'negative');
-              print('Failed to create channel.', this.output);
+              notify(`Failed to create channel '${channelName}'`, 'negative', 'top');
             }
           }
         } else {

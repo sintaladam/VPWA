@@ -48,7 +48,6 @@
 
 <script lang="ts">
 import type { Invite, Channel } from 'src/contracts';
-//import type { InviteType } from '../components/models';
 import { useActivePage } from 'src/stores/threadStore';
 import { notify } from 'src/utils/helperFunctions';
 import SocketService from 'src/services/SocketService';
@@ -83,10 +82,10 @@ export default {
                     this.visible = false;
                 }, 300);
                 SocketService.joinChannel(this.channel?.id || -1);
-                notify(`${this.channel?.name} was added to your channels`, 'positive');
+                notify(`${this.channel?.name} was added to your channels`, 'positive', 'top');
             }
             else {
-                notify(`accept invitation to ${this.channel?.name} failed`, 'negative');
+                notify(`accept invitation to ${this.channel?.name} failed`, 'negative', 'top');
             }
         },
         async handleReject() {
@@ -97,10 +96,10 @@ export default {
                 setTimeout(() => {
                     this.visible = false;
                 }, 300);
-                notify(`invitation to ${this.channel?.name} was rejected`, 'positive');
+                notify(`invitation to ${this.channel?.name} was rejected`, 'positive', 'top');
             }
             else {
-                notify(`reject invitation to ${this.channel?.name} failed`, 'negative');
+                notify(`reject invitation to ${this.channel?.name} failed`, 'negative', 'top');
             }
 
         },

@@ -139,19 +139,9 @@ export default {
     methods: {
         kickMember(userName: string) {
             const channelId = this.resolvedChannelId || this.activePage.activePageId;
-            //const res = await HomeService.kickMember(channelId, userId);
             const currentUserId = this.userStore.user!.id;
             console.log(`Kicking user ${userName} from channel ${channelId} by admin ${currentUserId}`);
             SocketService.kickUser(channelId, userName, this.activePage.isAdmin(channelId, currentUserId) );
-            // if (res?.ok) {
-            //     this.$emit('kickMemberEvent');
-            //     this.$q.notify({ type: 'positive', message: `user ${userName} was removed` });
-            //     // refresh list
-            //     await this.activePage.getMembers(channelId);
-            // }
-            // else {
-            //     this.$q.notify({ type: 'negative', message: `remove user ${userName} failed` })
-            // }
         }
     },
     emits: ['kickMemberEvent', 'update:modelValue', 'subscribe '],

@@ -21,7 +21,6 @@ import { useActivePage } from 'src/stores/threadStore';
 import { Platform } from 'quasar';
 import { type DeviceType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
-// import { HomeService } from 'src/services';
 import SocketService from 'src/services/SocketService';
 export default {
   data() {
@@ -52,14 +51,6 @@ export default {
   methods: {
     createInvite() {
       SocketService.inviteUser(this.channelId, this.slug);
-      //const res = await HomeService.createInvite(this.channelId, this.slug);
-      // if (res) {
-      //   this.$q.notify({ type: 'positive', message: `invitation to ${this.channelId} was successful` });
-      //   this.localDialogOpen = false;
-      // }
-      // else {
-      //     this.$q.notify({ type: 'negative', message: `invitation to ${this.channelId} failed` })
-      // }
     }
   },
   emits: ['update:modelValue']

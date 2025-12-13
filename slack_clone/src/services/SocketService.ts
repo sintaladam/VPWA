@@ -1,7 +1,5 @@
-import { Notify } from "quasar";
 import { socket } from "src/boot/socket";
-import { router } from 'src/router';
- 
+import { router } from 'src/router'; 
 import { useAuthStore } from "src/stores/authStore";
 import { AuthManager } from 'src/services';
 import { notify } from "src/utils/helperFunctions";
@@ -113,11 +111,7 @@ class SocketService {
 
     this.socket.on('kickVoteAdded', (data: { channelId: number; targetUserId: number; nickname: string; voteCount: number }) => {
       try {
-        Notify.create({
-          type: 'warning',
-          message: `Kick vote for ${data.nickname}: ${data.voteCount}/3`,
-          position: 'top',
-        });
+        notify(`Kick vote for ${data.nickname}: ${data.voteCount}/3`, 'warning', 'top');
       } catch (e) {
         console.error('kickVoteAdded handler error', e);
       }
@@ -155,17 +149,9 @@ class SocketService {
 
     this.socket.on('inviteSent', (data: { channelId: number; slug: string }) => {
       if (data) {
-        Notify.create({
-          type: 'positive',
-          message: `Invitation sent successfully to user: ${data.slug}!`,
-          position: 'top',
-        });
+        notify('Invitation sent successfully to user: ' + data.slug, 'positive', 'top');
       } else {
-        Notify.create({
-          type: 'negative',
-          message: "Invitation failed :(",
-          position: 'top',
-        });
+        notify('Invitation failed', 'negative', 'top');
       }
     });
 
@@ -174,11 +160,7 @@ class SocketService {
       console.log('current active page: ', useActivePage().activePageId);
       useActivePage().invites.push(data);
 
-      Notify.create({
-        type: 'info',
-        message: `You have been invited to join server: ${data.channel.name}`,
-        position: 'top',
-      });
+      notify(`You have been invited to join server: ${data.channel.name}`, 'info', 'top');
     });
 
     this.socket.on('invite_error', (data: { message: string }) => {
@@ -252,7 +234,7 @@ class SocketService {
   }
   deleteChannel(channelId: number) {
     this.socket.emit('deleteChannel', { channelId });
-    notify(`You successfully deleted the channel!`, 'positive');
+    notify(`You successfully deleted the channel!`, 'positive', 'top');
   }
   leaveChannel(channelId: number, userId: number) {
     this.socket.emit('leaveChannel', { channelId, userId });

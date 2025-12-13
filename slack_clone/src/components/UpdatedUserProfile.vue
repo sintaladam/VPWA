@@ -42,6 +42,7 @@ import { type ProfileAtr, type DeviceType } from './models';
 import { Platform } from 'quasar';
 import { type PropType } from 'vue';
 import type { User } from 'src/contracts';
+import { notify } from 'src/utils/helperFunctions';
 
 export default {
   data() {
@@ -95,10 +96,10 @@ export default {
         this.editing = false;
         this.localProfile = { ...this.authStore.user } as User;
         this.mentionsToggle = Boolean((this.authStore.user)?.mentionsOnly);
-        this.$q.notify({ type: 'positive', message: `updated successfuly` });
+        notify('updated successfuly', 'positive', 'top');
       }
       else {
-        this.$q.notify({ type: 'negative', message: `update failed` })
+        notify('update failed', 'negative', 'top');
       }
     },
     restore() {

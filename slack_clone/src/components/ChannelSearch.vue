@@ -37,6 +37,7 @@ import type { DeviceType } from './models';
 import { useAuthStore } from 'src/stores/authStore';
 import { HomeService } from 'src/services';
 import type { Channel } from 'src/contracts';
+import { notify } from 'src/utils/helperFunctions';
 
 export default {
   data() {
@@ -65,22 +66,22 @@ export default {
       const res = await HomeService.searchChannels(this.slug);
       if (res) {
         this.channels = res
-        this.$q.notify({ type: 'positive', message: `showing results for ${this.slug}` });
+        notify(`showing results for ${this.slug}`, 'positive', 'top');
       }
       else {
-          this.$q.notify({ type: 'negative', message: `search failed` })
+        notify('search failed', 'negative', 'top');
       }
     },
     async joinChannel(channelId: number) {
       const res = await this.activePage.joinChannel(channelId);
       if (res) {
-        this.$q.notify({ type: 'positive', message: `channel ${channelId} successfuly added` });
+        notify(`channel ${channelId} successfuly added`, 'positive', 'top');
         this.channels = [];
         this.slug = '';
         this.localDialogOpen = false;
       }
       else {
-          this.$q.notify({ type: 'negative', message: `join failed` })
+          notify('join failed', 'negative', 'top');
       }
     }
   },

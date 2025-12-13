@@ -2,10 +2,10 @@ import { defineStore } from 'pinia';
 import type { ChannelAtr, handleInviteType, KickVote, TypingActivity } from 'src/components/models';
 import type { Activity, Channel, Invite, Member, Message } from 'src/contracts';
 import HomeService from "src/services/HomeService";
-import { Notify } from 'quasar';
 import { useAuthStore } from 'src/stores/authStore';
 import SocketService from 'src/services/SocketService';
 import { router } from 'src/router';
+import { notify } from 'src/utils/helperFunctions';
 
 export const useActivePage = defineStore('channelPage', {
   state: () => ({
@@ -109,10 +109,7 @@ export const useActivePage = defineStore('channelPage', {
       await router?.push('/channel');
       // notify non-admin users that the channel was deleted by owner
       if (currentUserId !== null && !isCurrentUserAdmin) {
-        Notify.create({
-          type: 'negative',
-          message: 'Channel you were in was deleted by its owner'
-        });
+        notify('Channel you were in was deleted by its owner', 'negative', 'top');
       }
     },
     removeMember(channelId: number, userId: number) {
