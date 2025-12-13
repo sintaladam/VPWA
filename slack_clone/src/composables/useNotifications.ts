@@ -15,6 +15,9 @@ export function useNotifications() {
     const user = auth.user
     if (!user) return
 
+    const ok = await requestPermission()
+    if (!ok) return
+
     if (user.status === 'DND') return
     
     // check if user wants notifications only when mentioned
@@ -22,14 +25,13 @@ export function useNotifications() {
 
     if (message.sender?.id === user.id) return
 
-    const ok = await requestPermission()
-    if (!ok) return
-
     if (AppVisibility.appVisible) return // Boolean
 
     const title = (message.sender?.nickname ?? 'New message') + ' in ' + channel
-    const body = (message.content ?? '').slice(0, 120)
-
+    let body = (message.content ?? '').slice(0, 30)
+    
+    if ( message.content && message.content.length > 30 ) body = body.concat('...')
+    
     try {
       new Notification(title, { body })
     } catch (err) {

@@ -17,7 +17,7 @@
         <div class="column q-pt-md q-gutter-md">
           <q-btn color="white" text-color="black" label="Details" @click="editorOpen = true" />
           <q-btn color="white" text-color="black" label="User list" @click="openUserList" />
-          <q-btn color="white" text-color="black" label="Invite" @click="inviteCreatorOpen = true" v-show="channel.creatorId===userStore.user?.id"/>
+          <q-btn color="white" text-color="black" label="Invite" @click="inviteCreatorOpen = true" v-show="channel.creatorId===userStore.user?.id || channel.type === ChannelType.Public" />
           <q-btn color="white" text-color="negative" :label="label" @click="deleteOpen = true" />
           <channel-editor v-if="channelId !== undefined" v-model=editorOpen :channel="channel" />
           <UserList v-model="listOpen" :channelId="channel.id" @kick-member-event="getUsers"/>
@@ -39,6 +39,7 @@ import { HomeService } from 'src/services';
 import { useAuthStore } from 'src/stores/authStore';
 import InviteCreator from './InviteCreator.vue';
 import SocketService from 'src/services/SocketService';
+import { ChannelType } from 'src/components/models'
 
 export default {
   data() {
@@ -53,6 +54,7 @@ export default {
       listOpen: false,
       activeUsers: [] as Member[],
       label: '',
+      ChannelType: ChannelType,
     }
   },
   props: {
