@@ -282,7 +282,7 @@ class SocketService {
           nickname: targetNickname, 
           permanent: true 
         }, targetUser.id);
-        //this.send('userKicked', { channelId, userId: targetUser.id, nickname: targetNickname, permanent: true }, listener);
+        this.send('userKicked', { channelId, userId: targetUser.id, nickname: targetNickname, permanent: true }, listener);
       } else {
         // member vote-kick: register vote
         const existing = await KickVote.query({ client: txn })
